@@ -1,0 +1,47 @@
+# Written by the licensemanager SDK release script: changes made here are overwritten.
+# Publishes the package to Maven Central when a version tag is pushed. Maven Central has no trusted publishing: it needs
+# these secrets of this repository (or of its organization):
+# - MAVEN_CENTRAL_USERNAME and MAVEN_CENTRAL_PASSWORD: a user token of the Central Portal (central.sonatype.com),
+# - MAVEN_GPG_PRIVATE_KEY and MAVEN_GPG_PASSPHRASE: the armored private key signing the artifacts, and its passphrase.
+name: Publish
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+          server-id: central
+          server-username: MAVEN_CENTRAL_USERNAME
+          server-password: MAVEN_CENTRAL_PASSWORD
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+      - name: Check the version isn't published yet
+        id: check
+        run: |
+          property() { mvn -B -q help:evaluate -Dexpression="$1" -DforceStdout; }
+          group=$(property project.groupId)
+          artifact=$(property project.artifactId)
+          version=$(property project.version)
+          if curl -fsS -o /dev/null "https://repo1.maven.org/maven2/${group//.//}/$artifact/$version/$artifact-$version.pom"; then
+            echo "$group:$artifact:$version is already published"
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          fi
+      # Uploads the signed bundle to the Central Portal, which publishes it once it's validated.
+      - if: steps.check.outputs.published != 'true'
+        run: mvn -B -P sign-artifacts -DskipTests deploy
+        env:
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
