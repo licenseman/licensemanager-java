@@ -155,6 +155,16 @@ public class Integration {
   @javax.annotation.Nullable
   private OffsetDateTime lastEventAt;
 
+  public static final String SERIALIZED_NAME_AUTO_REFUND = "autoRefund";
+  @SerializedName(SERIALIZED_NAME_AUTO_REFUND)
+  @javax.annotation.Nonnull
+  private Boolean autoRefund;
+
+  public static final String SERIALIZED_NAME_CAN_REFUND = "canRefund";
+  @SerializedName(SERIALIZED_NAME_CAN_REFUND)
+  @javax.annotation.Nonnull
+  private Boolean canRefund;
+
   public static final String SERIALIZED_NAME_CREATED_AT = "createdAt";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
   @javax.annotation.Nonnull
@@ -353,6 +363,44 @@ public class Integration {
   }
 
 
+  public Integration autoRefund(@javax.annotation.Nonnull Boolean autoRefund) {
+    this.autoRefund = autoRefund;
+    return this;
+  }
+
+  /**
+   * Whether canceling a license bought through Stripe refunds its payment. On by default, always off when &#x60;canRefund&#x60; is false.
+   * @return autoRefund
+   */
+  @javax.annotation.Nonnull
+  public Boolean getAutoRefund() {
+    return autoRefund;
+  }
+
+  public void setAutoRefund(@javax.annotation.Nonnull Boolean autoRefund) {
+    this.autoRefund = autoRefund;
+  }
+
+
+  public Integration canRefund(@javax.annotation.Nonnull Boolean canRefund) {
+    this.canRefund = canRefund;
+    return this;
+  }
+
+  /**
+   * Whether the API key has the optional Refunds: Write permission, checked when connecting and every day. Without it, canceled licenses aren&#39;t refunded: refund their payments from Stripe.
+   * @return canRefund
+   */
+  @javax.annotation.Nonnull
+  public Boolean getCanRefund() {
+    return canRefund;
+  }
+
+  public void setCanRefund(@javax.annotation.Nonnull Boolean canRefund) {
+    this.canRefund = canRefund;
+  }
+
+
   public Integration createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
@@ -436,13 +484,15 @@ public class Integration {
         Objects.equals(this.statusReason, integration.statusReason) &&
         Objects.equals(this.lastCheckedAt, integration.lastCheckedAt) &&
         Objects.equals(this.lastEventAt, integration.lastEventAt) &&
+        Objects.equals(this.autoRefund, integration.autoRefund) &&
+        Objects.equals(this.canRefund, integration.canRefund) &&
         Objects.equals(this.createdAt, integration.createdAt)&&
         Objects.equals(this.additionalProperties, integration.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, provider, livemode, accountName, apiKeyHint, webhookUrl, status, statusReason, lastCheckedAt, lastEventAt, createdAt, additionalProperties);
+    return Objects.hash(id, provider, livemode, accountName, apiKeyHint, webhookUrl, status, statusReason, lastCheckedAt, lastEventAt, autoRefund, canRefund, createdAt, additionalProperties);
   }
 
   @Override
@@ -459,6 +509,8 @@ public class Integration {
     sb.append("    statusReason: ").append(toIndentedString(statusReason)).append("\n");
     sb.append("    lastCheckedAt: ").append(toIndentedString(lastCheckedAt)).append("\n");
     sb.append("    lastEventAt: ").append(toIndentedString(lastEventAt)).append("\n");
+    sb.append("    autoRefund: ").append(toIndentedString(autoRefund)).append("\n");
+    sb.append("    canRefund: ").append(toIndentedString(canRefund)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
@@ -479,10 +531,10 @@ public class Integration {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("id", "provider", "livemode", "accountName", "apiKeyHint", "webhookUrl", "status", "statusReason", "lastCheckedAt", "lastEventAt", "createdAt"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "provider", "livemode", "accountName", "apiKeyHint", "webhookUrl", "status", "statusReason", "lastCheckedAt", "lastEventAt", "autoRefund", "canRefund", "createdAt"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "provider", "livemode", "accountName", "apiKeyHint", "webhookUrl", "status", "statusReason", "lastCheckedAt", "lastEventAt", "createdAt"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "provider", "livemode", "accountName", "apiKeyHint", "webhookUrl", "status", "statusReason", "lastCheckedAt", "lastEventAt", "autoRefund", "canRefund", "createdAt"));
   }
 
   /**

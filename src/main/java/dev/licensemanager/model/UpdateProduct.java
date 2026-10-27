@@ -67,6 +67,11 @@ public class UpdateProduct {
   @javax.annotation.Nullable
   private UpdateProductPortal portal;
 
+  public static final String SERIALIZED_NAME_AUTO_MACHINE_CHANGE = "autoMachineChange";
+  @SerializedName(SERIALIZED_NAME_AUTO_MACHINE_CHANGE)
+  @javax.annotation.Nullable
+  private Boolean autoMachineChange;
+
   public UpdateProduct() {
   }
 
@@ -126,6 +131,25 @@ public class UpdateProduct {
     this.portal = portal;
   }
 
+
+  public UpdateProduct autoMachineChange(@javax.annotation.Nullable Boolean autoMachineChange) {
+    this.autoMachineChange = autoMachineChange;
+    return this;
+  }
+
+  /**
+   * Whether a new machine validating a license already on its max machines takes the place of the license&#39;s machine validated the longest ago, rather than being refused with &#x60;machine_limit_reached&#x60;. When the replaced machine is validated again, it takes its place back and the machine that replaced it is locked. See &#x60;validateKey&#x60;.
+   * @return autoMachineChange
+   */
+  @javax.annotation.Nullable
+  public Boolean getAutoMachineChange() {
+    return autoMachineChange;
+  }
+
+  public void setAutoMachineChange(@javax.annotation.Nullable Boolean autoMachineChange) {
+    this.autoMachineChange = autoMachineChange;
+  }
+
   /**
    * A container for additional, undeclared properties.
    * This is a holder for any undeclared properties as specified with
@@ -183,13 +207,14 @@ public class UpdateProduct {
     UpdateProduct updateProduct = (UpdateProduct) o;
     return Objects.equals(this.name, updateProduct.name) &&
         Objects.equals(this.slug, updateProduct.slug) &&
-        Objects.equals(this.portal, updateProduct.portal)&&
+        Objects.equals(this.portal, updateProduct.portal) &&
+        Objects.equals(this.autoMachineChange, updateProduct.autoMachineChange)&&
         Objects.equals(this.additionalProperties, updateProduct.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, slug, portal, additionalProperties);
+    return Objects.hash(name, slug, portal, autoMachineChange, additionalProperties);
   }
 
   @Override
@@ -199,6 +224,7 @@ public class UpdateProduct {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    slug: ").append(toIndentedString(slug)).append("\n");
     sb.append("    portal: ").append(toIndentedString(portal)).append("\n");
+    sb.append("    autoMachineChange: ").append(toIndentedString(autoMachineChange)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -218,7 +244,7 @@ public class UpdateProduct {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("name", "slug", "portal"));
+    openapiFields = new HashSet<String>(Arrays.asList("name", "slug", "portal", "autoMachineChange"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);

@@ -51,7 +51,7 @@ import java.util.Set;
 import dev.licensemanager.JSON;
 
 /**
- * Revenue of the licenses sold in one currency, each license counting on the day it was created. Licenses without a price are left out.
+ * Revenue of the licenses sold in one currency, each license counting on the day it was created. Licenses without a price are left out, and so are canceled ones, but in &#x60;canceledLicenseCount&#x60; and &#x60;canceledTotal&#x60;.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class Revenue {
@@ -69,6 +69,16 @@ public class Revenue {
   @SerializedName(SERIALIZED_NAME_TOTAL)
   @javax.annotation.Nonnull
   private BigDecimal total;
+
+  public static final String SERIALIZED_NAME_CANCELED_LICENSE_COUNT = "canceledLicenseCount";
+  @SerializedName(SERIALIZED_NAME_CANCELED_LICENSE_COUNT)
+  @javax.annotation.Nonnull
+  private Integer canceledLicenseCount;
+
+  public static final String SERIALIZED_NAME_CANCELED_TOTAL = "canceledTotal";
+  @SerializedName(SERIALIZED_NAME_CANCELED_TOTAL)
+  @javax.annotation.Nonnull
+  private BigDecimal canceledTotal;
 
   public static final String SERIALIZED_NAME_THIS_MONTH = "thisMonth";
   @SerializedName(SERIALIZED_NAME_THIS_MONTH)
@@ -128,7 +138,7 @@ public class Revenue {
   }
 
   /**
-   * Number of licenses sold in the currency, free ones included.
+   * Number of licenses sold in the currency, free ones included, canceled ones left out.
    * @return licenseCount
    */
   @javax.annotation.Nonnull
@@ -147,7 +157,7 @@ public class Revenue {
   }
 
   /**
-   * Sum of the prices of the licenses sold in the currency, in major units.
+   * Sum of the prices of the licenses sold in the currency, in major units, canceled ones left out.
    * @return total
    */
   @javax.annotation.Nonnull
@@ -157,6 +167,44 @@ public class Revenue {
 
   public void setTotal(@javax.annotation.Nonnull BigDecimal total) {
     this.total = total;
+  }
+
+
+  public Revenue canceledLicenseCount(@javax.annotation.Nonnull Integer canceledLicenseCount) {
+    this.canceledLicenseCount = canceledLicenseCount;
+    return this;
+  }
+
+  /**
+   * Number of canceled licenses sold in the currency.
+   * @return canceledLicenseCount
+   */
+  @javax.annotation.Nonnull
+  public Integer getCanceledLicenseCount() {
+    return canceledLicenseCount;
+  }
+
+  public void setCanceledLicenseCount(@javax.annotation.Nonnull Integer canceledLicenseCount) {
+    this.canceledLicenseCount = canceledLicenseCount;
+  }
+
+
+  public Revenue canceledTotal(@javax.annotation.Nonnull BigDecimal canceledTotal) {
+    this.canceledTotal = canceledTotal;
+    return this;
+  }
+
+  /**
+   * Sum of the prices of the canceled licenses sold in the currency, in major units: revenue lost to cancellations.
+   * @return canceledTotal
+   */
+  @javax.annotation.Nonnull
+  public BigDecimal getCanceledTotal() {
+    return canceledTotal;
+  }
+
+  public void setCanceledTotal(@javax.annotation.Nonnull BigDecimal canceledTotal) {
+    this.canceledTotal = canceledTotal;
   }
 
 
@@ -355,6 +403,8 @@ public class Revenue {
     return Objects.equals(this.currency, revenue.currency) &&
         Objects.equals(this.licenseCount, revenue.licenseCount) &&
         Objects.equals(this.total, revenue.total) &&
+        Objects.equals(this.canceledLicenseCount, revenue.canceledLicenseCount) &&
+        Objects.equals(this.canceledTotal, revenue.canceledTotal) &&
         Objects.equals(this.thisMonth, revenue.thisMonth) &&
         Objects.equals(this.lastMonth, revenue.lastMonth) &&
         Objects.equals(this.last30Days, revenue.last30Days) &&
@@ -366,7 +416,7 @@ public class Revenue {
 
   @Override
   public int hashCode() {
-    return Objects.hash(currency, licenseCount, total, thisMonth, lastMonth, last30Days, byDay, byMonth, byPolicy, additionalProperties);
+    return Objects.hash(currency, licenseCount, total, canceledLicenseCount, canceledTotal, thisMonth, lastMonth, last30Days, byDay, byMonth, byPolicy, additionalProperties);
   }
 
   @Override
@@ -376,6 +426,8 @@ public class Revenue {
     sb.append("    currency: ").append(toIndentedString(currency)).append("\n");
     sb.append("    licenseCount: ").append(toIndentedString(licenseCount)).append("\n");
     sb.append("    total: ").append(toIndentedString(total)).append("\n");
+    sb.append("    canceledLicenseCount: ").append(toIndentedString(canceledLicenseCount)).append("\n");
+    sb.append("    canceledTotal: ").append(toIndentedString(canceledTotal)).append("\n");
     sb.append("    thisMonth: ").append(toIndentedString(thisMonth)).append("\n");
     sb.append("    lastMonth: ").append(toIndentedString(lastMonth)).append("\n");
     sb.append("    last30Days: ").append(toIndentedString(last30Days)).append("\n");
@@ -401,10 +453,10 @@ public class Revenue {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("currency", "licenseCount", "total", "thisMonth", "lastMonth", "last30Days", "byDay", "byMonth", "byPolicy"));
+    openapiFields = new HashSet<String>(Arrays.asList("currency", "licenseCount", "total", "canceledLicenseCount", "canceledTotal", "thisMonth", "lastMonth", "last30Days", "byDay", "byMonth", "byPolicy"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("currency", "licenseCount", "total", "thisMonth", "lastMonth", "last30Days", "byDay", "byMonth", "byPolicy"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("currency", "licenseCount", "total", "canceledLicenseCount", "canceledTotal", "thisMonth", "lastMonth", "last30Days", "byDay", "byMonth", "byPolicy"));
   }
 
   /**

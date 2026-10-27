@@ -95,6 +95,14 @@ public class MachineTest {
     }
 
     /**
+     * Test the property 'overriddenByMachineId'
+     */
+    @Test
+    public void overriddenByMachineIdTest() {
+        // TODO: test overriddenByMachineId
+    }
+
+    /**
      * Test the property 'lastValidatedAt'
      */
     @Test

@@ -62,4 +62,12 @@ public class UpdateProductTest {
         // TODO: test portal
     }
 
+    /**
+     * Test the property 'autoMachineChange'
+     */
+    @Test
+    public void autoMachineChangeTest() {
+        // TODO: test autoMachineChange
+    }
+
 }

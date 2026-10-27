@@ -138,7 +138,7 @@ public class CreateProductWithPolicy {
   }
 
   /**
-   * Creates a test product: a sandbox of this live product of the organization, starting with copies of its policies, releases and portal settings.
+   * Creates a test product: a sandbox of this live product of the organization, starting with copies of its policies, releases, portal settings and &#x60;autoMachineChange&#x60;.
    * @return isTestFromProductId
    */
   @javax.annotation.Nullable

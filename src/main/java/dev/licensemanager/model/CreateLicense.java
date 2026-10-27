@@ -102,6 +102,11 @@ public class CreateLicense {
   @javax.annotation.Nullable
   private LicenseMaxVersionInput maxVersion;
 
+  public static final String SERIALIZED_NAME_CANCELLABLE_UNTIL = "cancellableUntil";
+  @SerializedName(SERIALIZED_NAME_CANCELLABLE_UNTIL)
+  @javax.annotation.Nullable
+  private OffsetDateTime cancellableUntil;
+
   public static final String SERIALIZED_NAME_SEND_KEY = "sendKey";
   @SerializedName(SERIALIZED_NAME_SEND_KEY)
   @javax.annotation.Nullable
@@ -293,6 +298,25 @@ public class CreateLicense {
   }
 
 
+  public CreateLicense cancellableUntil(@javax.annotation.Nullable OffsetDateTime cancellableUntil) {
+    this.cancellableUntil = cancellableUntil;
+    return this;
+  }
+
+  /**
+   * End of the money back guarantee: until then, the customer can cancel the license from the customer portal, or with a token. &#x60;null&#x60; to not let them. Defaults to the creation date plus the policy&#39;s &#x60;moneyBackGuaranteeDays&#x60;, or &#x60;null&#x60; when it has none.
+   * @return cancellableUntil
+   */
+  @javax.annotation.Nullable
+  public OffsetDateTime getCancellableUntil() {
+    return cancellableUntil;
+  }
+
+  public void setCancellableUntil(@javax.annotation.Nullable OffsetDateTime cancellableUntil) {
+    this.cancellableUntil = cancellableUntil;
+  }
+
+
   public CreateLicense sendKey(@javax.annotation.Nullable Boolean sendKey) {
     this.sendKey = sendKey;
     return this;
@@ -375,6 +399,7 @@ public class CreateLicense {
         Objects.equals(this.maxOfflineDurationSeconds, createLicense.maxOfflineDurationSeconds) &&
         Objects.equals(this.price, createLicense.price) &&
         Objects.equals(this.maxVersion, createLicense.maxVersion) &&
+        Objects.equals(this.cancellableUntil, createLicense.cancellableUntil) &&
         Objects.equals(this.sendKey, createLicense.sendKey)&&
         Objects.equals(this.additionalProperties, createLicense.additionalProperties);
   }
@@ -385,7 +410,7 @@ public class CreateLicense {
 
   @Override
   public int hashCode() {
-    return Objects.hash(email, key, policyId, expiresAt, meta, maxMachines, maxOfflineDurationSeconds, price, maxVersion, sendKey, additionalProperties);
+    return Objects.hash(email, key, policyId, expiresAt, meta, maxMachines, maxOfflineDurationSeconds, price, maxVersion, cancellableUntil, sendKey, additionalProperties);
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -408,6 +433,7 @@ public class CreateLicense {
     sb.append("    maxOfflineDurationSeconds: ").append(toIndentedString(maxOfflineDurationSeconds)).append("\n");
     sb.append("    price: ").append(toIndentedString(price)).append("\n");
     sb.append("    maxVersion: ").append(toIndentedString(maxVersion)).append("\n");
+    sb.append("    cancellableUntil: ").append(toIndentedString(cancellableUntil)).append("\n");
     sb.append("    sendKey: ").append(toIndentedString(sendKey)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
@@ -428,7 +454,7 @@ public class CreateLicense {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("email", "key", "policyId", "expiresAt", "meta", "maxMachines", "maxOfflineDurationSeconds", "price", "maxVersion", "sendKey"));
+    openapiFields = new HashSet<String>(Arrays.asList("email", "key", "policyId", "expiresAt", "meta", "maxMachines", "maxOfflineDurationSeconds", "price", "maxVersion", "cancellableUntil", "sendKey"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(Arrays.asList("email"));

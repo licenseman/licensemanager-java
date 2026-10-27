@@ -89,6 +89,11 @@ public class UpdatePolicy {
   @javax.annotation.Nullable
   private PolicySettingsMaxVersion maxVersion;
 
+  public static final String SERIALIZED_NAME_MONEY_BACK_GUARANTEE_DAYS = "moneyBackGuaranteeDays";
+  @SerializedName(SERIALIZED_NAME_MONEY_BACK_GUARANTEE_DAYS)
+  @javax.annotation.Nullable
+  private Integer moneyBackGuaranteeDays;
+
   public UpdatePolicy() {
   }
 
@@ -228,6 +233,27 @@ public class UpdatePolicy {
     this.maxVersion = maxVersion;
   }
 
+
+  public UpdatePolicy moneyBackGuaranteeDays(@javax.annotation.Nullable Integer moneyBackGuaranteeDays) {
+    this.moneyBackGuaranteeDays = moneyBackGuaranteeDays;
+    return this;
+  }
+
+  /**
+   * Number of days after their creation during which customers can cancel the licenses created with this policy, from the customer portal or with &#x60;cancelLicense&#x60;, which refunds their Stripe payment. Each license keeps the end of its own period as &#x60;cancellableUntil&#x60;. &#x60;null&#x60; for no money back guarantee. Defaults to &#x60;null&#x60;.
+   * minimum: 0
+   * maximum: 3650
+   * @return moneyBackGuaranteeDays
+   */
+  @javax.annotation.Nullable
+  public Integer getMoneyBackGuaranteeDays() {
+    return moneyBackGuaranteeDays;
+  }
+
+  public void setMoneyBackGuaranteeDays(@javax.annotation.Nullable Integer moneyBackGuaranteeDays) {
+    this.moneyBackGuaranteeDays = moneyBackGuaranteeDays;
+  }
+
   /**
    * A container for additional, undeclared properties.
    * This is a holder for any undeclared properties as specified with
@@ -289,7 +315,8 @@ public class UpdatePolicy {
         Objects.equals(this.duration, updatePolicy.duration) &&
         Objects.equals(this.maxMachines, updatePolicy.maxMachines) &&
         Objects.equals(this.maxOfflineDurationSeconds, updatePolicy.maxOfflineDurationSeconds) &&
-        Objects.equals(this.maxVersion, updatePolicy.maxVersion)&&
+        Objects.equals(this.maxVersion, updatePolicy.maxVersion) &&
+        Objects.equals(this.moneyBackGuaranteeDays, updatePolicy.moneyBackGuaranteeDays)&&
         Objects.equals(this.additionalProperties, updatePolicy.additionalProperties);
   }
 
@@ -299,7 +326,7 @@ public class UpdatePolicy {
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, slug, isDefault, duration, maxMachines, maxOfflineDurationSeconds, maxVersion, additionalProperties);
+    return Objects.hash(name, slug, isDefault, duration, maxMachines, maxOfflineDurationSeconds, maxVersion, moneyBackGuaranteeDays, additionalProperties);
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -320,6 +347,7 @@ public class UpdatePolicy {
     sb.append("    maxMachines: ").append(toIndentedString(maxMachines)).append("\n");
     sb.append("    maxOfflineDurationSeconds: ").append(toIndentedString(maxOfflineDurationSeconds)).append("\n");
     sb.append("    maxVersion: ").append(toIndentedString(maxVersion)).append("\n");
+    sb.append("    moneyBackGuaranteeDays: ").append(toIndentedString(moneyBackGuaranteeDays)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -339,7 +367,7 @@ public class UpdatePolicy {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("name", "slug", "isDefault", "duration", "maxMachines", "maxOfflineDurationSeconds", "maxVersion"));
+    openapiFields = new HashSet<String>(Arrays.asList("name", "slug", "isDefault", "duration", "maxMachines", "maxOfflineDurationSeconds", "maxVersion", "moneyBackGuaranteeDays"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);

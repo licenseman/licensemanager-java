@@ -10,6 +10,7 @@
 |**resource** | **String** |  |  |
 |**access** | [**AccessEnum**](#AccessEnum) |  |  |
 |**reason** | **String** |  |  |
+|**optional** | **Boolean** | Whether the key can connect without it, losing what it&#39;s for, explained by &#x60;reason&#x60;. |  |
 
 
 

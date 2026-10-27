@@ -17,6 +17,8 @@
 |**statusReason** | **String** | Why the integration isn&#39;t &#x60;active&#x60;, &#x60;null&#x60; when it is. |  |
 |**lastCheckedAt** | **OffsetDateTime** | Last time its health was checked, done every day. |  |
 |**lastEventAt** | **OffsetDateTime** | Last time it received an event from the provider. |  |
+|**autoRefund** | **Boolean** | Whether canceling a license bought through Stripe refunds its payment. On by default, always off when &#x60;canRefund&#x60; is false. |  |
+|**canRefund** | **Boolean** | Whether the API key has the optional Refunds: Write permission, checked when connecting and every day. Without it, canceled licenses aren&#39;t refunded: refund their payments from Stripe. |  |
 |**createdAt** | **OffsetDateTime** |  |  |
 
 

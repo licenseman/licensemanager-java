@@ -89,6 +89,14 @@ public class ProductTest {
     }
 
     /**
+     * Test the property 'autoMachineChange'
+     */
+    @Test
+    public void autoMachineChangeTest() {
+        // TODO: test autoMachineChange
+    }
+
+    /**
      * Test the property 'createdAt'
      */
     @Test

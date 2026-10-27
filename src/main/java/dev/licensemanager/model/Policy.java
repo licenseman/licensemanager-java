@@ -99,6 +99,11 @@ public class Policy {
   @javax.annotation.Nullable
   private PolicyMaxVersion maxVersion;
 
+  public static final String SERIALIZED_NAME_MONEY_BACK_GUARANTEE_DAYS = "moneyBackGuaranteeDays";
+  @SerializedName(SERIALIZED_NAME_MONEY_BACK_GUARANTEE_DAYS)
+  @javax.annotation.Nullable
+  private Integer moneyBackGuaranteeDays;
+
   public static final String SERIALIZED_NAME_LICENSE_COUNT = "licenseCount";
   @SerializedName(SERIALIZED_NAME_LICENSE_COUNT)
   @javax.annotation.Nonnull
@@ -288,6 +293,25 @@ public class Policy {
   }
 
 
+  public Policy moneyBackGuaranteeDays(@javax.annotation.Nullable Integer moneyBackGuaranteeDays) {
+    this.moneyBackGuaranteeDays = moneyBackGuaranteeDays;
+    return this;
+  }
+
+  /**
+   * Number of days after their creation during which customers can cancel the licenses created with this policy, from the customer portal or with &#x60;cancelLicense&#x60;. &#x60;null&#x60; when they can&#39;t.
+   * @return moneyBackGuaranteeDays
+   */
+  @javax.annotation.Nullable
+  public Integer getMoneyBackGuaranteeDays() {
+    return moneyBackGuaranteeDays;
+  }
+
+  public void setMoneyBackGuaranteeDays(@javax.annotation.Nullable Integer moneyBackGuaranteeDays) {
+    this.moneyBackGuaranteeDays = moneyBackGuaranteeDays;
+  }
+
+
   public Policy licenseCount(@javax.annotation.Nonnull Integer licenseCount) {
     this.licenseCount = licenseCount;
     return this;
@@ -408,6 +432,7 @@ public class Policy {
         Objects.equals(this.maxMachines, policy.maxMachines) &&
         Objects.equals(this.maxOfflineDurationSeconds, policy.maxOfflineDurationSeconds) &&
         Objects.equals(this.maxVersion, policy.maxVersion) &&
+        Objects.equals(this.moneyBackGuaranteeDays, policy.moneyBackGuaranteeDays) &&
         Objects.equals(this.licenseCount, policy.licenseCount) &&
         Objects.equals(this.createdAt, policy.createdAt) &&
         Objects.equals(this.updatedAt, policy.updatedAt)&&
@@ -416,7 +441,7 @@ public class Policy {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, productId, slug, name, isDefault, duration, maxMachines, maxOfflineDurationSeconds, maxVersion, licenseCount, createdAt, updatedAt, additionalProperties);
+    return Objects.hash(id, productId, slug, name, isDefault, duration, maxMachines, maxOfflineDurationSeconds, maxVersion, moneyBackGuaranteeDays, licenseCount, createdAt, updatedAt, additionalProperties);
   }
 
   @Override
@@ -432,6 +457,7 @@ public class Policy {
     sb.append("    maxMachines: ").append(toIndentedString(maxMachines)).append("\n");
     sb.append("    maxOfflineDurationSeconds: ").append(toIndentedString(maxOfflineDurationSeconds)).append("\n");
     sb.append("    maxVersion: ").append(toIndentedString(maxVersion)).append("\n");
+    sb.append("    moneyBackGuaranteeDays: ").append(toIndentedString(moneyBackGuaranteeDays)).append("\n");
     sb.append("    licenseCount: ").append(toIndentedString(licenseCount)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
@@ -454,10 +480,10 @@ public class Policy {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("id", "productId", "slug", "name", "isDefault", "duration", "maxMachines", "maxOfflineDurationSeconds", "maxVersion", "licenseCount", "createdAt", "updatedAt"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "productId", "slug", "name", "isDefault", "duration", "maxMachines", "maxOfflineDurationSeconds", "maxVersion", "moneyBackGuaranteeDays", "licenseCount", "createdAt", "updatedAt"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "productId", "slug", "name", "isDefault", "duration", "maxMachines", "maxOfflineDurationSeconds", "maxVersion", "licenseCount", "createdAt", "updatedAt"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "productId", "slug", "name", "isDefault", "duration", "maxMachines", "maxOfflineDurationSeconds", "maxVersion", "moneyBackGuaranteeDays", "licenseCount", "createdAt", "updatedAt"));
   }
 
   /**

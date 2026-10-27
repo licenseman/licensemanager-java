@@ -19,6 +19,7 @@ import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import dev.licensemanager.model.CancellationReason;
 import dev.licensemanager.model.LicenseMaxVersion;
 import dev.licensemanager.model.LicenseStatus;
 import dev.licensemanager.model.Price;
@@ -136,6 +137,31 @@ public class License {
   @SerializedName(SERIALIZED_NAME_STATUS)
   @javax.annotation.Nonnull
   private LicenseStatus status;
+
+  public static final String SERIALIZED_NAME_CANCELLABLE_UNTIL = "cancellableUntil";
+  @SerializedName(SERIALIZED_NAME_CANCELLABLE_UNTIL)
+  @javax.annotation.Nullable
+  private OffsetDateTime cancellableUntil;
+
+  public static final String SERIALIZED_NAME_CANCELED_AT = "canceledAt";
+  @SerializedName(SERIALIZED_NAME_CANCELED_AT)
+  @javax.annotation.Nullable
+  private OffsetDateTime canceledAt;
+
+  public static final String SERIALIZED_NAME_CANCELLATION_REASON = "cancellationReason";
+  @SerializedName(SERIALIZED_NAME_CANCELLATION_REASON)
+  @javax.annotation.Nonnull
+  private CancellationReason cancellationReason;
+
+  public static final String SERIALIZED_NAME_CANCELLATION_COMMENT = "cancellationComment";
+  @SerializedName(SERIALIZED_NAME_CANCELLATION_COMMENT)
+  @javax.annotation.Nullable
+  private String cancellationComment;
+
+  public static final String SERIALIZED_NAME_STRIPE_REFUND_ID = "stripeRefundId";
+  @SerializedName(SERIALIZED_NAME_STRIPE_REFUND_ID)
+  @javax.annotation.Nullable
+  private String stripeRefundId;
 
   public static final String SERIALIZED_NAME_UPDATED_AT = "updatedAt";
   @SerializedName(SERIALIZED_NAME_UPDATED_AT)
@@ -457,6 +483,101 @@ public class License {
   }
 
 
+  public License cancellableUntil(@javax.annotation.Nullable OffsetDateTime cancellableUntil) {
+    this.cancellableUntil = cancellableUntil;
+    return this;
+  }
+
+  /**
+   * End of the money back guarantee: until then, the customer can cancel the license from the customer portal, or with a token. Set from the policy&#39;s &#x60;moneyBackGuaranteeDays&#x60; when the license is created. &#x60;null&#x60; when the customer can&#39;t cancel it.
+   * @return cancellableUntil
+   */
+  @javax.annotation.Nullable
+  public OffsetDateTime getCancellableUntil() {
+    return cancellableUntil;
+  }
+
+  public void setCancellableUntil(@javax.annotation.Nullable OffsetDateTime cancellableUntil) {
+    this.cancellableUntil = cancellableUntil;
+  }
+
+
+  public License canceledAt(@javax.annotation.Nullable OffsetDateTime canceledAt) {
+    this.canceledAt = canceledAt;
+    return this;
+  }
+
+  /**
+   * When the license was canceled: validating its key fails since. &#x60;null&#x60; when it wasn&#39;t.
+   * @return canceledAt
+   */
+  @javax.annotation.Nullable
+  public OffsetDateTime getCanceledAt() {
+    return canceledAt;
+  }
+
+  public void setCanceledAt(@javax.annotation.Nullable OffsetDateTime canceledAt) {
+    this.canceledAt = canceledAt;
+  }
+
+
+  public License cancellationReason(@javax.annotation.Nonnull CancellationReason cancellationReason) {
+    this.cancellationReason = cancellationReason;
+    return this;
+  }
+
+  /**
+   * Get cancellationReason
+   * @return cancellationReason
+   */
+  @javax.annotation.Nonnull
+  public CancellationReason getCancellationReason() {
+    return cancellationReason;
+  }
+
+  public void setCancellationReason(@javax.annotation.Nonnull CancellationReason cancellationReason) {
+    this.cancellationReason = cancellationReason;
+  }
+
+
+  public License cancellationComment(@javax.annotation.Nullable String cancellationComment) {
+    this.cancellationComment = cancellationComment;
+    return this;
+  }
+
+  /**
+   * Comment given when the license was canceled. &#x60;null&#x60; when there&#39;s none.
+   * @return cancellationComment
+   */
+  @javax.annotation.Nullable
+  public String getCancellationComment() {
+    return cancellationComment;
+  }
+
+  public void setCancellationComment(@javax.annotation.Nullable String cancellationComment) {
+    this.cancellationComment = cancellationComment;
+  }
+
+
+  public License stripeRefundId(@javax.annotation.Nullable String stripeRefundId) {
+    this.stripeRefundId = stripeRefundId;
+    return this;
+  }
+
+  /**
+   * Id of the Stripe refund of the license&#39;s payment once it was canceled, through the Stripe integration. &#x60;null&#x60; otherwise.
+   * @return stripeRefundId
+   */
+  @javax.annotation.Nullable
+  public String getStripeRefundId() {
+    return stripeRefundId;
+  }
+
+  public void setStripeRefundId(@javax.annotation.Nullable String stripeRefundId) {
+    this.stripeRefundId = stripeRefundId;
+  }
+
+
   public License updatedAt(@javax.annotation.Nonnull OffsetDateTime updatedAt) {
     this.updatedAt = updatedAt;
     return this;
@@ -546,13 +667,18 @@ public class License {
         Objects.equals(this.maxVersion, license.maxVersion) &&
         Objects.equals(this.price, license.price) &&
         Objects.equals(this.status, license.status) &&
+        Objects.equals(this.cancellableUntil, license.cancellableUntil) &&
+        Objects.equals(this.canceledAt, license.canceledAt) &&
+        Objects.equals(this.cancellationReason, license.cancellationReason) &&
+        Objects.equals(this.cancellationComment, license.cancellationComment) &&
+        Objects.equals(this.stripeRefundId, license.stripeRefundId) &&
         Objects.equals(this.updatedAt, license.updatedAt)&&
         Objects.equals(this.additionalProperties, license.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, productId, policyId, customerId, key, createdAt, expiresAt, meta, stripePaymentIntentId, maxMachines, maxOfflineDurationSeconds, activeMachineCount, lastActivatedAt, maxVersion, price, status, updatedAt, additionalProperties);
+    return Objects.hash(id, productId, policyId, customerId, key, createdAt, expiresAt, meta, stripePaymentIntentId, maxMachines, maxOfflineDurationSeconds, activeMachineCount, lastActivatedAt, maxVersion, price, status, cancellableUntil, canceledAt, cancellationReason, cancellationComment, stripeRefundId, updatedAt, additionalProperties);
   }
 
   @Override
@@ -575,6 +701,11 @@ public class License {
     sb.append("    maxVersion: ").append(toIndentedString(maxVersion)).append("\n");
     sb.append("    price: ").append(toIndentedString(price)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    cancellableUntil: ").append(toIndentedString(cancellableUntil)).append("\n");
+    sb.append("    canceledAt: ").append(toIndentedString(canceledAt)).append("\n");
+    sb.append("    cancellationReason: ").append(toIndentedString(cancellationReason)).append("\n");
+    sb.append("    cancellationComment: ").append(toIndentedString(cancellationComment)).append("\n");
+    sb.append("    stripeRefundId: ").append(toIndentedString(stripeRefundId)).append("\n");
     sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
@@ -595,10 +726,10 @@ public class License {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("id", "productId", "policyId", "customerId", "key", "createdAt", "expiresAt", "meta", "stripePaymentIntentId", "maxMachines", "maxOfflineDurationSeconds", "activeMachineCount", "lastActivatedAt", "maxVersion", "price", "status", "updatedAt"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "productId", "policyId", "customerId", "key", "createdAt", "expiresAt", "meta", "stripePaymentIntentId", "maxMachines", "maxOfflineDurationSeconds", "activeMachineCount", "lastActivatedAt", "maxVersion", "price", "status", "cancellableUntil", "canceledAt", "cancellationReason", "cancellationComment", "stripeRefundId", "updatedAt"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "productId", "policyId", "customerId", "key", "createdAt", "expiresAt", "meta", "stripePaymentIntentId", "maxMachines", "maxOfflineDurationSeconds", "activeMachineCount", "lastActivatedAt", "maxVersion", "price", "status", "updatedAt"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "productId", "policyId", "customerId", "key", "createdAt", "expiresAt", "meta", "stripePaymentIntentId", "maxMachines", "maxOfflineDurationSeconds", "activeMachineCount", "lastActivatedAt", "maxVersion", "price", "status", "cancellableUntil", "canceledAt", "cancellationReason", "cancellationComment", "stripeRefundId", "updatedAt"));
   }
 
   /**
@@ -647,6 +778,14 @@ public class License {
       }
       // validate the required field `status`
       LicenseStatus.validateJsonElement(jsonObj.get("status"));
+      // validate the required field `cancellationReason`
+      CancellationReason.validateJsonElement(jsonObj.get("cancellationReason"));
+      if ((jsonObj.get("cancellationComment") != null && !jsonObj.get("cancellationComment").isJsonNull()) && !jsonObj.get("cancellationComment").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `cancellationComment` to be a primitive type in the JSON string but got `%s`", jsonObj.get("cancellationComment").toString()));
+      }
+      if ((jsonObj.get("stripeRefundId") != null && !jsonObj.get("stripeRefundId").isJsonNull()) && !jsonObj.get("stripeRefundId").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `stripeRefundId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("stripeRefundId").toString()));
+      }
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {

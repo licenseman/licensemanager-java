@@ -105,7 +105,7 @@ Every method is documented, with its parameters and responses, in the [`docs`](d
 
 | Class | Methods |
 | --- | --- |
-| [`LicensesApi`](docs/LicensesApi.md) | `validateKey`, `listLicenses`, `createLicense`, `listCustomerLicenses`, `getLicense`, `deleteLicense`, `updateLicense`, `getLicenseStats`, `sendLicenseKeys`, `getSigningKey` |
+| [`LicensesApi`](docs/LicensesApi.md) | `validateKey`, `listLicenses`, `createLicense`, `listCustomerLicenses`, `getLicense`, `deleteLicense`, `updateLicense`, `getLicenseStats`, `cancelLicense`, `sendLicenseKeys`, `getSigningKey` |
 | [`PortalApi`](docs/PortalApi.md) | `getPortal`, `requestPortalLink`, `createPortalLink`, `sendPortalLink` |
 | [`ProductsApi`](docs/ProductsApi.md) | `listProducts`, `createProduct`, `getProduct`, `deleteProduct`, `updateProduct`, `resetProduct`, `uploadProductLogo`, `deleteProductLogo`, `getProductStats` |
 | [`PoliciesApi`](docs/PoliciesApi.md) | `listPolicies`, `createPolicy`, `getPolicy`, `deletePolicy`, `updatePolicy` |
@@ -114,7 +114,7 @@ Every method is documented, with its parameters and responses, in the [`docs`](d
 | [`ReleasesApi`](docs/ReleasesApi.md) | `listReleases`, `createRelease`, `getRelease`, `deleteRelease`, `updateRelease` |
 | [`TokensApi`](docs/TokensApi.md) | `createCustomerToken`, `createLicenseToken`, `createMachineToken` |
 | [`EventsApi`](docs/EventsApi.md) | `listPolicyEvents`, `listLicenseEvents` |
-| [`IntegrationsApi`](docs/IntegrationsApi.md) | `getStripeIntegration`, `connectStripe`, `disconnectIntegration`, `checkIntegration`, `listStripePrices`, `createStripeMapping`, `deleteStripeMapping`, `updateStripeMapping` |
+| [`IntegrationsApi`](docs/IntegrationsApi.md) | `getStripeIntegration`, `connectStripe`, `disconnectIntegration`, `updateIntegration`, `checkIntegration`, `listStripePrices`, `createStripeMapping`, `deleteStripeMapping`, `updateStripeMapping` |
 
 ## Versioning
 

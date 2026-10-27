@@ -31,7 +31,7 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT",
-        "description": "Short-lived token scoped to a customer, license or machine, signed with HS256. Its claims:\n\n- `typ`: `customer`, `license` or `machine`, the type of resource the token is scoped to.\n- `sub`: id of that resource.\n- `scope`: space separated permissions, among `customer:read`, `customer:write`, `license:read`, `license:write`, `machine:read` and `machine:write`. A write permission implies the matching read one. Without `scope`, the token can't do anything.\n- `exp`: expiration time.\n\nOnly the endpoints that say so accept tokens: the others answer `403` with `token_not_allowed`, as do the endpoints that don't accept its type. A token without the endpoint's permission answers `403` with `insufficient_scope`. The token reaches the resource it's scoped to, the ones below it and the ones above it: a license token reaches its customer and machines, but not the customer's other licenses. Resources it doesn't reach answer `404`.\n\nA token can't be revoked: it works until it expires, unless the resource it's scoped to is deleted, which makes it answer `401` with `invalid_token`. Tokens are created by `createCustomerToken`, `createLicenseToken` and `createMachineToken`, with an API key or a session, or with a token for the resources below it: a customer token creates license and machine tokens, a license token machine tokens. Portal links (`createPortalLink`, `requestPortalLink`) hold customer tokens too."
+        "description": "Short-lived token scoped to a customer, license or machine, signed with HS256. Its claims:\n\n- `typ`: `customer`, `license` or `machine`, the type of resource the token is scoped to.\n- `sub`: id of that resource.\n- `scope`: space separated permissions, among `customer:read`, `customer:write`, `license:read`, `license:write`, `license:cancel`, `machine:read` and `machine:write`. A write permission implies the other ones of its resource: `license:write` implies `license:read` and `license:cancel`. Without `scope`, the token can't do anything.\n- `exp`: expiration time.\n\nOnly the endpoints that say so accept tokens: the others answer `403` with `token_not_allowed`, as do the endpoints that don't accept its type. A token without the endpoint's permission answers `403` with `insufficient_scope`. The token reaches the resource it's scoped to, the ones below it and the ones above it: a license token reaches its customer and machines, but not the customer's other licenses. Resources it doesn't reach answer `404`.\n\nA token can't be revoked: it works until it expires, unless the resource it's scoped to is deleted, which makes it answer `401` with `invalid_token`. Tokens are created by `createCustomerToken`, `createLicenseToken` and `createMachineToken`, with an API key or a session, or with a token for the resources below it: a customer token creates license and machine tokens, a license token machine tokens. Portal links (`createPortalLink`, `requestPortalLink`) hold customer tokens too."
       }
     },
     "schemas": {
@@ -373,6 +373,11 @@
           "portal": {
             "$ref": "#/components/schemas/PortalSettings"
           },
+          "autoMachineChange": {
+            "type": "boolean",
+            "description": "Whether a new machine validating a license already on its max machines takes the place of the license's machine validated the longest ago, rather than being refused with `machine_limit_reached`. When the replaced machine is validated again, it takes its place back and the machine that replaced it is locked. See `validateKey`.",
+            "example": true
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time",
@@ -391,6 +396,7 @@
           "isTestFromProductId",
           "logoUrl",
           "portal",
+          "autoMachineChange",
           "createdAt",
           "updatedAt"
         ]
@@ -498,7 +504,7 @@
               },
               "isTestFromProductId": {
                 "type": "string",
-                "description": "Creates a test product: a sandbox of this live product of the organization, starting with copies of its policies, releases and portal settings.",
+                "description": "Creates a test product: a sandbox of this live product of the organization, starting with copies of its policies, releases, portal settings and `autoMachineChange`.",
                 "example": "x7Kp2QaZ"
               }
             }
@@ -589,6 +595,16 @@
               }
             ],
             "description": "Latest version of the product the licenses created with this policy can use. `null` allows every version. Defaults to `null`.\n\n- `fixed`: up to a hard-coded `version`. `\"2\"` allows every 2.y.z version: its minor versions and bug fixes. `\"2.3\"` allows every 2.3.z version: its bug fixes.\n- `lock`: every version released during some time after the license is created, then only the updates of the version reached by then. The major version locks `majorAfter` the creation of the license, then the license only gets the minor versions and bug fixes of its major version. The minor version optionally locks `minorAfter` it, never sooner than the major version, then the license only gets the bug fixes of its minor version. `{ \"type\": \"lock\", \"majorAfter\": { \"value\": 1, \"unit\": \"months\" }, \"minorAfter\": { \"value\": 12, \"unit\": \"months\" } }` allows every version released during the month after the license is created, then the minor versions and bug fixes of the major version reached by then until the end of the first year, then only the bug fixes of the minor version reached by then. `majorAfter` at 0 allows minor versions only, and both at 0 allows bug fixes only: no updates.\n\nBug fixes are never locked: a hard-coded version has no patch number, like `\"2.3.1\"`, and a lock only locks major and minor versions."
+          },
+          "moneyBackGuaranteeDays": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "exclusiveMinimum": 0,
+            "maximum": 3650,
+            "description": "Number of days after their creation during which customers can cancel the licenses created with this policy, from the customer portal or with `cancelLicense`, which refunds their Stripe payment. Each license keeps the end of its own period as `cancellableUntil`. `null` for no money back guarantee. Defaults to `null`.",
+            "example": 30
           }
         }
       },
@@ -819,6 +835,11 @@
                 ]
               }
             }
+          },
+          "autoMachineChange": {
+            "type": "boolean",
+            "description": "Whether a new machine validating a license already on its max machines takes the place of the license's machine validated the longest ago, rather than being refused with `machine_limit_reached`. When the replaced machine is validated again, it takes its place back and the machine that replaced it is locked. See `validateKey`.",
+            "example": true
           }
         }
       },
@@ -845,7 +866,7 @@
           },
           "activeLicenseCount": {
             "type": "integer",
-            "description": "Number of licenses that haven't expired, and that a machine validated in the last 90 days.",
+            "description": "Number of licenses that haven't expired nor were canceled, and that a machine validated in the last 90 days.",
             "example": 87
           },
           "newLicenseCount": {
@@ -855,12 +876,12 @@
           },
           "expiringLicenseCount": {
             "type": "integer",
-            "description": "Number of licenses expiring in the next 30 days.",
+            "description": "Number of licenses expiring in the next 30 days, canceled ones left out.",
             "example": 3
           },
           "expiredLicenseCount": {
             "type": "integer",
-            "description": "Number of licenses that expired in the last 30 days.",
+            "description": "Number of licenses that expired in the last 30 days, canceled ones left out.",
             "example": 2
           },
           "activeMachineCount": {
@@ -875,7 +896,7 @@
           },
           "seatCount": {
             "type": "integer",
-            "description": "Sum of the maximum numbers of machines of the licenses that haven't expired. Licenses without a maximum are left out.",
+            "description": "Sum of the maximum numbers of machines of the licenses that haven't expired nor were canceled. Licenses without a maximum are left out.",
             "example": 200
           },
           "usedSeatCount": {
@@ -971,6 +992,17 @@
               ]
             },
             "description": "Number of licenses of each policy created each day and each month, for the policies with licenses created over the covered months."
+          },
+          "cancellation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CancellationStats"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Cancellations of the licenses with a money back guarantee. `null` when no license of the product has one."
           },
           "revenue": {
             "type": "array",
@@ -1079,11 +1111,104 @@
           "newLicensesByDay",
           "newLicensesByMonth",
           "newLicensesByPolicy",
+          "cancellation",
           "revenue",
           "activationsByVersion",
           "activeMachinesByVersion",
           "activeMachinesByPlatform"
         ]
+      },
+      "CancellationStats": {
+        "type": "object",
+        "properties": {
+          "licenseCount": {
+            "type": "integer",
+            "description": "Number of licenses with a money back guarantee: a `cancellableUntil`.",
+            "example": 80
+          },
+          "canceledLicenseCount": {
+            "type": "integer",
+            "description": "Number of them that were canceled.",
+            "example": 4
+          },
+          "cancellableLicenseCount": {
+            "type": "integer",
+            "description": "Number of them whose money back guarantee hasn't ended, and that weren't canceled: they can still be.",
+            "example": 12
+          },
+          "rate": {
+            "type": "number",
+            "description": "Share of them that were canceled, from 0 to 1: `canceledLicenseCount` over `licenseCount`.",
+            "example": 0.05
+          },
+          "canceledByDay": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Number of them canceled each day, aligned on `days`, on the day of their cancellation.",
+            "example": [
+              0,
+              1,
+              0
+            ]
+          },
+          "canceledByMonth": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Number of them canceled each month, aligned on `months`, on the month of their cancellation.",
+            "example": [
+              1,
+              0,
+              2
+            ]
+          },
+          "byReason": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "$ref": "#/components/schemas/CancellationReason"
+                },
+                "count": {
+                  "type": "integer",
+                  "example": 2
+                }
+              },
+              "required": [
+                "reason",
+                "count"
+              ]
+            },
+            "description": "Number of them canceled for each reason, from the most given one. Reasons never given are left out."
+          }
+        },
+        "required": [
+          "licenseCount",
+          "canceledLicenseCount",
+          "cancellableLicenseCount",
+          "rate",
+          "canceledByDay",
+          "canceledByMonth",
+          "byReason"
+        ],
+        "description": "Cancellations of the licenses with a money back guarantee. Licenses canceled without one are left out."
+      },
+      "CancellationReason": {
+        "type": "string",
+        "enum": [
+          "too_expensive",
+          "missing_features",
+          "not_working",
+          "switched",
+          "unused",
+          "other"
+        ],
+        "description": "- `too_expensive`: too expensive.\n- `missing_features`: missing features i need.\n- `not_working`: doesn't work as expected.\n- `switched`: found an alternative.\n- `unused`: no longer needed.\n- `other`: other.",
+        "example": "too_expensive"
       },
       "Revenue": {
         "type": "object",
@@ -1095,13 +1220,23 @@
           },
           "licenseCount": {
             "type": "integer",
-            "description": "Number of licenses sold in the currency, free ones included.",
+            "description": "Number of licenses sold in the currency, free ones included, canceled ones left out.",
             "example": 42
           },
           "total": {
             "type": "number",
-            "description": "Sum of the prices of the licenses sold in the currency, in major units.",
+            "description": "Sum of the prices of the licenses sold in the currency, in major units, canceled ones left out.",
             "example": 2099.58
+          },
+          "canceledLicenseCount": {
+            "type": "integer",
+            "description": "Number of canceled licenses sold in the currency.",
+            "example": 2
+          },
+          "canceledTotal": {
+            "type": "number",
+            "description": "Sum of the prices of the canceled licenses sold in the currency, in major units: revenue lost to cancellations.",
+            "example": 99.98
           },
           "thisMonth": {
             "type": "number",
@@ -1189,6 +1324,8 @@
           "currency",
           "licenseCount",
           "total",
+          "canceledLicenseCount",
+          "canceledTotal",
           "thisMonth",
           "lastMonth",
           "last30Days",
@@ -1196,7 +1333,7 @@
           "byMonth",
           "byPolicy"
         ],
-        "description": "Revenue of the licenses sold in one currency, each license counting on the day it was created. Licenses without a price are left out."
+        "description": "Revenue of the licenses sold in one currency, each license counting on the day it was created. Licenses without a price are left out, and so are canceled ones, but in `canceledLicenseCount` and `canceledTotal`."
       },
       "PolicyList": {
         "type": "object",
@@ -1319,6 +1456,14 @@
             ],
             "description": "Latest version of the product the licenses created with this policy can use. `null` when they can use every version.\n\n- `fixed`: up to a hard-coded `version`. `\"2\"` allows every 2.y.z version: its minor versions and bug fixes. `\"2.3\"` allows every 2.3.z version: its bug fixes.\n- `lock`: every version released during some time after the license is created, then only the updates of the version reached by then. The major version locks `majorAfter` the creation of the license, then the license only gets the minor versions and bug fixes of its major version. The minor version optionally locks `minorAfter` it, never sooner than the major version, then the license only gets the bug fixes of its minor version. `{ \"type\": \"lock\", \"majorAfter\": { \"value\": 1, \"unit\": \"months\" }, \"minorAfter\": { \"value\": 12, \"unit\": \"months\" } }` allows every version released during the month after the license is created, then the minor versions and bug fixes of the major version reached by then until the end of the first year, then only the bug fixes of the minor version reached by then. `majorAfter` at 0 allows minor versions only, and both at 0 allows bug fixes only: no updates.\n\nBug fixes are never locked: a hard-coded version has no patch number, like `\"2.3.1\"`, and a lock only locks major and minor versions."
           },
+          "moneyBackGuaranteeDays": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Number of days after their creation during which customers can cancel the licenses created with this policy, from the customer portal or with `cancelLicense`. `null` when they can't.",
+            "example": 30
+          },
           "licenseCount": {
             "type": "integer",
             "description": "Number of licenses following this policy.",
@@ -1345,6 +1490,7 @@
           "maxMachines",
           "maxOfflineDurationSeconds",
           "maxVersion",
+          "moneyBackGuaranteeDays",
           "licenseCount",
           "createdAt",
           "updatedAt"
@@ -1453,6 +1599,16 @@
               }
             ],
             "description": "Latest version of the product the licenses created with this policy can use. `null` allows every version. Defaults to `null`.\n\n- `fixed`: up to a hard-coded `version`. `\"2\"` allows every 2.y.z version: its minor versions and bug fixes. `\"2.3\"` allows every 2.3.z version: its bug fixes.\n- `lock`: every version released during some time after the license is created, then only the updates of the version reached by then. The major version locks `majorAfter` the creation of the license, then the license only gets the minor versions and bug fixes of its major version. The minor version optionally locks `minorAfter` it, never sooner than the major version, then the license only gets the bug fixes of its minor version. `{ \"type\": \"lock\", \"majorAfter\": { \"value\": 1, \"unit\": \"months\" }, \"minorAfter\": { \"value\": 12, \"unit\": \"months\" } }` allows every version released during the month after the license is created, then the minor versions and bug fixes of the major version reached by then until the end of the first year, then only the bug fixes of the minor version reached by then. `majorAfter` at 0 allows minor versions only, and both at 0 allows bug fixes only: no updates.\n\nBug fixes are never locked: a hard-coded version has no patch number, like `\"2.3.1\"`, and a lock only locks major and minor versions."
+          },
+          "moneyBackGuaranteeDays": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "exclusiveMinimum": 0,
+            "maximum": 3650,
+            "description": "Number of days after their creation during which customers can cancel the licenses created with this policy, from the customer portal or with `cancelLicense`, which refunds their Stripe payment. Each license keeps the end of its own period as `cancellableUntil`. `null` for no money back guarantee. Defaults to `null`.",
+            "example": 30
           }
         },
         "required": [
@@ -1562,6 +1718,16 @@
               }
             ],
             "description": "Latest version of the product the licenses created with this policy can use. `null` allows every version. Defaults to `null`.\n\n- `fixed`: up to a hard-coded `version`. `\"2\"` allows every 2.y.z version: its minor versions and bug fixes. `\"2.3\"` allows every 2.3.z version: its bug fixes.\n- `lock`: every version released during some time after the license is created, then only the updates of the version reached by then. The major version locks `majorAfter` the creation of the license, then the license only gets the minor versions and bug fixes of its major version. The minor version optionally locks `minorAfter` it, never sooner than the major version, then the license only gets the bug fixes of its minor version. `{ \"type\": \"lock\", \"majorAfter\": { \"value\": 1, \"unit\": \"months\" }, \"minorAfter\": { \"value\": 12, \"unit\": \"months\" } }` allows every version released during the month after the license is created, then the minor versions and bug fixes of the major version reached by then until the end of the first year, then only the bug fixes of the minor version reached by then. `majorAfter` at 0 allows minor versions only, and both at 0 allows bug fixes only: no updates.\n\nBug fixes are never locked: a hard-coded version has no patch number, like `\"2.3.1\"`, and a lock only locks major and minor versions."
+          },
+          "moneyBackGuaranteeDays": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "exclusiveMinimum": 0,
+            "maximum": 3650,
+            "description": "Number of days after their creation during which customers can cancel the licenses created with this policy, from the customer portal or with `cancelLicense`, which refunds their Stripe payment. Each license keeps the end of its own period as `cancellableUntil`. `null` for no money back guarantee. Defaults to `null`.",
+            "example": 30
           }
         }
       },
@@ -1796,6 +1962,54 @@
           "status": {
             "$ref": "#/components/schemas/LicenseStatus"
           },
+          "cancellableUntil": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "End of the money back guarantee: until then, the customer can cancel the license from the customer portal, or with a token. Set from the policy's `moneyBackGuaranteeDays` when the license is created. `null` when the customer can't cancel it.",
+            "example": "2026-02-14T09:30:00.000Z"
+          },
+          "canceledAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the license was canceled: validating its key fails since. `null` when it wasn't.",
+            "example": "2026-01-20T16:12:00.000Z"
+          },
+          "cancellationReason": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CancellationReason"
+              },
+              {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Why the license was canceled. `null` when it wasn't."
+              }
+            ]
+          },
+          "cancellationComment": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Comment given when the license was canceled. `null` when there's none.",
+            "example": "I only needed it for one project."
+          },
+          "stripeRefundId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Id of the Stripe refund of the license's payment once it was canceled, through the Stripe integration. `null` otherwise.",
+            "example": "re_3MtwBwLkdIwHu7ix0Bs5rA2b"
+          },
           "updatedAt": {
             "type": "string",
             "format": "date-time",
@@ -1820,6 +2034,11 @@
           "maxVersion",
           "price",
           "status",
+          "cancellableUntil",
+          "canceledAt",
+          "cancellationReason",
+          "cancellationComment",
+          "stripeRefundId",
           "updatedAt"
         ]
       },
@@ -1889,9 +2108,10 @@
         "enum": [
           "active",
           "inactive",
-          "expired"
+          "expired",
+          "canceled"
         ],
-        "description": "`expired` when the license has expired, `active` when a machine validated its key in the last 90 days, `inactive` otherwise.",
+        "description": "`canceled` when the license was canceled, `expired` when it has expired, `active` when a machine validated its key in the last 90 days, `inactive` otherwise.",
         "example": "active"
       },
       "CreateLicense": {
@@ -1958,6 +2178,15 @@
           },
           "maxVersion": {
             "$ref": "#/components/schemas/LicenseMaxVersionInput"
+          },
+          "cancellableUntil": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "End of the money back guarantee: until then, the customer can cancel the license from the customer portal, or with a token. `null` to not let them. Defaults to the creation date plus the policy's `moneyBackGuaranteeDays`, or `null` when it has none.",
+            "example": "2026-02-14T09:30:00.000Z"
           },
           "sendKey": {
             "type": "boolean",
@@ -2182,8 +2411,39 @@
           },
           "price": {
             "$ref": "#/components/schemas/PriceInput"
+          },
+          "cancellableUntil": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "End of the money back guarantee: until then, the customer can cancel the license from the customer portal, or with a token. `null` to not let them.",
+            "example": "2026-02-14T09:30:00.000Z"
           }
         }
+      },
+      "CancelLicense": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "$ref": "#/components/schemas/CancellationReason"
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "What the customer said about the cancellation.",
+            "example": "I only needed it for one project."
+          },
+          "refund": {
+            "type": "boolean",
+            "description": "Whether to refund the license's Stripe payment, when it was bought through the Stripe integration. Defaults to the integration's `autoRefund`. Ignored for tokens, which always follow `autoRefund`, and when the integration's `canRefund` is false: its API key can't create refunds.",
+            "example": true
+          }
+        },
+        "required": [
+          "reason"
+        ]
       },
       "SendLicenseKeys": {
         "type": "object",
@@ -2258,9 +2518,10 @@
             "type": "string",
             "enum": [
               "active",
-              "deactivated"
+              "deactivated",
+              "locked"
             ],
-            "description": "Whether the machine counts as using the license.",
+            "description": "Whether the machine counts as using the license. A `locked` machine doesn't, and its validations are refused with `machine_locked`: it overrode a machine that came back. See `validateKey`.",
             "example": "active"
           },
           "version": {
@@ -2270,6 +2531,14 @@
             ],
             "description": "Version of the application last validated on the machine.",
             "example": "1.4.2"
+          },
+          "overriddenByMachineId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "For a machine deactivated or locked by automatic machine changes, the machine that took its place. Validating the key on a deactivated machine that has one takes its place back. `null` otherwise.",
+            "example": null
           },
           "lastValidatedAt": {
             "type": [
@@ -2299,6 +2568,7 @@
           "name",
           "status",
           "version",
+          "overriddenByMachineId",
           "lastValidatedAt",
           "createdAt",
           "updatedAt"
@@ -2311,11 +2581,11 @@
             "type": "string",
             "format": "uri",
             "description": "Link to the customer portal, holding the token.",
-            "example": "https://app.example.com/portal/x7Kp2QaZ?token=eyJhbGciOi…"
+            "example": "https://app.licensemanager.dev/portal/x7Kp2QaZ?token=eyJhbGciOi…"
           },
           "token": {
             "type": "string",
-            "description": "Customer token in the link, with the `customer:read`, `license:read` and `machine:write` permissions.",
+            "description": "Customer token in the link, with the `customer:read`, `license:read`, `license:cancel` and `machine:write` permissions.",
             "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…"
           },
           "expiresAt": {
@@ -2518,6 +2788,7 @@
                 "customer:write",
                 "license:read",
                 "license:write",
+                "license:cancel",
                 "machine:read",
                 "machine:write"
               ]
@@ -2553,12 +2824,13 @@
                 "customer:write",
                 "license:read",
                 "license:write",
+                "license:cancel",
                 "machine:read",
                 "machine:write"
               ]
             },
             "minItems": 1,
-            "description": "Permissions of the token. A write permission implies the matching read one. A token creating a token can only give the permissions it has.",
+            "description": "Permissions of the token. A write permission implies the other ones of its resource, like the read one: `license:write` implies `license:read` and `license:cancel`. A token creating a token can only give the permissions it has.",
             "example": [
               "license:read",
               "machine:write"
@@ -2669,9 +2941,12 @@
           "license.updated",
           "license.validated",
           "license.validation_failed",
+          "license.canceled",
+          "license.refunded",
+          "license.refund_failed",
           "machine.deactivated"
         ],
-        "description": "- `policy.created`: `payload` holds the policy's settings.\n- `policy.updated`: `payload.changes` maps each changed field to its previous (`from`) and new (`to`) value. Making a policy the default also updates the previous default one.\n- `license.created`: `payload` holds the license's key, `policyId`, `customerId` and settings. Not linked to the policy.\n- `license.updated`: `payload.changes`, like `policy.updated`.\n- `license.validated`: a machine validated the license key. `payload` holds the machine's `fingerprint`, `name` and `version`, and whether the validation created the machine (`machineCreated`) or activated it again (`machineActivated`).\n- `license.validation_failed`: validating the license key failed. `payload` holds the error `code` and `message`, and the `fingerprint`, `name`, `platform` and `version` sent, the name and platform being the machine's when none is sent. Linked to the machine when it exists.\n- `machine.deactivated`: a machine was deactivated, so it no longer counts as using the license. `payload` holds the machine's `fingerprint` and `name`. Linked to the license and the machine.\n\nAn update that changes nothing records no event. Deletions record no events, and customers, products and releases have none.",
+        "description": "- `policy.created`: `payload` holds the policy's settings.\n- `policy.updated`: `payload.changes` maps each changed field to its previous (`from`) and new (`to`) value. Making a policy the default also updates the previous default one.\n- `license.created`: `payload` holds the license's key, `policyId`, `customerId` and settings. Not linked to the policy.\n- `license.updated`: `payload.changes`, like `policy.updated`.\n- `license.validated`: a machine validated the license key. `payload` holds the machine's `fingerprint`, `name` and `version`, whether the validation created the machine (`machineCreated`) or activated it again (`machineActivated`), the `overriddenMachineId` of the machine it deactivated to take its place, `null` when none, and the `lockedMachineIds` of the machines it locked as it took its place back (see `validateKey`).\n- `license.validation_failed`: validating the license key failed. `payload` holds the error `code` and `message`, and the `fingerprint`, `name`, `platform` and `version` sent, the name and platform being the machine's when none is sent. Linked to the machine when it exists.\n- `license.canceled`: the license was canceled. `payload` holds the cancellation `reason` and `comment`, and whether its Stripe payment is being refunded (`refund`).\n- `license.refunded`: the Stripe payment of a canceled license was refunded. `payload` holds the Stripe `refundId` and the `amount` refunded. Has the `integration` actor.\n- `license.refund_failed`: refunding the Stripe payment of a canceled license failed. `payload` holds the error `message`: refund it from Stripe. Has the `integration` actor.\n- `machine.deactivated`: a machine was deactivated or locked, so it no longer counts as using the license. `payload` holds the machine's `fingerprint` and `name`, the `overriddenByMachineId` of the machine that took its place, `null` when it was deactivated through the API, and whether it was `locked`. Deactivations by validations have the `automation` actor. Linked to the license and the machine.\n\nAn update that changes nothing records no event. Deletions record no events, and customers, products and releases have none.",
         "example": "license.validated"
       },
       "EventMachine": {
@@ -2734,7 +3009,7 @@
                   "string",
                   "null"
                 ],
-                "example": "jane@example.com"
+                "example": "jane@licensemanager.dev"
               },
               "image": {
                 "type": [
@@ -2890,7 +3165,7 @@
             "items": {
               "$ref": "#/components/schemas/StripePermission"
             },
-            "description": "Permissions the restricted API key needs, and why. Every other permission can stay `None`."
+            "description": "Permissions the restricted API key needs, and why, the `optional` ones included. Every other permission can stay `None`."
           },
           "integration": {
             "anyOf": [
@@ -2936,12 +3211,18 @@
           "reason": {
             "type": "string",
             "example": "Lists your prices so you can choose which ones create licenses, and checks they can still be paid."
+          },
+          "optional": {
+            "type": "boolean",
+            "description": "Whether the key can connect without it, losing what it's for, explained by `reason`.",
+            "example": false
           }
         },
         "required": [
           "resource",
           "access",
-          "reason"
+          "reason",
+          "optional"
         ]
       },
       "Integration": {
@@ -2977,7 +3258,7 @@
           "webhookUrl": {
             "type": "string",
             "description": "URL of the webhook endpoint created on the Stripe account.",
-            "example": "https://api.example.com/v1/webhooks/stripe/i8Fz4QnRt"
+            "example": "https://api.licensemanager.dev/v1/webhooks/stripe/i8Fz4QnRt"
           },
           "status": {
             "$ref": "#/components/schemas/IntegrationStatus"
@@ -3006,6 +3287,16 @@
             "format": "date-time",
             "description": "Last time it received an event from the provider."
           },
+          "autoRefund": {
+            "type": "boolean",
+            "description": "Whether canceling a license bought through Stripe refunds its payment. On by default, always off when `canRefund` is false.",
+            "example": true
+          },
+          "canRefund": {
+            "type": "boolean",
+            "description": "Whether the API key has the optional Refunds: Write permission, checked when connecting and every day. Without it, canceled licenses aren't refunded: refund their payments from Stripe.",
+            "example": true
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -3022,6 +3313,8 @@
           "statusReason",
           "lastCheckedAt",
           "lastEventAt",
+          "autoRefund",
+          "canRefund",
           "createdAt"
         ]
       },
@@ -3109,13 +3402,23 @@
           "apiKey": {
             "type": "string",
             "minLength": 1,
-            "description": "Restricted API key of the Stripe account (`rk_live_…` for live products, `rk_test_…` for test products), with the `requiredPermissions` of `getStripeIntegration`. A secret key works too, but gives the app more access than it needs.",
+            "description": "Restricted API key of the Stripe account (`rk_live_…` for live products, `rk_test_…` for test products), with the `requiredPermissions` of `getStripeIntegration`. Without the optional ones, it connects with what they're for turned off. A secret key works too, but gives the app more access than it needs.",
             "example": "rk_live_51Nv0FG…"
           }
         },
         "required": [
           "apiKey"
         ]
+      },
+      "UpdateIntegration": {
+        "type": "object",
+        "properties": {
+          "autoRefund": {
+            "type": "boolean",
+            "description": "Whether canceling a license bought through Stripe refunds its payment. Can only be turned on when the integration's `canRefund` is true: the API key has the Refunds: Write permission.",
+            "example": false
+          }
+        }
       },
       "StripePrice": {
         "type": "object",
@@ -3200,7 +3503,7 @@
         ],
         "operationId": "validateKey",
         "summary": "Validate a license key",
-        "description": "Checks the license key of the product on a machine and returns a token the application can verify offline with the organization's public key. Doesn't need authentication.\n\nThe license must allow the `version`: up to its `maxVersion.version` when it has one, like `\"2.3\"` for every 2.3.z version and older. Its `maxVersion.lockMajorAt` and `maxVersion.lockMinorAt` are enforced once they hard-code `maxVersion.version`, within the hour they're reached. When it doesn't, the error's `latestAllowedVersion` is the latest release of the product the license allows, so the application can offer to install it.\n\nThe machine with the `fingerprint` is created when the license has none, and activated when it's deactivated, unless the license is already active on its maximum number of machines. A machine that's already active is never refused for the maximum number of machines, even when it was lowered below the number of active machines. Its `version`, and its `name` and `platform` when given, are updated: they can't be cleared.\n\nThe checks run in this order, and the first one failing answers: the license has expired, then it doesn't allow the version, then it's on its maximum number of machines. Each failure is recorded as a `license.validation_failed` event, except for keys that don't exist.\n\nChanges to the license, like deactivating the machine or shortening its expiration, don't revoke the tokens already returned: the application only sees them when it validates its key again, at the latest when its token expires.",
+        "description": "Checks the license key of the product on a machine and returns a token the application can verify offline with the organization's public key. Doesn't need authentication.\n\nThe license must allow the `version`: up to its `maxVersion.version` when it has one, like `\"2.3\"` for every 2.3.z version and older. Its `maxVersion.lockMajorAt` and `maxVersion.lockMinorAt` are enforced once they hard-code `maxVersion.version`, within the hour they're reached. When it doesn't, the error's `latestAllowedVersion` is the latest release of the product the license allows, so the application can offer to install it.\n\nThe machine with the `fingerprint` is created when the license has none, and activated when it's deactivated, unless the license is already active on its maximum number of machines. A machine that's already active is never refused for the maximum number of machines, even when it was lowered below the number of active machines. Its `version`, and its `name` and `platform` when given, are updated: they can't be cleared.\n\nUnless the product disables `autoMachineChange`, a new machine isn't refused when the license is on its maximum number of machines: it takes the place of the active machine validated the longest ago, which is deactivated with its `overriddenByMachineId` set to the new machine, and recorded as a `machine.deactivated` event. When a machine deactivated this way is validated again, it takes its place back: the machine that overrode it, and the ones that overrode that one in turn, are locked, with their `overriddenByMachineId` set to the machine coming back. A locked machine is always refused, so two machines can't take turns on one place.\n\nThe checks run in this order, and the first one failing answers: the license has expired or was canceled, then it doesn't allow the version, then the machine is locked, then it's on its maximum number of machines. Each failure is recorded as a `license.validation_failed` event, except for keys that don't exist.\n\nChanges to the license, like deactivating the machine or shortening its expiration, don't revoke the tokens already returned: the application only sees them when it validates its key again, at the latest when its token expires.",
         "security": [],
         "parameters": [
           {
@@ -3245,7 +3548,7 @@
             }
           },
           "403": {
-            "description": "`license_expired`: the license has expired. `version_not_allowed`: the license doesn't allow the version, with the `latestAllowedVersion`. `machine_limit_reached`: the license is already active on its maximum number of machines",
+            "description": "`license_expired`: the license has expired, or was canceled. `version_not_allowed`: the license doesn't allow the version, with the `latestAllowedVersion`. `machine_locked`: the machine was locked after the machine it overrode came back. `machine_limit_reached`: the license is already active on its maximum number of machines, and the product disables `autoMachineChange` or the machine isn't new",
             "content": {
               "application/json": {
                 "schema": {
@@ -3555,7 +3858,7 @@
         ],
         "operationId": "createProduct",
         "summary": "Create a product",
-        "description": "Without a `slug`, the product gets one derived from its name: lower cased, without accents and special characters (`Élan Pro 2!` becomes `elan-pro-2`).\nWhen another product of the organization already uses it, a dash and 3 random lowercase letters or digits are appended (`elan-pro-2-k3f`), until the slug is free.\n\nAn explicit `slug` is used as is: the request fails with a `409` when it's taken, it's never changed.\n\nSlug uniqueness is enforced by the database, so when concurrent requests end up with the same slug, only one succeeds and the others get a `409`, even without an explicit `slug`. Retrying such a request without a `slug` derives a new one.\n\nThe product is created with its default policy, named `Default policy` with the `default` slug, whose settings are given by `defaultPolicy`. Omitted settings default to licenses that never expire, on a single machine, offline for one week, for every version of the product. Unlike `createPolicy`, where `maxMachines` defaults to no limit.\n\nWith `isTestFromProductId`, the product is a test product: its id, its slug, and the ids, slugs and license keys of its resources start with `test_` (`TEST-` for license keys), and only test API keys reach it. It starts with copies of the policies, releases and portal settings of the live product, `defaultPolicy` is ignored. Later changes to the live product aren't copied: reset the test product to copy them again. Test API keys can only create test products, live API keys only live ones.\n\n**Required role permission**: `product:create` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "description": "Without a `slug`, the product gets one derived from its name: lower cased, without accents and special characters (`Élan Pro 2!` becomes `elan-pro-2`).\nWhen another product of the organization already uses it, a dash and 3 random lowercase letters or digits are appended (`elan-pro-2-k3f`), until the slug is free.\n\nAn explicit `slug` is used as is: the request fails with a `409` when it's taken, it's never changed.\n\nSlug uniqueness is enforced by the database, so when concurrent requests end up with the same slug, only one succeeds and the others get a `409`, even without an explicit `slug`. Retrying such a request without a `slug` derives a new one.\n\nThe product is created with its default policy, named `Default policy` with the `default` slug, whose settings are given by `defaultPolicy`. Omitted settings default to licenses that never expire, on a single machine, offline for one week, for every version of the product. Unlike `createPolicy`, where `maxMachines` defaults to no limit.\n\nWith `isTestFromProductId`, the product is a test product: its id, its slug, and the ids, slugs and license keys of its resources start with `test_` (`TEST-` for license keys), and only test API keys reach it. It starts with copies of the policies, releases, portal settings and `autoMachineChange` of the live product, `defaultPolicy` is ignored. Later changes to the live product aren't copied: reset the test product to copy them again. Test API keys can only create test products, live API keys only live ones.\n\n**Required role permission**: `product:create` when called with a session, granted by the member's role. API keys aren't limited by roles.",
         "x-required-permissions": [
           "product:create"
         ],
@@ -3963,7 +4266,7 @@
         ],
         "operationId": "resetProduct",
         "summary": "Reset a test product",
-        "description": "Deletes the customers, licenses, machines, policies and releases of the test product, with their events, then copies the policies, releases and portal settings of its live product again. Its id, name and slug are kept, but the copied policies get new ids. The tokens of its customers, licenses and machines stop working.\n\n**Required role permission**: `product:update` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "description": "Deletes the customers, licenses, machines, policies and releases of the test product, with their events, then copies the policies, releases, portal settings and `autoMachineChange` of its live product again. Its id, name and slug are kept, but the copied policies get new ids. The tokens of its customers, licenses and machines stop working.\n\n**Required role permission**: `product:update` when called with a session, granted by the member's role. API keys aren't limited by roles.",
         "x-required-permissions": [
           "product:update"
         ],
@@ -6001,7 +6304,7 @@
         ],
         "operationId": "createLicense",
         "summary": "Create a license",
-        "description": "Without a `key`, the license gets a random one, like `7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF`: 5 groups of 5 characters separated by dashes, each character an upper case letter or a digit other than `O`, `0`, `I` and `1`. That's 32 possible characters encoding 5 bits each, for 125 random bits.\n\nWithout a `policyId`, the license follows the product's default policy.\n\nWithout an `expiresAt`, the license expires after the duration of its policy, or never when the policy has none. `expiresAt: null` makes it never expire.\n\nWithout a `price`, the price paid for the license is unknown: it's left out of the revenue stats.\n\nThe values of `maxVersion` left out are taken from the max version of the policy: its hard-coded version, or the times after the creation of the license its versions lock.\n\nThe license belongs to the product's customer with the given `email`, which is created when there's none.\n\nWith `sendKey: true`, the key is emailed to the customer once the license is created.\n\nThe license copies the settings of its policy when it's created: later changes to the policy don't affect it. Its key, policy and customer can't be changed afterwards.\n\n**Required role permission**: `license:create` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "description": "Without a `key`, the license gets a random one, like `7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF`: 5 groups of 5 characters separated by dashes, each character an upper case letter or a digit other than `O`, `0`, `I` and `1`. That's 32 possible characters encoding 5 bits each, for 125 random bits.\n\nWithout a `policyId`, the license follows the product's default policy.\n\nWithout an `expiresAt`, the license expires after the duration of its policy, or never when the policy has none. `expiresAt: null` makes it never expire.\n\nWithout a `price`, the price paid for the license is unknown: it's left out of the revenue stats.\n\nWithout a `cancellableUntil`, the customer can cancel the license during the policy's `moneyBackGuaranteeDays` after its creation, or never when the policy has none.\n\nThe values of `maxVersion` left out are taken from the max version of the policy: its hard-coded version, or the times after the creation of the license its versions lock.\n\nThe license belongs to the product's customer with the given `email`, which is created when there's none.\n\nWith `sendKey: true`, the key is emailed to the customer once the license is created.\n\nThe license copies the settings of its policy when it's created: later changes to the policy don't affect it. Its key, policy and customer can't be changed afterwards.\n\n**Required role permission**: `license:create` when called with a session, granted by the member's role. API keys aren't limited by roles.",
         "x-required-permissions": [
           "license:create"
         ],
@@ -6605,7 +6908,7 @@
         ],
         "operationId": "updateLicense",
         "summary": "Update a license",
-        "description": "The key, policy and customer of a license can't be changed: sending them does nothing.\n\nThe changes apply to the next validations of the key, not to the license tokens `validateKey` already returned, which stay valid until they expire. Lowering `maxMachines` doesn't deactivate machines: the ones already active keep validating, and new ones are refused until enough are deactivated.\n\n**Required role permission**: `license:update` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "description": "The key, policy and customer of a license can't be changed: sending them does nothing.\n\nThe changes apply to the next validations of the key, not to the license tokens `validateKey` already returned, which stay valid until they expire. Lowering `maxMachines` doesn't deactivate machines: the ones already active keep validating, and new ones replace them one at a time when the product has `autoMachineChange`, or are refused until enough are deactivated.\n\n**Required role permission**: `license:update` when called with a session, granted by the member's role. API keys aren't limited by roles.",
         "x-required-permissions": [
           "license:update"
         ],
@@ -6894,6 +7197,132 @@
         }
       }
     },
+    "/v1/licenses/{id}/cancel": {
+      "post": {
+        "tags": [
+          "Licenses"
+        ],
+        "operationId": "cancelLicense",
+        "summary": "Cancel a license",
+        "description": "Cancels the license right away: validating its key then fails with `license_expired`, like an expired license, and its status is `canceled`. A cancellation can't be undone.\n\nCustomers can cancel their licenses until their `cancellableUntil`, the end of their money back guarantee: tokens can't cancel a license past it, or without one. API keys and sessions can cancel any license.\n\nWhen the license was bought through the Stripe integration, its payment is refunded in the background, unless the integration disables `autoRefund`, its API key lacks the optional Refunds: Write permission (`canRefund`), or `refund` is `false`: the refund is its price paid, taxes included, and its id is set as `stripeRefundId`. The customer is emailed a confirmation, and the owners and admins of the organization are told about the cancellation and its refund. In test products, the customer is only emailed when their email is a member's of the organization.\n\nRecords a `license.canceled` event, then a `license.refunded` or `license.refund_failed` one once the refund is done.\n\n**Token access**: customer, license tokens with the `license:cancel` permission (or the matching write one). A token reaches the license it's scoped to, or the licenses of its customer.\n\n**Required role permission**: `license:cancel` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "token": [
+              "license:cancel"
+            ]
+          }
+        ],
+        "x-required-permissions": [
+          "license:cancel"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "l3Nv8KwB"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelLicense"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Canceled license",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/License"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: no credentials. `invalid_api_key`: the API key doesn't exist, was revoked or has expired. `invalid_token`: the token's signature is invalid, it has expired, or the resource it's scoped to was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "`plan_limit_exceeded`: the organization stayed over its plan's limits after the grace period, its API is blocked until it upgrades. `plan_limit_reached`: creating the resource would go over the plan's limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`token_not_allowed`: the endpoint doesn't accept tokens, or not of this type. `insufficient_scope`: the token lacks the permission. `no_active_organization` or `forbidden`: the session has no organization, or isn't a member of the one requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "License not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`already_canceled`: the license is already canceled. `not_cancellable`: for tokens, the license has no money back guarantee, or it has ended",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation_error`: invalid path, query or body, with the `issues`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/licenses/send-keys": {
       "post": {
         "tags": [
@@ -7098,7 +7527,8 @@
               "type": "string",
               "enum": [
                 "active",
-                "deactivated"
+                "deactivated",
+                "locked"
               ],
               "description": "Only returns the machines with this status.",
               "example": "active"
@@ -7293,7 +7723,7 @@
         ],
         "operationId": "deactivateMachine",
         "summary": "Deactivate a machine",
-        "description": "The machine no longer counts as using the license, freeing its place when the license has a maximum number of machines. Validating the license key on the machine activates it again, unless the license is on its maximum number of machines by then. Deactivating a deactivated machine does nothing.\n\nThe license token `validateKey` returned to the machine isn't revoked: the application can keep running offline until it expires. Machines can't be deleted: they're deleted with their license.\n\n**Token access**: customer, license, machine tokens with the `machine:write` permission (or the matching write one). A token reaches the machine it's scoped to, or the machines of its license or customer.\n\n**Required role permission**: `machine:deactivate` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "description": "The machine no longer counts as using the license, freeing its place when the license has a maximum number of machines. Validating the license key on the machine activates it again, unless the license is on its maximum number of machines by then. Deactivating a deactivated or locked machine does nothing.\n\nThe license token `validateKey` returned to the machine isn't revoked: the application can keep running offline until it expires. Machines can't be deleted: they're deleted with their license.\n\n**Token access**: customer, license, machine tokens with the `machine:write` permission (or the matching write one). A token reaches the machine it's scoped to, or the machines of its license or customer.\n\n**Required role permission**: `machine:deactivate` when called with a session, granted by the member's role. API keys aren't limited by roles.",
         "security": [
           {
             "apiKey": []
@@ -7399,7 +7829,7 @@
         ],
         "operationId": "createPortalLink",
         "summary": "Create a link to the customer portal",
-        "description": "Link letting the customer see their licenses and deactivate their machines in the customer portal, without signing in. Anyone with the link can, until it expires or the customer is deleted: it can't be revoked otherwise. The token also works with the API endpoints that accept customer tokens.\n\nLinks can be created while the product's customer portal is disabled, but the portal answers `404` until it's enabled, and `sendPortalLink` refuses to email them.\n\n**Required role permission**: `portalLink:create` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "description": "Link letting the customer see their licenses, cancel them during their money back guarantee, and deactivate their machines in the customer portal, without signing in. Anyone with the link can, until it expires or the customer is deleted: it can't be revoked otherwise. The token also works with the API endpoints that accept customer tokens.\n\nLinks can be created while the product's customer portal is disabled, but the portal answers `404` until it's enabled, and `sendPortalLink` refuses to email them.\n\n**Required role permission**: `portalLink:create` when called with a session, granted by the member's role. API keys aren't limited by roles.",
         "x-required-permissions": [
           "portalLink:create"
         ],
@@ -9140,7 +9570,7 @@
             }
           },
           "422": {
-            "description": "`validation_error`: invalid body. `invalid_api_key`: not a Stripe secret or restricted key, or Stripe rejected it. `key_mode_mismatch`: a test mode key for a live product, or the opposite. `missing_permission`: the key lacks required permissions, listed in the message",
+            "description": "`validation_error`: invalid body. `invalid_api_key`: not a Stripe secret or restricted key, or Stripe rejected it. `key_mode_mismatch`: a test mode key for a live product, or the opposite. `missing_permission`: the key lacks required permissions, listed in the message. Optional ones aren't required: without Refunds: Write, it connects with `canRefund` false",
             "content": {
               "application/json": {
                 "schema": {
@@ -9260,6 +9690,110 @@
           },
           "502": {
             "description": "`provider_unavailable`: Stripe couldn't be reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "updateIntegration",
+        "summary": "Update an integration",
+        "description": "Changes the settings of the integration, for every product of its mode. Doesn't accept tokens: only API keys and sessions.\n\n**Required role permission**: `integration:update` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "x-required-permissions": [
+          "integration:update"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "i8Fz4QnRt"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIntegration"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated integration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Integration"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: no credentials. `invalid_api_key`: the API key doesn't exist, was revoked or has expired. `invalid_token`: the token's signature is invalid, it has expired, or the resource it's scoped to was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "`plan_limit_exceeded`: the organization stayed over its plan's limits after the grace period, its API is blocked until it upgrades. `plan_limit_reached`: creating the resource would go over the plan's limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`token_not_allowed`: the endpoint doesn't accept tokens, or not of this type. `insufficient_scope`: the token lacks the permission. `no_active_organization` or `forbidden`: the session has no organization, or isn't a member of the one requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Integration not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation_error`: invalid body. `missing_permission`: turning `autoRefund` on while the API key lacks the Refunds: Write permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
             "content": {
               "application/json": {
                 "schema": {

@@ -18,6 +18,7 @@ import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import dev.licensemanager.model.CancellationStats;
 import dev.licensemanager.model.ProductStatsActivationsByVersionInner;
 import dev.licensemanager.model.ProductStatsActiveMachinesByPlatformInner;
 import dev.licensemanager.model.ProductStatsActiveMachinesByVersionInner;
@@ -163,6 +164,14 @@ public class ProductStatsTest {
     @Test
     public void newLicensesByPolicyTest() {
         // TODO: test newLicensesByPolicy
+    }
+
+    /**
+     * Test the property 'cancellation'
+     */
+    @Test
+    public void cancellationTest() {
+        // TODO: test cancellation
     }
 
     /**

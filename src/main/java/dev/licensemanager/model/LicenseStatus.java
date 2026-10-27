@@ -24,7 +24,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * &#x60;expired&#x60; when the license has expired, &#x60;active&#x60; when a machine validated its key in the last 90 days, &#x60;inactive&#x60; otherwise.
+ * &#x60;canceled&#x60; when the license was canceled, &#x60;expired&#x60; when it has expired, &#x60;active&#x60; when a machine validated its key in the last 90 days, &#x60;inactive&#x60; otherwise.
  */
 @JsonAdapter(LicenseStatus.Adapter.class)
 public enum LicenseStatus {
@@ -34,6 +34,8 @@ public enum LicenseStatus {
   INACTIVE("inactive"),
   
   EXPIRED("expired"),
+  
+  CANCELED("canceled"),
   
   UNKNOWN_DEFAULT_OPEN_API("unknown_default_open_api");
 

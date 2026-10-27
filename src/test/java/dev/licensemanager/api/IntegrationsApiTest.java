@@ -21,6 +21,7 @@ import dev.licensemanager.model.Integration;
 import dev.licensemanager.model.IntegrationMapping;
 import dev.licensemanager.model.ListStripePrices200Response;
 import dev.licensemanager.model.StripeIntegration;
+import dev.licensemanager.model.UpdateIntegration;
 import dev.licensemanager.model.UpdateIntegrationMapping;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -141,6 +142,22 @@ public class IntegrationsApiTest {
     public void listStripePricesTest() throws ApiException {
         String id = null;
         ListStripePrices200Response response = api.listStripePrices(id)
+                .execute();
+        // TODO: test validations
+    }
+
+    /**
+     * Update an integration
+     *
+     * Changes the settings of the integration, for every product of its mode. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:update&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     *
+     * @throws ApiException if the Api call fails
+     */
+    @Test
+    public void updateIntegrationTest() throws ApiException {
+        String id = null;
+        UpdateIntegration updateIntegration = null;
+        Integration response = api.updateIntegration(id, updateIntegration)
                 .execute();
         // TODO: test validations
     }

@@ -66,6 +66,8 @@ public class CreateToken {
     
     LICENSE_WRITE("license:write"),
     
+    LICENSE_CANCEL("license:cancel"),
+    
     MACHINE_READ("machine:read"),
     
     MACHINE_WRITE("machine:write"),
@@ -142,7 +144,7 @@ public class CreateToken {
   }
 
   /**
-   * Permissions of the token. A write permission implies the matching read one. A token creating a token can only give the permissions it has.
+   * Permissions of the token. A write permission implies the other ones of its resource, like the read one: &#x60;license:write&#x60; implies &#x60;license:read&#x60; and &#x60;license:cancel&#x60;. A token creating a token can only give the permissions it has.
    * @return scope
    */
   @javax.annotation.Nonnull

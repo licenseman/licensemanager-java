@@ -66,6 +66,22 @@ public class RevenueTest {
     }
 
     /**
+     * Test the property 'canceledLicenseCount'
+     */
+    @Test
+    public void canceledLicenseCountTest() {
+        // TODO: test canceledLicenseCount
+    }
+
+    /**
+     * Test the property 'canceledTotal'
+     */
+    @Test
+    public void canceledTotalTest() {
+        // TODO: test canceledTotal
+    }
+
+    /**
      * Test the property 'thisMonth'
      */
     @Test

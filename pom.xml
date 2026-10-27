@@ -5,7 +5,7 @@
     <artifactId>licensemanager-java</artifactId>
     <packaging>jar</packaging>
     <name>licensemanager-java</name>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
     <url>https://licensemanager.dev</url>
     <description>Java client for the LicenseManager API: products, policies, customers, licenses, machines and releases.</description>
     <scm>

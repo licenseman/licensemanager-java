@@ -96,7 +96,7 @@ public class PortalLink {
   }
 
   /**
-   * Customer token in the link, with the &#x60;customer:read&#x60;, &#x60;license:read&#x60; and &#x60;machine:write&#x60; permissions.
+   * Customer token in the link, with the &#x60;customer:read&#x60;, &#x60;license:read&#x60;, &#x60;license:cancel&#x60; and &#x60;machine:write&#x60; permissions.
    * @return token
    */
   @javax.annotation.Nonnull

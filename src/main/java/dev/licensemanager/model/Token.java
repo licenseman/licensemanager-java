@@ -133,6 +133,8 @@ public class Token {
     
     LICENSE_WRITE("license:write"),
     
+    LICENSE_CANCEL("license:cancel"),
+    
     MACHINE_READ("machine:read"),
     
     MACHINE_WRITE("machine:write"),

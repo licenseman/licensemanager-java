@@ -6,6 +6,10 @@ README.md
 api/openapi.yaml
 build.gradle
 build.sbt
+docs/CancelLicense.md
+docs/CancellationReason.md
+docs/CancellationStats.md
+docs/CancellationStatsByReasonInner.md
 docs/ConnectStripe.md
 docs/CreateCustomer.md
 docs/CreateIntegrationMapping.md
@@ -99,6 +103,7 @@ docs/StripePrice.md
 docs/Token.md
 docs/TokensApi.md
 docs/UpdateCustomer.md
+docs/UpdateIntegration.md
 docs/UpdateIntegrationMapping.md
 docs/UpdateLicense.md
 docs/UpdatePolicy.md
@@ -145,6 +150,10 @@ src/main/java/dev/licensemanager/auth/Authentication.java
 src/main/java/dev/licensemanager/auth/HttpBasicAuth.java
 src/main/java/dev/licensemanager/auth/HttpBearerAuth.java
 src/main/java/dev/licensemanager/model/AbstractOpenApiSchema.java
+src/main/java/dev/licensemanager/model/CancelLicense.java
+src/main/java/dev/licensemanager/model/CancellationReason.java
+src/main/java/dev/licensemanager/model/CancellationStats.java
+src/main/java/dev/licensemanager/model/CancellationStatsByReasonInner.java
 src/main/java/dev/licensemanager/model/ConnectStripe.java
 src/main/java/dev/licensemanager/model/CreateCustomer.java
 src/main/java/dev/licensemanager/model/CreateIntegrationMapping.java
@@ -228,6 +237,7 @@ src/main/java/dev/licensemanager/model/StripePermission.java
 src/main/java/dev/licensemanager/model/StripePrice.java
 src/main/java/dev/licensemanager/model/Token.java
 src/main/java/dev/licensemanager/model/UpdateCustomer.java
+src/main/java/dev/licensemanager/model/UpdateIntegration.java
 src/main/java/dev/licensemanager/model/UpdateIntegrationMapping.java
 src/main/java/dev/licensemanager/model/UpdateLicense.java
 src/main/java/dev/licensemanager/model/UpdatePolicy.java
@@ -247,6 +257,10 @@ src/test/java/dev/licensemanager/api/PortalApiTest.java
 src/test/java/dev/licensemanager/api/ProductsApiTest.java
 src/test/java/dev/licensemanager/api/ReleasesApiTest.java
 src/test/java/dev/licensemanager/api/TokensApiTest.java
+src/test/java/dev/licensemanager/model/CancelLicenseTest.java
+src/test/java/dev/licensemanager/model/CancellationReasonTest.java
+src/test/java/dev/licensemanager/model/CancellationStatsByReasonInnerTest.java
+src/test/java/dev/licensemanager/model/CancellationStatsTest.java
 src/test/java/dev/licensemanager/model/ConnectStripeTest.java
 src/test/java/dev/licensemanager/model/CreateCustomerTest.java
 src/test/java/dev/licensemanager/model/CreateIntegrationMappingTest.java
@@ -331,6 +345,7 @@ src/test/java/dev/licensemanager/model/StripePriceTest.java
 src/test/java/dev/licensemanager/model/TokenTest.java
 src/test/java/dev/licensemanager/model/UpdateCustomerTest.java
 src/test/java/dev/licensemanager/model/UpdateIntegrationMappingTest.java
+src/test/java/dev/licensemanager/model/UpdateIntegrationTest.java
 src/test/java/dev/licensemanager/model/UpdateLicenseTest.java
 src/test/java/dev/licensemanager/model/UpdatePolicyTest.java
 src/test/java/dev/licensemanager/model/UpdateProductPortalTest.java

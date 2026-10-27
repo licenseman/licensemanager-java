@@ -116,6 +116,14 @@ public class CreateLicenseTest {
     }
 
     /**
+     * Test the property 'cancellableUntil'
+     */
+    @Test
+    public void cancellableUntilTest() {
+        // TODO: test cancellableUntil
+    }
+
+    /**
      * Test the property 'sendKey'
      */
     @Test

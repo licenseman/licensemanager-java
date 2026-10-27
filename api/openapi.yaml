@@ -33,7 +33,9 @@ paths:
 
         The machine with the `fingerprint` is created when the license has none, and activated when it's deactivated, unless the license is already active on its maximum number of machines. A machine that's already active is never refused for the maximum number of machines, even when it was lowered below the number of active machines. Its `version`, and its `name` and `platform` when given, are updated: they can't be cleared.
 
-        The checks run in this order, and the first one failing answers: the license has expired, then it doesn't allow the version, then it's on its maximum number of machines. Each failure is recorded as a `license.validation_failed` event, except for keys that don't exist.
+        Unless the product disables `autoMachineChange`, a new machine isn't refused when the license is on its maximum number of machines: it takes the place of the active machine validated the longest ago, which is deactivated with its `overriddenByMachineId` set to the new machine, and recorded as a `machine.deactivated` event. When a machine deactivated this way is validated again, it takes its place back: the machine that overrode it, and the ones that overrode that one in turn, are locked, with their `overriddenByMachineId` set to the machine coming back. A locked machine is always refused, so two machines can't take turns on one place.
+
+        The checks run in this order, and the first one failing answers: the license has expired or was canceled, then it doesn't allow the version, then the machine is locked, then it's on its maximum number of machines. Each failure is recorded as a `license.validation_failed` event, except for keys that don't exist.
 
         Changes to the license, like deactivating the machine or shortening its expiration, don't revoke the tokens already returned: the application only sees them when it validates its key again, at the latest when its token expires.
       operationId: validateKey
@@ -71,10 +73,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidateKeyError"
-          description: "`license_expired`: the license has expired. `version_not_allowed`:\
-            \ the license doesn't allow the version, with the `latestAllowedVersion`.\
-            \ `machine_limit_reached`: the license is already active on its maximum\
-            \ number of machines"
+          description: "`license_expired`: the license has expired, or was canceled.\
+            \ `version_not_allowed`: the license doesn't allow the version, with the\
+            \ `latestAllowedVersion`. `machine_locked`: the machine was locked after\
+            \ the machine it overrode came back. `machine_limit_reached`: the license\
+            \ is already active on its maximum number of machines, and the product\
+            \ disables `autoMachineChange` or the machine isn't new"
         "404":
           content:
             application/json:
@@ -352,7 +356,7 @@ paths:
 
         The product is created with its default policy, named `Default policy` with the `default` slug, whose settings are given by `defaultPolicy`. Omitted settings default to licenses that never expire, on a single machine, offline for one week, for every version of the product. Unlike `createPolicy`, where `maxMachines` defaults to no limit.
 
-        With `isTestFromProductId`, the product is a test product: its id, its slug, and the ids, slugs and license keys of its resources start with `test_` (`TEST-` for license keys), and only test API keys reach it. It starts with copies of the policies, releases and portal settings of the live product, `defaultPolicy` is ignored. Later changes to the live product aren't copied: reset the test product to copy them again. Test API keys can only create test products, live API keys only live ones.
+        With `isTestFromProductId`, the product is a test product: its id, its slug, and the ids, slugs and license keys of its resources start with `test_` (`TEST-` for license keys), and only test API keys reach it. It starts with copies of the policies, releases, portal settings and `autoMachineChange` of the live product, `defaultPolicy` is ignored. Later changes to the live product aren't copied: reset the test product to copy them again. Test API keys can only create test products, live API keys only live ones.
 
         **Required role permission**: `product:create` when called with a session, granted by the member's role. API keys aren't limited by roles.
       operationId: createProduct
@@ -673,7 +677,7 @@ paths:
   /v1/products/{id}/reset:
     post:
       description: |-
-        Deletes the customers, licenses, machines, policies and releases of the test product, with their events, then copies the policies, releases and portal settings of its live product again. Its id, name and slug are kept, but the copied policies get new ids. The tokens of its customers, licenses and machines stop working.
+        Deletes the customers, licenses, machines, policies and releases of the test product, with their events, then copies the policies, releases, portal settings and `autoMachineChange` of its live product again. Its id, name and slug are kept, but the copied policies get new ids. The tokens of its customers, licenses and machines stop working.
 
         **Required role permission**: `product:update` when called with a session, granted by the member's role. API keys aren't limited by roles.
       operationId: resetProduct
@@ -2423,6 +2427,8 @@ paths:
 
         Without a `price`, the price paid for the license is unknown: it's left out of the revenue stats.
 
+        Without a `cancellableUntil`, the customer can cancel the license during the policy's `moneyBackGuaranteeDays` after its creation, or never when the policy has none.
+
         The values of `maxVersion` left out are taken from the max version of the policy: its hard-coded version, or the times after the creation of the license its versions lock.
 
         The license belongs to the product's customer with the given `email`, which is created when there's none.
@@ -3050,7 +3056,7 @@ paths:
       description: |-
         The key, policy and customer of a license can't be changed: sending them does nothing.
 
-        The changes apply to the next validations of the key, not to the license tokens `validateKey` already returned, which stay valid until they expire. Lowering `maxMachines` doesn't deactivate machines: the ones already active keep validating, and new ones are refused until enough are deactivated.
+        The changes apply to the next validations of the key, not to the license tokens `validateKey` already returned, which stay valid until they expire. Lowering `maxMachines` doesn't deactivate machines: the ones already active keep validating, and new ones replace them one at a time when the product has `autoMachineChange`, or are refused until enough are deactivated.
 
         **Required role permission**: `license:update` when called with a session, granted by the member's role. API keys aren't limited by roles.
       operationId: updateLicense
@@ -3203,6 +3209,109 @@ paths:
       summary: Get the stats of a license
       tags:
       - Licenses
+      x-accepts:
+      - application/json
+  /v1/licenses/{id}/cancel:
+    post:
+      description: |-
+        Cancels the license right away: validating its key then fails with `license_expired`, like an expired license, and its status is `canceled`. A cancellation can't be undone.
+
+        Customers can cancel their licenses until their `cancellableUntil`, the end of their money back guarantee: tokens can't cancel a license past it, or without one. API keys and sessions can cancel any license.
+
+        When the license was bought through the Stripe integration, its payment is refunded in the background, unless the integration disables `autoRefund`, its API key lacks the optional Refunds: Write permission (`canRefund`), or `refund` is `false`: the refund is its price paid, taxes included, and its id is set as `stripeRefundId`. The customer is emailed a confirmation, and the owners and admins of the organization are told about the cancellation and its refund. In test products, the customer is only emailed when their email is a member's of the organization.
+
+        Records a `license.canceled` event, then a `license.refunded` or `license.refund_failed` one once the refund is done.
+
+        **Token access**: customer, license tokens with the `license:cancel` permission (or the matching write one). A token reaches the license it's scoped to, or the licenses of its customer.
+
+        **Required role permission**: `license:cancel` when called with a session, granted by the member's role. API keys aren't limited by roles.
+      operationId: cancelLicense
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          example: l3Nv8KwB
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelLicense"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/License"
+          description: Canceled license
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`unauthorized`: no credentials. `invalid_api_key`: the API\
+            \ key doesn't exist, was revoked or has expired. `invalid_token`: the\
+            \ token's signature is invalid, it has expired, or the resource it's scoped\
+            \ to was deleted"
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`plan_limit_exceeded`: the organization stayed over its plan's\
+            \ limits after the grace period, its API is blocked until it upgrades.\
+            \ `plan_limit_reached`: creating the resource would go over the plan's\
+            \ limit"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`token_not_allowed`: the endpoint doesn't accept tokens, or\
+            \ not of this type. `insufficient_scope`: the token lacks the permission.\
+            \ `no_active_organization` or `forbidden`: the session has no organization,\
+            \ or isn't a member of the one requested"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: License not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`already_canceled`: the license is already canceled. `not_cancellable`:\
+            \ for tokens, the license has no money back guarantee, or it has ended"
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`validation_error`: invalid path, query or body, with the\
+            \ `issues`"
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`rate_limited`: the API key made more than 10 requests in\
+            \ the last second. Wait for the `Retry-After` seconds"
+      security:
+      - apiKey: []
+      - token:
+        - license:cancel
+      summary: Cancel a license
+      tags:
+      - Licenses
+      x-required-permissions:
+      - license:cancel
+      x-content-type: application/json
       x-accepts:
       - application/json
   /v1/licenses/send-keys:
@@ -3387,6 +3496,7 @@ paths:
           enum:
           - active
           - deactivated
+          - locked
           example: active
           type: string
         style: form
@@ -3534,7 +3644,7 @@ paths:
   /v1/machines/{id}/deactivate:
     post:
       description: |-
-        The machine no longer counts as using the license, freeing its place when the license has a maximum number of machines. Validating the license key on the machine activates it again, unless the license is on its maximum number of machines by then. Deactivating a deactivated machine does nothing.
+        The machine no longer counts as using the license, freeing its place when the license has a maximum number of machines. Validating the license key on the machine activates it again, unless the license is on its maximum number of machines by then. Deactivating a deactivated or locked machine does nothing.
 
         The license token `validateKey` returned to the machine isn't revoked: the application can keep running offline until it expires. Machines can't be deleted: they're deleted with their license.
 
@@ -3619,7 +3729,7 @@ paths:
   /v1/customers/{id}/portal-links:
     post:
       description: |-
-        Link letting the customer see their licenses and deactivate their machines in the customer portal, without signing in. Anyone with the link can, until it expires or the customer is deleted: it can't be revoked otherwise. The token also works with the API endpoints that accept customer tokens.
+        Link letting the customer see their licenses, cancel them during their money back guarantee, and deactivate their machines in the customer portal, without signing in. Anyone with the link can, until it expires or the customer is deleted: it can't be revoked otherwise. The token also works with the API endpoints that accept customer tokens.
 
         Links can be created while the product's customer portal is disabled, but the portal answers `404` until it's enabled, and `sendPortalLink` refuses to email them.
 
@@ -5057,7 +5167,9 @@ paths:
           description: "`validation_error`: invalid body. `invalid_api_key`: not a\
             \ Stripe secret or restricted key, or Stripe rejected it. `key_mode_mismatch`:\
             \ a test mode key for a live product, or the opposite. `missing_permission`:\
-            \ the key lacks required permissions, listed in the message"
+            \ the key lacks required permissions, listed in the message. Optional\
+            \ ones aren't required: without Refunds: Write, it connects with `canRefund`\
+            \ false"
         "429":
           content:
             application/json:
@@ -5155,6 +5267,89 @@ paths:
       - Integrations
       x-required-permissions:
       - integration:delete
+      x-accepts:
+      - application/json
+    patch:
+      description: |-
+        Changes the settings of the integration, for every product of its mode. Doesn't accept tokens: only API keys and sessions.
+
+        **Required role permission**: `integration:update` when called with a session, granted by the member's role. API keys aren't limited by roles.
+      operationId: updateIntegration
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          example: i8Fz4QnRt
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateIntegration"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Integration"
+          description: Updated integration
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`unauthorized`: no credentials. `invalid_api_key`: the API\
+            \ key doesn't exist, was revoked or has expired. `invalid_token`: the\
+            \ token's signature is invalid, it has expired, or the resource it's scoped\
+            \ to was deleted"
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`plan_limit_exceeded`: the organization stayed over its plan's\
+            \ limits after the grace period, its API is blocked until it upgrades.\
+            \ `plan_limit_reached`: creating the resource would go over the plan's\
+            \ limit"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`token_not_allowed`: the endpoint doesn't accept tokens, or\
+            \ not of this type. `insufficient_scope`: the token lacks the permission.\
+            \ `no_active_organization` or `forbidden`: the session has no organization,\
+            \ or isn't a member of the one requested"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Integration not found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`validation_error`: invalid body. `missing_permission`: turning\
+            \ `autoRefund` on while the API key lacks the Refunds: Write permission"
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`rate_limited`: the API key made more than 10 requests in\
+            \ the last second. Wait for the `Retry-After` seconds"
+      summary: Update an integration
+      tags:
+      - Integrations
+      x-required-permissions:
+      - integration:update
+      x-content-type: application/json
       x-accepts:
       - application/json
   /v1/integrations/{id}/check:
@@ -5802,6 +5997,7 @@ components:
             returnUrl: https://example.com/account
             returnDomains:
             - example.com
+          autoMachineChange: true
           createdAt: 2026-01-15T09:30:00.000Z
           updatedAt: 2026-01-15T09:30:00.000Z
         - id: x7Kp2QaZ
@@ -5816,6 +6012,7 @@ components:
             returnUrl: https://example.com/account
             returnDomains:
             - example.com
+          autoMachineChange: true
           createdAt: 2026-01-15T09:30:00.000Z
           updatedAt: 2026-01-15T09:30:00.000Z
         pagination:
@@ -5850,6 +6047,7 @@ components:
           returnUrl: https://example.com/account
           returnDomains:
           - example.com
+        autoMachineChange: true
         createdAt: 2026-01-15T09:30:00.000Z
         updatedAt: 2026-01-15T09:30:00.000Z
       properties:
@@ -5877,6 +6075,14 @@ components:
           type: string
         portal:
           $ref: "#/components/schemas/PortalSettings"
+        autoMachineChange:
+          description: "Whether a new machine validating a license already on its\
+            \ max machines takes the place of the license's machine validated the\
+            \ longest ago, rather than being refused with `machine_limit_reached`.\
+            \ When the replaced machine is validated again, it takes its place back\
+            \ and the machine that replaced it is locked. See `validateKey`."
+          example: true
+          type: boolean
         createdAt:
           example: 2026-01-15T09:30:00.000Z
           format: date-time
@@ -5886,6 +6092,7 @@ components:
           format: date-time
           type: string
       required:
+      - autoMachineChange
       - createdAt
       - id
       - isTestFromProductId
@@ -5992,8 +6199,8 @@ components:
             $ref: "#/components/schemas/PolicySettings"
           isTestFromProductId:
             description: "Creates a test product: a sandbox of this live product of\
-              \ the organization, starting with copies of its policies, releases and\
-              \ portal settings."
+              \ the organization, starting with copies of its policies, releases,\
+              \ portal settings and `autoMachineChange`."
             example: x7Kp2QaZ
             type: string
       example:
@@ -6008,6 +6215,7 @@ components:
           maxVersion:
             type: fixed
             version: "2.3"
+          moneyBackGuaranteeDays: 30
         isTestFromProductId: x7Kp2QaZ
     PolicySettings:
       example:
@@ -6019,6 +6227,7 @@ components:
         maxVersion:
           type: fixed
           version: "2.3"
+        moneyBackGuaranteeDays: 30
       properties:
         duration:
           $ref: "#/components/schemas/PolicySettings_duration"
@@ -6042,6 +6251,18 @@ components:
           type: integer
         maxVersion:
           $ref: "#/components/schemas/PolicySettings_maxVersion"
+        moneyBackGuaranteeDays:
+          description: "Number of days after their creation during which customers\
+            \ can cancel the licenses created with this policy, from the customer\
+            \ portal or with `cancelLicense`, which refunds their Stripe payment.\
+            \ Each license keeps the end of its own period as `cancellableUntil`.\
+            \ `null` for no money back guarantee. Defaults to `null`."
+          example: 30
+          exclusiveMinimum: true
+          maximum: 3650
+          minimum: 0
+          nullable: true
+          type: integer
     FixedMaxVersion:
       description: "The licenses can use up to `version`, whenever they're created."
       example:
@@ -6110,6 +6331,7 @@ components:
           returnUrl: https://example.com/account
           returnDomains:
           - example.com
+        autoMachineChange: true
       properties:
         name:
           example: Acme Pro
@@ -6127,6 +6349,14 @@ components:
           type: string
         portal:
           $ref: "#/components/schemas/UpdateProduct_portal"
+        autoMachineChange:
+          description: "Whether a new machine validating a license already on its\
+            \ max machines takes the place of the license's machine validated the\
+            \ longest ago, rather than being refused with `machine_limit_reached`.\
+            \ When the replaced machine is validated again, it takes its place back\
+            \ and the machine that replaced it is locked. See `validateKey`."
+          example: true
+          type: boolean
     UploadLogo:
       properties:
         file:
@@ -6180,10 +6410,13 @@ components:
           - 4
           - 9
           - 12
+        cancellation: ""
         revenue:
         - currency: USD
           licenseCount: 42
           total: 2099.58
+          canceledLicenseCount: 2
+          canceledTotal: 99.98
           thisMonth: 349.93
           lastMonth: 299.94
           last30Days: 399.92
@@ -6217,6 +6450,8 @@ components:
         - currency: USD
           licenseCount: 42
           total: 2099.58
+          canceledLicenseCount: 2
+          canceledTotal: 99.98
           thisMonth: 349.93
           lastMonth: 299.94
           last30Days: 399.92
@@ -6274,8 +6509,8 @@ components:
           example: 120
           type: integer
         activeLicenseCount:
-          description: "Number of licenses that haven't expired, and that a machine\
-            \ validated in the last 90 days."
+          description: "Number of licenses that haven't expired nor were canceled,\
+            \ and that a machine validated in the last 90 days."
           example: 87
           type: integer
         newLicenseCount:
@@ -6284,11 +6519,13 @@ components:
           example: 14
           type: integer
         expiringLicenseCount:
-          description: Number of licenses expiring in the next 30 days.
+          description: "Number of licenses expiring in the next 30 days, canceled\
+            \ ones left out."
           example: 3
           type: integer
         expiredLicenseCount:
-          description: Number of licenses that expired in the last 30 days.
+          description: "Number of licenses that expired in the last 30 days, canceled\
+            \ ones left out."
           example: 2
           type: integer
         activeMachineCount:
@@ -6301,7 +6538,8 @@ components:
           type: integer
         seatCount:
           description: Sum of the maximum numbers of machines of the licenses that
-            haven't expired. Licenses without a maximum are left out.
+            haven't expired nor were canceled. Licenses without a maximum are left
+            out.
           example: 200
           type: integer
         usedSeatCount:
@@ -6359,6 +6597,12 @@ components:
             $ref: "#/components/schemas/ProductStats_newLicensesByPolicy_inner"
           type: array
           default: null
+        cancellation:
+          allOf:
+          - $ref: "#/components/schemas/CancellationStats"
+          description: Cancellations of the licenses with a money back guarantee.
+            `null` when no license of the product has one.
+          nullable: true
         revenue:
           description: "Revenue in each currency licenses were sold in, from the one\
             \ with the most licenses sold. Amounts aren't converted between currencies."
@@ -6393,6 +6637,7 @@ components:
       - activeMachineCount
       - activeMachinesByPlatform
       - activeMachinesByVersion
+      - cancellation
       - days
       - expiredLicenseCount
       - expiringLicenseCount
@@ -6407,13 +6652,92 @@ components:
       - revenue
       - seatCount
       - usedSeatCount
+    CancellationStats:
+      description: Cancellations of the licenses with a money back guarantee. Licenses
+        canceled without one are left out.
+      properties:
+        licenseCount:
+          description: "Number of licenses with a money back guarantee: a `cancellableUntil`."
+          example: 80
+          type: integer
+        canceledLicenseCount:
+          description: Number of them that were canceled.
+          example: 4
+          type: integer
+        cancellableLicenseCount:
+          description: "Number of them whose money back guarantee hasn't ended, and\
+            \ that weren't canceled: they can still be."
+          example: 12
+          type: integer
+        rate:
+          description: "Share of them that were canceled, from 0 to 1: `canceledLicenseCount`\
+            \ over `licenseCount`."
+          example: 0.05
+          type: number
+        canceledByDay:
+          description: "Number of them canceled each day, aligned on `days`, on the\
+            \ day of their cancellation."
+          example:
+          - 0
+          - 1
+          - 0
+          items:
+            type: integer
+          type: array
+          default: null
+        canceledByMonth:
+          description: "Number of them canceled each month, aligned on `months`, on\
+            \ the month of their cancellation."
+          example:
+          - 1
+          - 0
+          - 2
+          items:
+            type: integer
+          type: array
+          default: null
+        byReason:
+          description: "Number of them canceled for each reason, from the most given\
+            \ one. Reasons never given are left out."
+          items:
+            $ref: "#/components/schemas/CancellationStats_byReason_inner"
+          type: array
+          default: null
+      required:
+      - byReason
+      - canceledByDay
+      - canceledByMonth
+      - canceledLicenseCount
+      - cancellableLicenseCount
+      - licenseCount
+      - rate
+    CancellationReason:
+      description: |-
+        - `too_expensive`: too expensive.
+        - `missing_features`: missing features i need.
+        - `not_working`: doesn't work as expected.
+        - `switched`: found an alternative.
+        - `unused`: no longer needed.
+        - `other`: other.
+      enum:
+      - too_expensive
+      - missing_features
+      - not_working
+      - switched
+      - unused
+      - other
+      example: too_expensive
+      type: string
     Revenue:
       description: "Revenue of the licenses sold in one currency, each license counting\
-        \ on the day it was created. Licenses without a price are left out."
+        \ on the day it was created. Licenses without a price are left out, and so\
+        \ are canceled ones, but in `canceledLicenseCount` and `canceledTotal`."
       example:
         currency: USD
         licenseCount: 42
         total: 2099.58
+        canceledLicenseCount: 2
+        canceledTotal: 99.98
         thisMonth: 349.93
         lastMonth: 299.94
         last30Days: 399.92
@@ -6450,13 +6774,23 @@ components:
           example: USD
           type: string
         licenseCount:
-          description: "Number of licenses sold in the currency, free ones included."
+          description: "Number of licenses sold in the currency, free ones included,\
+            \ canceled ones left out."
           example: 42
           type: integer
         total:
           description: "Sum of the prices of the licenses sold in the currency, in\
-            \ major units."
+            \ major units, canceled ones left out."
           example: 2099.58
+          type: number
+        canceledLicenseCount:
+          description: Number of canceled licenses sold in the currency.
+          example: 2
+          type: integer
+        canceledTotal:
+          description: "Sum of the prices of the canceled licenses sold in the currency,\
+            \ in major units: revenue lost to cancellations."
+          example: 99.98
           type: number
         thisMonth:
           description: "Revenue of the current month, in UTC."
@@ -6501,6 +6835,8 @@ components:
       - byDay
       - byMonth
       - byPolicy
+      - canceledLicenseCount
+      - canceledTotal
       - currency
       - last30Days
       - lastMonth
@@ -6523,6 +6859,7 @@ components:
           maxVersion:
             type: fixed
             version: "2.3"
+          moneyBackGuaranteeDays: 30
           licenseCount: 12
           createdAt: 2026-01-15T09:30:00.000Z
           updatedAt: 2026-01-15T09:30:00.000Z
@@ -6539,6 +6876,7 @@ components:
           maxVersion:
             type: fixed
             version: "2.3"
+          moneyBackGuaranteeDays: 30
           licenseCount: 12
           createdAt: 2026-01-15T09:30:00.000Z
           updatedAt: 2026-01-15T09:30:00.000Z
@@ -6575,6 +6913,7 @@ components:
         maxVersion:
           type: fixed
           version: "2.3"
+        moneyBackGuaranteeDays: 30
         licenseCount: 12
         createdAt: 2026-01-15T09:30:00.000Z
         updatedAt: 2026-01-15T09:30:00.000Z
@@ -6611,6 +6950,13 @@ components:
           type: integer
         maxVersion:
           $ref: "#/components/schemas/Policy_maxVersion"
+        moneyBackGuaranteeDays:
+          description: "Number of days after their creation during which customers\
+            \ can cancel the licenses created with this policy, from the customer\
+            \ portal or with `cancelLicense`. `null` when they can't."
+          example: 30
+          nullable: true
+          type: integer
         licenseCount:
           description: Number of licenses following this policy.
           example: 12
@@ -6632,6 +6978,7 @@ components:
       - maxMachines
       - maxOfflineDurationSeconds
       - maxVersion
+      - moneyBackGuaranteeDays
       - name
       - productId
       - slug
@@ -6649,6 +6996,7 @@ components:
         maxVersion:
           type: fixed
           version: "2.3"
+        moneyBackGuaranteeDays: 30
       properties:
         name:
           example: Yearly
@@ -6691,6 +7039,18 @@ components:
           type: integer
         maxVersion:
           $ref: "#/components/schemas/PolicySettings_maxVersion"
+        moneyBackGuaranteeDays:
+          description: "Number of days after their creation during which customers\
+            \ can cancel the licenses created with this policy, from the customer\
+            \ portal or with `cancelLicense`, which refunds their Stripe payment.\
+            \ Each license keeps the end of its own period as `cancellableUntil`.\
+            \ `null` for no money back guarantee. Defaults to `null`."
+          example: 30
+          exclusiveMinimum: true
+          maximum: 3650
+          minimum: 0
+          nullable: true
+          type: integer
       required:
       - name
     UpdatePolicy:
@@ -6706,6 +7066,7 @@ components:
         maxVersion:
           type: fixed
           version: "2.3"
+        moneyBackGuaranteeDays: 30
       properties:
         name:
           example: Yearly
@@ -6748,6 +7109,18 @@ components:
           type: integer
         maxVersion:
           $ref: "#/components/schemas/PolicySettings_maxVersion"
+        moneyBackGuaranteeDays:
+          description: "Number of days after their creation during which customers\
+            \ can cancel the licenses created with this policy, from the customer\
+            \ portal or with `cancelLicense`, which refunds their Stripe payment.\
+            \ Each license keeps the end of its own period as `cancellableUntil`.\
+            \ `null` for no money back guarantee. Defaults to `null`."
+          example: 30
+          exclusiveMinimum: true
+          maximum: 3650
+          minimum: 0
+          nullable: true
+          type: integer
     CustomerList:
       example:
         data:
@@ -6898,6 +7271,11 @@ components:
             amount: 49.99
             currency: USD
           status: active
+          cancellableUntil: 2026-02-14T09:30:00.000Z
+          canceledAt: 2026-01-20T16:12:00.000Z
+          cancellationReason: ""
+          cancellationComment: I only needed it for one project.
+          stripeRefundId: re_3MtwBwLkdIwHu7ix0Bs5rA2b
           updatedAt: 2026-01-15T09:30:00.000Z
         - id: l3Nv8KwB
           productId: x7Kp2QaZ
@@ -6921,6 +7299,11 @@ components:
             amount: 49.99
             currency: USD
           status: active
+          cancellableUntil: 2026-02-14T09:30:00.000Z
+          canceledAt: 2026-01-20T16:12:00.000Z
+          cancellationReason: ""
+          cancellationComment: I only needed it for one project.
+          stripeRefundId: re_3MtwBwLkdIwHu7ix0Bs5rA2b
           updatedAt: 2026-01-15T09:30:00.000Z
         pagination:
           page: 1
@@ -6964,6 +7347,11 @@ components:
           amount: 49.99
           currency: USD
         status: active
+        cancellableUntil: 2026-02-14T09:30:00.000Z
+        canceledAt: 2026-01-20T16:12:00.000Z
+        cancellationReason: ""
+        cancellationComment: I only needed it for one project.
+        stripeRefundId: re_3MtwBwLkdIwHu7ix0Bs5rA2b
         updatedAt: 2026-01-15T09:30:00.000Z
       properties:
         id:
@@ -7038,6 +7426,40 @@ components:
           $ref: "#/components/schemas/Price"
         status:
           $ref: "#/components/schemas/LicenseStatus"
+        cancellableUntil:
+          description: "End of the money back guarantee: until then, the customer\
+            \ can cancel the license from the customer portal, or with a token. Set\
+            \ from the policy's `moneyBackGuaranteeDays` when the license is created.\
+            \ `null` when the customer can't cancel it."
+          example: 2026-02-14T09:30:00.000Z
+          format: date-time
+          nullable: true
+          type: string
+        canceledAt:
+          description: "When the license was canceled: validating its key fails since.\
+            \ `null` when it wasn't."
+          example: 2026-01-20T16:12:00.000Z
+          format: date-time
+          nullable: true
+          type: string
+        cancellationReason:
+          allOf:
+          - $ref: "#/components/schemas/CancellationReason"
+          - description: Why the license was canceled. `null` when it wasn't.
+            nullable: true
+            type: string
+        cancellationComment:
+          description: Comment given when the license was canceled. `null` when there's
+            none.
+          example: I only needed it for one project.
+          nullable: true
+          type: string
+        stripeRefundId:
+          description: "Id of the Stripe refund of the license's payment once it was\
+            \ canceled, through the Stripe integration. `null` otherwise."
+          example: re_3MtwBwLkdIwHu7ix0Bs5rA2b
+          nullable: true
+          type: string
         updatedAt:
           description: "Last time the license's settings were edited, not when its\
             \ key was validated."
@@ -7046,6 +7468,10 @@ components:
           type: string
       required:
       - activeMachineCount
+      - canceledAt
+      - cancellableUntil
+      - cancellationComment
+      - cancellationReason
       - createdAt
       - customerId
       - expiresAt
@@ -7061,6 +7487,7 @@ components:
       - productId
       - status
       - stripePaymentIntentId
+      - stripeRefundId
       - updatedAt
     LicenseMaxVersion:
       description: "Latest version of the product the license can use: its hard-coded\
@@ -7132,12 +7559,14 @@ components:
       - currency
       type: object
     LicenseStatus:
-      description: "`expired` when the license has expired, `active` when a machine\
-        \ validated its key in the last 90 days, `inactive` otherwise."
+      description: "`canceled` when the license was canceled, `expired` when it has\
+        \ expired, `active` when a machine validated its key in the last 90 days,\
+        \ `inactive` otherwise."
       enum:
       - active
       - inactive
       - expired
+      - canceled
       example: active
       type: string
     CreateLicense:
@@ -7157,6 +7586,7 @@ components:
           version: "2.3"
           lockMajorAt: 2026-02-15T09:30:00.000Z
           lockMinorAt: 2027-01-15T09:30:00.000Z
+        cancellableUntil: 2026-02-14T09:30:00.000Z
         sendKey: true
       properties:
         email:
@@ -7218,6 +7648,15 @@ components:
           $ref: "#/components/schemas/PriceInput"
         maxVersion:
           $ref: "#/components/schemas/LicenseMaxVersionInput"
+        cancellableUntil:
+          description: "End of the money back guarantee: until then, the customer\
+            \ can cancel the license from the customer portal, or with a token. `null`\
+            \ to not let them. Defaults to the creation date plus the policy's `moneyBackGuaranteeDays`,\
+            \ or `null` when it has none."
+          example: 2026-02-14T09:30:00.000Z
+          format: date-time
+          nullable: true
+          type: string
         sendKey:
           description: "`true` emails the key to the customer once the license is\
             \ created, like `sendLicenseKeys`. Sent in the background: a failed email\
@@ -7380,6 +7819,7 @@ components:
         price:
           amount: 49.99
           currency: USD
+        cancellableUntil: 2026-02-14T09:30:00.000Z
       properties:
         expiresAt:
           description: '`null` makes the license never expire.'
@@ -7418,6 +7858,37 @@ components:
             left out are kept.
         price:
           $ref: "#/components/schemas/PriceInput"
+        cancellableUntil:
+          description: "End of the money back guarantee: until then, the customer\
+            \ can cancel the license from the customer portal, or with a token. `null`\
+            \ to not let them."
+          example: 2026-02-14T09:30:00.000Z
+          format: date-time
+          nullable: true
+          type: string
+    CancelLicense:
+      example:
+        reason: too_expensive
+        comment: I only needed it for one project.
+        refund: true
+      properties:
+        reason:
+          $ref: "#/components/schemas/CancellationReason"
+        comment:
+          description: What the customer said about the cancellation.
+          example: I only needed it for one project.
+          maxLength: 2000
+          type: string
+        refund:
+          description: "Whether to refund the license's Stripe payment, when it was\
+            \ bought through the Stripe integration. Defaults to the integration's\
+            \ `autoRefund`. Ignored for tokens, which always follow `autoRefund`,\
+            \ and when the integration's `canRefund` is false: its API key can't create\
+            \ refunds."
+          example: true
+          type: boolean
+      required:
+      - reason
     SendLicenseKeys:
       example:
         ids:
@@ -7445,6 +7916,7 @@ components:
           name: Jane's MacBook
           status: active
           version: 1.4.2
+          overriddenByMachineId: overriddenByMachineId
           lastValidatedAt: 2026-01-15T09:30:00.000Z
           createdAt: 2026-01-15T09:30:00.000Z
           updatedAt: 2026-01-15T09:30:00.000Z
@@ -7455,6 +7927,7 @@ components:
           name: Jane's MacBook
           status: active
           version: 1.4.2
+          overriddenByMachineId: overriddenByMachineId
           lastValidatedAt: 2026-01-15T09:30:00.000Z
           createdAt: 2026-01-15T09:30:00.000Z
           updatedAt: 2026-01-15T09:30:00.000Z
@@ -7485,6 +7958,7 @@ components:
         name: Jane's MacBook
         status: active
         version: 1.4.2
+        overriddenByMachineId: overriddenByMachineId
         lastValidatedAt: 2026-01-15T09:30:00.000Z
         createdAt: 2026-01-15T09:30:00.000Z
         updatedAt: 2026-01-15T09:30:00.000Z
@@ -7508,10 +7982,13 @@ components:
           nullable: true
           type: string
         status:
-          description: Whether the machine counts as using the license.
+          description: "Whether the machine counts as using the license. A `locked`\
+            \ machine doesn't, and its validations are refused with `machine_locked`:\
+            \ it overrode a machine that came back. See `validateKey`."
           enum:
           - active
           - deactivated
+          - locked
           example: active
           type: string
         version:
@@ -7519,6 +7996,13 @@ components:
           example: 1.4.2
           nullable: true
           type: string
+        overriddenByMachineId:
+          description: "For a machine deactivated or locked by automatic machine changes,\
+            \ the machine that took its place. Validating the key on a deactivated\
+            \ machine that has one takes its place back. `null` otherwise."
+          nullable: true
+          type: string
+          example: null
         lastValidatedAt:
           description: When the license was last validated on the machine.
           example: 2026-01-15T09:30:00.000Z
@@ -7540,24 +8024,25 @@ components:
       - lastValidatedAt
       - licenseId
       - name
+      - overriddenByMachineId
       - platform
       - status
       - updatedAt
       - version
     PortalLink:
       example:
-        url: https://app.example.com/portal/x7Kp2QaZ?token=eyJhbGciOi…
+        url: https://app.licensemanager.dev/portal/x7Kp2QaZ?token=eyJhbGciOi…
         token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…
         expiresAt: 2026-01-22T09:30:00.000Z
       properties:
         url:
           description: "Link to the customer portal, holding the token."
-          example: https://app.example.com/portal/x7Kp2QaZ?token=eyJhbGciOi…
+          example: https://app.licensemanager.dev/portal/x7Kp2QaZ?token=eyJhbGciOi…
           format: uri
           type: string
         token:
-          description: "Customer token in the link, with the `customer:read`, `license:read`\
-            \ and `machine:write` permissions."
+          description: "Customer token in the link, with the `customer:read`, `license:read`,\
+            \ `license:cancel` and `machine:write` permissions."
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…
           type: string
         expiresAt:
@@ -7773,6 +8258,7 @@ components:
             - customer:write
             - license:read
             - license:write
+            - license:cancel
             - machine:read
             - machine:write
             type: string
@@ -7796,8 +8282,10 @@ components:
         expiresInSeconds: 3600
       properties:
         scope:
-          description: Permissions of the token. A write permission implies the matching
-            read one. A token creating a token can only give the permissions it has.
+          description: "Permissions of the token. A write permission implies the other\
+            \ ones of its resource, like the read one: `license:write` implies `license:read`\
+            \ and `license:cancel`. A token creating a token can only give the permissions\
+            \ it has."
           example:
           - license:read
           - machine:write
@@ -7807,6 +8295,7 @@ components:
             - customer:write
             - license:read
             - license:write
+            - license:cancel
             - machine:read
             - machine:write
             type: string
@@ -7845,7 +8334,7 @@ components:
             type: user
             id: u2Hk9PzLq
             name: Jane Doe
-            email: jane@example.com
+            email: jane@licensemanager.dev
             image: https://example.com/jane.png
         - id: e6Pw2JcXa
           type: license.validated
@@ -7864,7 +8353,7 @@ components:
             type: user
             id: u2Hk9PzLq
             name: Jane Doe
-            email: jane@example.com
+            email: jane@licensemanager.dev
             image: https://example.com/jane.png
         pagination:
           page: 1
@@ -7903,7 +8392,7 @@ components:
           type: user
           id: u2Hk9PzLq
           name: Jane Doe
-          email: jane@example.com
+          email: jane@licensemanager.dev
           image: https://example.com/jane.png
       properties:
         id:
@@ -7955,9 +8444,12 @@ components:
         - `policy.updated`: `payload.changes` maps each changed field to its previous (`from`) and new (`to`) value. Making a policy the default also updates the previous default one.
         - `license.created`: `payload` holds the license's key, `policyId`, `customerId` and settings. Not linked to the policy.
         - `license.updated`: `payload.changes`, like `policy.updated`.
-        - `license.validated`: a machine validated the license key. `payload` holds the machine's `fingerprint`, `name` and `version`, and whether the validation created the machine (`machineCreated`) or activated it again (`machineActivated`).
+        - `license.validated`: a machine validated the license key. `payload` holds the machine's `fingerprint`, `name` and `version`, whether the validation created the machine (`machineCreated`) or activated it again (`machineActivated`), the `overriddenMachineId` of the machine it deactivated to take its place, `null` when none, and the `lockedMachineIds` of the machines it locked as it took its place back (see `validateKey`).
         - `license.validation_failed`: validating the license key failed. `payload` holds the error `code` and `message`, and the `fingerprint`, `name`, `platform` and `version` sent, the name and platform being the machine's when none is sent. Linked to the machine when it exists.
-        - `machine.deactivated`: a machine was deactivated, so it no longer counts as using the license. `payload` holds the machine's `fingerprint` and `name`. Linked to the license and the machine.
+        - `license.canceled`: the license was canceled. `payload` holds the cancellation `reason` and `comment`, and whether its Stripe payment is being refunded (`refund`).
+        - `license.refunded`: the Stripe payment of a canceled license was refunded. `payload` holds the Stripe `refundId` and the `amount` refunded. Has the `integration` actor.
+        - `license.refund_failed`: refunding the Stripe payment of a canceled license failed. `payload` holds the error `message`: refund it from Stripe. Has the `integration` actor.
+        - `machine.deactivated`: a machine was deactivated or locked, so it no longer counts as using the license. `payload` holds the machine's `fingerprint` and `name`, the `overriddenByMachineId` of the machine that took its place, `null` when it was deactivated through the API, and whether it was `locked`. Deactivations by validations have the `automation` actor. Linked to the license and the machine.
 
         An update that changes nothing records no event. Deletions record no events, and customers, products and releases have none.
       enum:
@@ -7967,6 +8459,9 @@ components:
       - license.updated
       - license.validated
       - license.validation_failed
+      - license.canceled
+      - license.refunded
+      - license.refund_failed
       - machine.deactivated
       example: license.validated
       type: string
@@ -8016,10 +8511,12 @@ components:
           access: Read
           reason: "Lists your prices so you can choose which ones create licenses,\
             \ and checks they can still be paid."
+          optional: false
         - resource: Prices
           access: Read
           reason: "Lists your prices so you can choose which ones create licenses,\
             \ and checks they can still be paid."
+          optional: false
         integration: ""
         mappings:
         - id: g2Lk7RwPa
@@ -8058,8 +8555,8 @@ components:
             \ can't be: set `WEBHOOK_URL` on the server, like to a tunnel in development."
           type: boolean
         requiredPermissions:
-          description: "Permissions the restricted API key needs, and why. Every other\
-            \ permission can stay `None`."
+          description: "Permissions the restricted API key needs, and why, the `optional`\
+            \ ones included. Every other permission can stay `None`."
           items:
             $ref: "#/components/schemas/StripePermission"
           type: array
@@ -8088,6 +8585,7 @@ components:
         access: Read
         reason: "Lists your prices so you can choose which ones create licenses, and\
           \ checks they can still be paid."
+        optional: false
       properties:
         resource:
           example: Prices
@@ -8101,8 +8599,14 @@ components:
           example: "Lists your prices so you can choose which ones create licenses,\
             \ and checks they can still be paid."
           type: string
+        optional:
+          description: "Whether the key can connect without it, losing what it's for,\
+            \ explained by `reason`."
+          example: false
+          type: boolean
       required:
       - access
+      - optional
       - reason
       - resource
     Integration:
@@ -8112,12 +8616,14 @@ components:
         livemode: true
         accountName: Acme Inc.
         apiKeyHint: rk_live_…Ab3d
-        webhookUrl: https://api.example.com/v1/webhooks/stripe/i8Fz4QnRt
+        webhookUrl: https://api.licensemanager.dev/v1/webhooks/stripe/i8Fz4QnRt
         status: active
         statusReason: "The API key can't manage webhook endpoints: give it the Webhook\
           \ Endpoints: Write permission"
         lastCheckedAt: 2000-01-23T04:56:07.000+00:00
         lastEventAt: 2000-01-23T04:56:07.000+00:00
+        autoRefund: true
+        canRefund: true
         createdAt: 2000-01-23T04:56:07.000+00:00
       properties:
         id:
@@ -8143,7 +8649,7 @@ components:
           type: string
         webhookUrl:
           description: URL of the webhook endpoint created on the Stripe account.
-          example: https://api.example.com/v1/webhooks/stripe/i8Fz4QnRt
+          example: https://api.licensemanager.dev/v1/webhooks/stripe/i8Fz4QnRt
           type: string
         status:
           $ref: "#/components/schemas/IntegrationStatus"
@@ -8163,12 +8669,25 @@ components:
           format: date-time
           nullable: true
           type: string
+        autoRefund:
+          description: "Whether canceling a license bought through Stripe refunds\
+            \ its payment. On by default, always off when `canRefund` is false."
+          example: true
+          type: boolean
+        canRefund:
+          description: "Whether the API key has the optional Refunds: Write permission,\
+            \ checked when connecting and every day. Without it, canceled licenses\
+            \ aren't refunded: refund their payments from Stripe."
+          example: true
+          type: boolean
         createdAt:
           format: date-time
           type: string
       required:
       - accountName
       - apiKeyHint
+      - autoRefund
+      - canRefund
       - createdAt
       - id
       - lastCheckedAt
@@ -8261,13 +8780,24 @@ components:
         apiKey:
           description: "Restricted API key of the Stripe account (`rk_live_…` for\
             \ live products, `rk_test_…` for test products), with the `requiredPermissions`\
-            \ of `getStripeIntegration`. A secret key works too, but gives the app\
+            \ of `getStripeIntegration`. Without the optional ones, it connects with\
+            \ what they're for turned off. A secret key works too, but gives the app\
             \ more access than it needs."
           example: rk_live_51Nv0FG…
           minLength: 1
           type: string
       required:
       - apiKey
+    UpdateIntegration:
+      example:
+        autoRefund: false
+      properties:
+        autoRefund:
+          description: "Whether canceling a license bought through Stripe refunds\
+            \ its payment. Can only be turned on when the integration's `canRefund`\
+            \ is true: the API key has the Refunds: Write permission."
+          example: false
+          type: boolean
     StripePrice:
       example:
         id: price_1MoBy5LkdIwHu7ix
@@ -8699,6 +9229,16 @@ components:
       required:
       - count
       - platform
+    CancellationStats_byReason_inner:
+      properties:
+        reason:
+          $ref: "#/components/schemas/CancellationReason"
+        count:
+          example: 2
+          type: integer
+      required:
+      - count
+      - reason
     Policy_duration:
       anyOf:
       - $ref: "#/components/schemas/PolicySettings_duration_anyOf"
@@ -8781,7 +9321,7 @@ components:
         type: user
         id: u2Hk9PzLq
         name: Jane Doe
-        email: jane@example.com
+        email: jane@licensemanager.dev
         image: https://example.com/jane.png
       properties:
         type:
@@ -8798,7 +9338,7 @@ components:
           nullable: true
           type: string
         email:
-          example: jane@example.com
+          example: jane@licensemanager.dev
           nullable: true
           type: string
         image:
@@ -8901,7 +9441,7 @@ components:
 
         - `typ`: `customer`, `license` or `machine`, the type of resource the token is scoped to.
         - `sub`: id of that resource.
-        - `scope`: space separated permissions, among `customer:read`, `customer:write`, `license:read`, `license:write`, `machine:read` and `machine:write`. A write permission implies the matching read one. Without `scope`, the token can't do anything.
+        - `scope`: space separated permissions, among `customer:read`, `customer:write`, `license:read`, `license:write`, `license:cancel`, `machine:read` and `machine:write`. A write permission implies the other ones of its resource: `license:write` implies `license:read` and `license:cancel`. Without `scope`, the token can't do anything.
         - `exp`: expiration time.
 
         Only the endpoints that say so accept tokens: the others answer `403` with `token_not_allowed`, as do the endpoints that don't accept its type. A token without the endpoint's permission answers `403` with `insufficient_scope`. The token reaches the resource it's scoped to, the ones below it and the ones above it: a license token reaches its customer and machines, but not the customer's other licenses. Resources it doesn't reach answer `404`.

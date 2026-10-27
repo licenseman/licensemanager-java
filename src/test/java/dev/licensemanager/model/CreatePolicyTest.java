@@ -96,4 +96,12 @@ public class CreatePolicyTest {
         // TODO: test maxVersion
     }
 
+    /**
+     * Test the property 'moneyBackGuaranteeDays'
+     */
+    @Test
+    public void moneyBackGuaranteeDaysTest() {
+        // TODO: test moneyBackGuaranteeDays
+    }
+
 }

@@ -33,6 +33,7 @@
 | CUSTOMER_WRITE | &quot;customer:write&quot; |
 | LICENSE_READ | &quot;license:read&quot; |
 | LICENSE_WRITE | &quot;license:write&quot; |
+| LICENSE_CANCEL | &quot;license:cancel&quot; |
 | MACHINE_READ | &quot;machine:read&quot; |
 | MACHINE_WRITE | &quot;machine:write&quot; |
 | UNKNOWN_DEFAULT_OPEN_API | &quot;unknown_default_open_api&quot; |

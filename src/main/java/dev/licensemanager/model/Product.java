@@ -84,6 +84,11 @@ public class Product {
   @javax.annotation.Nonnull
   private PortalSettings portal;
 
+  public static final String SERIALIZED_NAME_AUTO_MACHINE_CHANGE = "autoMachineChange";
+  @SerializedName(SERIALIZED_NAME_AUTO_MACHINE_CHANGE)
+  @javax.annotation.Nonnull
+  private Boolean autoMachineChange;
+
   public static final String SERIALIZED_NAME_CREATED_AT = "createdAt";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
   @javax.annotation.Nonnull
@@ -211,6 +216,25 @@ public class Product {
   }
 
 
+  public Product autoMachineChange(@javax.annotation.Nonnull Boolean autoMachineChange) {
+    this.autoMachineChange = autoMachineChange;
+    return this;
+  }
+
+  /**
+   * Whether a new machine validating a license already on its max machines takes the place of the license&#39;s machine validated the longest ago, rather than being refused with &#x60;machine_limit_reached&#x60;. When the replaced machine is validated again, it takes its place back and the machine that replaced it is locked. See &#x60;validateKey&#x60;.
+   * @return autoMachineChange
+   */
+  @javax.annotation.Nonnull
+  public Boolean getAutoMachineChange() {
+    return autoMachineChange;
+  }
+
+  public void setAutoMachineChange(@javax.annotation.Nonnull Boolean autoMachineChange) {
+    this.autoMachineChange = autoMachineChange;
+  }
+
+
   public Product createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
@@ -309,6 +333,7 @@ public class Product {
         Objects.equals(this.isTestFromProductId, product.isTestFromProductId) &&
         Objects.equals(this.logoUrl, product.logoUrl) &&
         Objects.equals(this.portal, product.portal) &&
+        Objects.equals(this.autoMachineChange, product.autoMachineChange) &&
         Objects.equals(this.createdAt, product.createdAt) &&
         Objects.equals(this.updatedAt, product.updatedAt)&&
         Objects.equals(this.additionalProperties, product.additionalProperties);
@@ -316,7 +341,7 @@ public class Product {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, slug, name, isTestFromProductId, logoUrl, portal, createdAt, updatedAt, additionalProperties);
+    return Objects.hash(id, slug, name, isTestFromProductId, logoUrl, portal, autoMachineChange, createdAt, updatedAt, additionalProperties);
   }
 
   @Override
@@ -329,6 +354,7 @@ public class Product {
     sb.append("    isTestFromProductId: ").append(toIndentedString(isTestFromProductId)).append("\n");
     sb.append("    logoUrl: ").append(toIndentedString(logoUrl)).append("\n");
     sb.append("    portal: ").append(toIndentedString(portal)).append("\n");
+    sb.append("    autoMachineChange: ").append(toIndentedString(autoMachineChange)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
@@ -350,10 +376,10 @@ public class Product {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("id", "slug", "name", "isTestFromProductId", "logoUrl", "portal", "createdAt", "updatedAt"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "slug", "name", "isTestFromProductId", "logoUrl", "portal", "autoMachineChange", "createdAt", "updatedAt"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "slug", "name", "isTestFromProductId", "logoUrl", "portal", "createdAt", "updatedAt"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "slug", "name", "isTestFromProductId", "logoUrl", "portal", "autoMachineChange", "createdAt", "updatedAt"));
   }
 
   /**

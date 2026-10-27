@@ -120,6 +120,22 @@ public class IntegrationTest {
     }
 
     /**
+     * Test the property 'autoRefund'
+     */
+    @Test
+    public void autoRefundTest() {
+        // TODO: test autoRefund
+    }
+
+    /**
+     * Test the property 'canRefund'
+     */
+    @Test
+    public void canRefundTest() {
+        // TODO: test canRefund
+    }
+
+    /**
      * Test the property 'createdAt'
      */
     @Test

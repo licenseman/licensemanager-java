@@ -34,6 +34,7 @@ import dev.licensemanager.model.Integration;
 import dev.licensemanager.model.IntegrationMapping;
 import dev.licensemanager.model.ListStripePrices200Response;
 import dev.licensemanager.model.StripeIntegration;
+import dev.licensemanager.model.UpdateIntegration;
 import dev.licensemanager.model.UpdateIntegrationMapping;
 
 import java.lang.reflect.Type;
@@ -380,7 +381,7 @@ public class IntegrationsApi {
             <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
             <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
             <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Stripe can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
-            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Stripe secret or restricted key, or Stripe rejected it. &#x60;key_mode_mismatch&#x60;: a test mode key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Stripe secret or restricted key, or Stripe rejected it. &#x60;key_mode_mismatch&#x60;: a test mode key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message. Optional ones aren&#39;t required: without Refunds: Write, it connects with &#x60;canRefund&#x60; false </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
             <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
@@ -403,7 +404,7 @@ public class IntegrationsApi {
             <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
             <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
             <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Stripe can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
-            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Stripe secret or restricted key, or Stripe rejected it. &#x60;key_mode_mismatch&#x60;: a test mode key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Stripe secret or restricted key, or Stripe rejected it. &#x60;key_mode_mismatch&#x60;: a test mode key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message. Optional ones aren&#39;t required: without Refunds: Write, it connects with &#x60;canRefund&#x60; false </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
             <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
@@ -427,7 +428,7 @@ public class IntegrationsApi {
             <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
             <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
             <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Stripe can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
-            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Stripe secret or restricted key, or Stripe rejected it. &#x60;key_mode_mismatch&#x60;: a test mode key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Stripe secret or restricted key, or Stripe rejected it. &#x60;key_mode_mismatch&#x60;: a test mode key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message. Optional ones aren&#39;t required: without Refunds: Write, it connects with &#x60;canRefund&#x60; false </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
             <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
@@ -451,7 +452,7 @@ public class IntegrationsApi {
             <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
             <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
             <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Stripe can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
-            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Stripe secret or restricted key, or Stripe rejected it. &#x60;key_mode_mismatch&#x60;: a test mode key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Stripe secret or restricted key, or Stripe rejected it. &#x60;key_mode_mismatch&#x60;: a test mode key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message. Optional ones aren&#39;t required: without Refunds: Write, it connects with &#x60;canRefund&#x60; false </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
             <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
@@ -477,7 +478,7 @@ public class IntegrationsApi {
         <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
         <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
         <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Stripe can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
-        <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Stripe secret or restricted key, or Stripe rejected it. &#x60;key_mode_mismatch&#x60;: a test mode key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Stripe secret or restricted key, or Stripe rejected it. &#x60;key_mode_mismatch&#x60;: a test mode key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message. Optional ones aren&#39;t required: without Refunds: Write, it connects with &#x60;canRefund&#x60; false </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
         <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
      </table>
@@ -1446,6 +1447,204 @@ public class IntegrationsApi {
      */
     public APIlistStripePricesRequest listStripePrices(@javax.annotation.Nonnull String id) {
         return new APIlistStripePricesRequest(id);
+    }
+    private okhttp3.Call updateIntegrationCall(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateIntegration updateIntegration, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = updateIntegration;
+
+        // create path and map variables
+        String localVarPath = "/v1/integrations/{id}"
+            .replace("{" + "id" + "}", localVarApiClient.escapeString(id.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "apiKey" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "PATCH", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call updateIntegrationValidateBeforeCall(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateIntegration updateIntegration, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'id' is set
+        if (id == null) {
+            throw new ApiException("Missing the required parameter 'id' when calling updateIntegration(Async)");
+        }
+
+        // verify the required parameter 'updateIntegration' is set
+        if (updateIntegration == null) {
+            throw new ApiException("Missing the required parameter 'updateIntegration' when calling updateIntegration(Async)");
+        }
+
+        return updateIntegrationCall(id, updateIntegration, _callback);
+
+    }
+
+
+    private ApiResponse<Integration> updateIntegrationWithHttpInfo(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateIntegration updateIntegration) throws ApiException {
+        okhttp3.Call localVarCall = updateIntegrationValidateBeforeCall(id, updateIntegration, null);
+        Type localVarReturnType = new TypeToken<Integration>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    private okhttp3.Call updateIntegrationAsync(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateIntegration updateIntegration, final ApiCallback<Integration> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = updateIntegrationValidateBeforeCall(id, updateIntegration, _callback);
+        Type localVarReturnType = new TypeToken<Integration>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+
+    public class APIupdateIntegrationRequest {
+        @javax.annotation.Nonnull
+        private final String id;
+        @javax.annotation.Nonnull
+        private final UpdateIntegration updateIntegration;
+
+        private APIupdateIntegrationRequest(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateIntegration updateIntegration) {
+            this.id = id;
+            this.updateIntegration = updateIntegration;
+        }
+
+        /**
+         * Build call for updateIntegration
+         * @param _callback ApiCallback API callback
+         * @return Call to execute
+         * @throws ApiException If fail to serialize the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Updated integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Integration not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;missing_permission&#x60;: turning &#x60;autoRefund&#x60; on while the API key lacks the Refunds: Write permission </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
+            return updateIntegrationCall(id, updateIntegration, _callback);
+        }
+
+        /**
+         * Execute updateIntegration request
+         * @return Integration
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Updated integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Integration not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;missing_permission&#x60;: turning &#x60;autoRefund&#x60; on while the API key lacks the Refunds: Write permission </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public Integration execute() throws ApiException {
+            ApiResponse<Integration> localVarResp = updateIntegrationWithHttpInfo(id, updateIntegration);
+            return localVarResp.getData();
+        }
+
+        /**
+         * Execute updateIntegration request with HTTP info returned
+         * @return ApiResponse&lt;Integration&gt;
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Updated integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Integration not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;missing_permission&#x60;: turning &#x60;autoRefund&#x60; on while the API key lacks the Refunds: Write permission </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public ApiResponse<Integration> executeWithHttpInfo() throws ApiException {
+            return updateIntegrationWithHttpInfo(id, updateIntegration);
+        }
+
+        /**
+         * Execute updateIntegration request (asynchronously)
+         * @param _callback The callback to be executed when the API call finishes
+         * @return The request call
+         * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Updated integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Integration not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;missing_permission&#x60;: turning &#x60;autoRefund&#x60; on while the API key lacks the Refunds: Write permission </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call executeAsync(final ApiCallback<Integration> _callback) throws ApiException {
+            return updateIntegrationAsync(id, updateIntegration, _callback);
+        }
+    }
+
+    /**
+     * Update an integration
+     * Changes the settings of the integration, for every product of its mode. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:update&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     * @param id  (required)
+     * @param updateIntegration  (required)
+     * @return APIupdateIntegrationRequest
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Updated integration </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+        <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Integration not found </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;missing_permission&#x60;: turning &#x60;autoRefund&#x60; on while the API key lacks the Refunds: Write permission </td><td>  -  </td></tr>
+        <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+     </table>
+     */
+    public APIupdateIntegrationRequest updateIntegration(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateIntegration updateIntegration) {
+        return new APIupdateIntegrationRequest(id, updateIntegration);
     }
     private okhttp3.Call updateStripeMappingCall(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateIntegrationMapping updateIntegrationMapping, final ApiCallback _callback) throws ApiException {
         String basePath = null;

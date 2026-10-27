@@ -87,6 +87,11 @@ public class UpdateLicense {
   @javax.annotation.Nullable
   private PriceInput price;
 
+  public static final String SERIALIZED_NAME_CANCELLABLE_UNTIL = "cancellableUntil";
+  @SerializedName(SERIALIZED_NAME_CANCELLABLE_UNTIL)
+  @javax.annotation.Nullable
+  private OffsetDateTime cancellableUntil;
+
   public UpdateLicense() {
   }
 
@@ -215,6 +220,25 @@ public class UpdateLicense {
     this.price = price;
   }
 
+
+  public UpdateLicense cancellableUntil(@javax.annotation.Nullable OffsetDateTime cancellableUntil) {
+    this.cancellableUntil = cancellableUntil;
+    return this;
+  }
+
+  /**
+   * End of the money back guarantee: until then, the customer can cancel the license from the customer portal, or with a token. &#x60;null&#x60; to not let them.
+   * @return cancellableUntil
+   */
+  @javax.annotation.Nullable
+  public OffsetDateTime getCancellableUntil() {
+    return cancellableUntil;
+  }
+
+  public void setCancellableUntil(@javax.annotation.Nullable OffsetDateTime cancellableUntil) {
+    this.cancellableUntil = cancellableUntil;
+  }
+
   /**
    * A container for additional, undeclared properties.
    * This is a holder for any undeclared properties as specified with
@@ -275,7 +299,8 @@ public class UpdateLicense {
         Objects.equals(this.maxMachines, updateLicense.maxMachines) &&
         Objects.equals(this.maxOfflineDurationSeconds, updateLicense.maxOfflineDurationSeconds) &&
         Objects.equals(this.maxVersion, updateLicense.maxVersion) &&
-        Objects.equals(this.price, updateLicense.price)&&
+        Objects.equals(this.price, updateLicense.price) &&
+        Objects.equals(this.cancellableUntil, updateLicense.cancellableUntil)&&
         Objects.equals(this.additionalProperties, updateLicense.additionalProperties);
   }
 
@@ -285,7 +310,7 @@ public class UpdateLicense {
 
   @Override
   public int hashCode() {
-    return Objects.hash(expiresAt, meta, maxMachines, maxOfflineDurationSeconds, maxVersion, price, additionalProperties);
+    return Objects.hash(expiresAt, meta, maxMachines, maxOfflineDurationSeconds, maxVersion, price, cancellableUntil, additionalProperties);
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -305,6 +330,7 @@ public class UpdateLicense {
     sb.append("    maxOfflineDurationSeconds: ").append(toIndentedString(maxOfflineDurationSeconds)).append("\n");
     sb.append("    maxVersion: ").append(toIndentedString(maxVersion)).append("\n");
     sb.append("    price: ").append(toIndentedString(price)).append("\n");
+    sb.append("    cancellableUntil: ").append(toIndentedString(cancellableUntil)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -324,7 +350,7 @@ public class UpdateLicense {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("expiresAt", "meta", "maxMachines", "maxOfflineDurationSeconds", "maxVersion", "price"));
+    openapiFields = new HashSet<String>(Arrays.asList("expiresAt", "meta", "maxMachines", "maxOfflineDurationSeconds", "maxVersion", "price", "cancellableUntil"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);

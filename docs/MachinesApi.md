@@ -15,7 +15,7 @@ All URIs are relative to *https://api.licensemanager.dev*
 
 Deactivate a machine
 
-The machine no longer counts as using the license, freeing its place when the license has a maximum number of machines. Validating the license key on the machine activates it again, unless the license is on its maximum number of machines by then. Deactivating a deactivated machine does nothing.  The license token &#x60;validateKey&#x60; returned to the machine isn&#39;t revoked: the application can keep running offline until it expires. Machines can&#39;t be deleted: they&#39;re deleted with their license.  **Token access**: customer, license, machine tokens with the &#x60;machine:write&#x60; permission (or the matching write one). A token reaches the machine it&#39;s scoped to, or the machines of its license or customer.  **Required role permission**: &#x60;machine:deactivate&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+The machine no longer counts as using the license, freeing its place when the license has a maximum number of machines. Validating the license key on the machine activates it again, unless the license is on its maximum number of machines by then. Deactivating a deactivated or locked machine does nothing.  The license token &#x60;validateKey&#x60; returned to the machine isn&#39;t revoked: the application can keep running offline until it expires. Machines can&#39;t be deleted: they&#39;re deleted with their license.  **Token access**: customer, license, machine tokens with the &#x60;machine:write&#x60; permission (or the matching write one). A token reaches the machine it&#39;s scoped to, or the machines of its license or customer.  **Required role permission**: &#x60;machine:deactivate&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
 
 ### Example
 ```java
@@ -241,7 +241,7 @@ public class Example {
 | **sort** | **String**| Field to sort by, prefixed with &#x60;-&#x60; for descending order. Defaults to &#x60;-createdAt&#x60;. | [optional] [default to -createdAt] [enum: name, -name, platform, -platform, createdAt, -createdAt, updatedAt, -updatedAt] |
 | **search** | **String**| Case-insensitive text the fingerprint or name contains. | [optional] |
 | **fingerprint** | **String**| Only returns the machine with this exact fingerprint. | [optional] |
-| **status** | **String**| Only returns the machines with this status. | [optional] [enum: active, deactivated] |
+| **status** | **String**| Only returns the machines with this status. | [optional] [enum: active, deactivated, locked] |
 
 ### Return type
 

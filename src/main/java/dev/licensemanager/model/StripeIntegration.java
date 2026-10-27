@@ -136,7 +136,7 @@ public class StripeIntegration {
   }
 
   /**
-   * Permissions the restricted API key needs, and why. Every other permission can stay &#x60;None&#x60;.
+   * Permissions the restricted API key needs, and why, the &#x60;optional&#x60; ones included. Every other permission can stay &#x60;None&#x60;.
    * @return requiredPermissions
    */
   @javax.annotation.Nonnull

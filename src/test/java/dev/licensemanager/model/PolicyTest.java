@@ -113,6 +113,14 @@ public class PolicyTest {
     }
 
     /**
+     * Test the property 'moneyBackGuaranteeDays'
+     */
+    @Test
+    public void moneyBackGuaranteeDaysTest() {
+        // TODO: test moneyBackGuaranteeDays
+    }
+
+    /**
      * Test the property 'licenseCount'
      */
     @Test

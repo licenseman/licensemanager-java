@@ -18,6 +18,7 @@ import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import dev.licensemanager.model.CancellationReason;
 import dev.licensemanager.model.LicenseMaxVersion;
 import dev.licensemanager.model.LicenseStatus;
 import dev.licensemanager.model.Price;
@@ -169,6 +170,46 @@ public class LicenseTest {
     @Test
     public void statusTest() {
         // TODO: test status
+    }
+
+    /**
+     * Test the property 'cancellableUntil'
+     */
+    @Test
+    public void cancellableUntilTest() {
+        // TODO: test cancellableUntil
+    }
+
+    /**
+     * Test the property 'canceledAt'
+     */
+    @Test
+    public void canceledAtTest() {
+        // TODO: test canceledAt
+    }
+
+    /**
+     * Test the property 'cancellationReason'
+     */
+    @Test
+    public void cancellationReasonTest() {
+        // TODO: test cancellationReason
+    }
+
+    /**
+     * Test the property 'cancellationComment'
+     */
+    @Test
+    public void cancellationCommentTest() {
+        // TODO: test cancellationComment
+    }
+
+    /**
+     * Test the property 'stripeRefundId'
+     */
+    @Test
+    public void stripeRefundIdTest() {
+        // TODO: test stripeRefundId
     }
 
     /**

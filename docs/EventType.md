@@ -17,6 +17,12 @@
 
 * `LICENSE_VALIDATION_FAILED` (value: `"license.validation_failed"`)
 
+* `LICENSE_CANCELED` (value: `"license.canceled"`)
+
+* `LICENSE_REFUNDED` (value: `"license.refunded"`)
+
+* `LICENSE_REFUND_FAILED` (value: `"license.refund_failed"`)
+
 * `MACHINE_DEACTIVATED` (value: `"machine.deactivated"`)
 
 * `UNKNOWN_DEFAULT_OPEN_API` (value: `"unknown_default_open_api"`)

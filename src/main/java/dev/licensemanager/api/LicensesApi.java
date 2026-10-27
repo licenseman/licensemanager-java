@@ -28,6 +28,7 @@ import java.io.IOException;
 
 
 import java.math.BigDecimal;
+import dev.licensemanager.model.CancelLicense;
 import dev.licensemanager.model.CreateLicense;
 import dev.licensemanager.model.Error;
 import dev.licensemanager.model.License;
@@ -85,6 +86,209 @@ public class LicensesApi {
         this.localCustomBaseUrl = customBaseUrl;
     }
 
+    private okhttp3.Call cancelLicenseCall(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull CancelLicense cancelLicense, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = cancelLicense;
+
+        // create path and map variables
+        String localVarPath = "/v1/licenses/{id}/cancel"
+            .replace("{" + "id" + "}", localVarApiClient.escapeString(id.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "apiKey", "token" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call cancelLicenseValidateBeforeCall(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull CancelLicense cancelLicense, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'id' is set
+        if (id == null) {
+            throw new ApiException("Missing the required parameter 'id' when calling cancelLicense(Async)");
+        }
+
+        // verify the required parameter 'cancelLicense' is set
+        if (cancelLicense == null) {
+            throw new ApiException("Missing the required parameter 'cancelLicense' when calling cancelLicense(Async)");
+        }
+
+        return cancelLicenseCall(id, cancelLicense, _callback);
+
+    }
+
+
+    private ApiResponse<License> cancelLicenseWithHttpInfo(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull CancelLicense cancelLicense) throws ApiException {
+        okhttp3.Call localVarCall = cancelLicenseValidateBeforeCall(id, cancelLicense, null);
+        Type localVarReturnType = new TypeToken<License>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    private okhttp3.Call cancelLicenseAsync(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull CancelLicense cancelLicense, final ApiCallback<License> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = cancelLicenseValidateBeforeCall(id, cancelLicense, _callback);
+        Type localVarReturnType = new TypeToken<License>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+
+    public class APIcancelLicenseRequest {
+        @javax.annotation.Nonnull
+        private final String id;
+        @javax.annotation.Nonnull
+        private final CancelLicense cancelLicense;
+
+        private APIcancelLicenseRequest(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull CancelLicense cancelLicense) {
+            this.id = id;
+            this.cancelLicense = cancelLicense;
+        }
+
+        /**
+         * Build call for cancelLicense
+         * @param _callback ApiCallback API callback
+         * @return Call to execute
+         * @throws ApiException If fail to serialize the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Canceled license </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> License not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;already_canceled&#x60;: the license is already canceled. &#x60;not_cancellable&#x60;: for tokens, the license has no money back guarantee, or it has ended </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
+            return cancelLicenseCall(id, cancelLicense, _callback);
+        }
+
+        /**
+         * Execute cancelLicense request
+         * @return License
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Canceled license </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> License not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;already_canceled&#x60;: the license is already canceled. &#x60;not_cancellable&#x60;: for tokens, the license has no money back guarantee, or it has ended </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public License execute() throws ApiException {
+            ApiResponse<License> localVarResp = cancelLicenseWithHttpInfo(id, cancelLicense);
+            return localVarResp.getData();
+        }
+
+        /**
+         * Execute cancelLicense request with HTTP info returned
+         * @return ApiResponse&lt;License&gt;
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Canceled license </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> License not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;already_canceled&#x60;: the license is already canceled. &#x60;not_cancellable&#x60;: for tokens, the license has no money back guarantee, or it has ended </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public ApiResponse<License> executeWithHttpInfo() throws ApiException {
+            return cancelLicenseWithHttpInfo(id, cancelLicense);
+        }
+
+        /**
+         * Execute cancelLicense request (asynchronously)
+         * @param _callback The callback to be executed when the API call finishes
+         * @return The request call
+         * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Canceled license </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> License not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;already_canceled&#x60;: the license is already canceled. &#x60;not_cancellable&#x60;: for tokens, the license has no money back guarantee, or it has ended </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call executeAsync(final ApiCallback<License> _callback) throws ApiException {
+            return cancelLicenseAsync(id, cancelLicense, _callback);
+        }
+    }
+
+    /**
+     * Cancel a license
+     * Cancels the license right away: validating its key then fails with &#x60;license_expired&#x60;, like an expired license, and its status is &#x60;canceled&#x60;. A cancellation can&#39;t be undone.  Customers can cancel their licenses until their &#x60;cancellableUntil&#x60;, the end of their money back guarantee: tokens can&#39;t cancel a license past it, or without one. API keys and sessions can cancel any license.  When the license was bought through the Stripe integration, its payment is refunded in the background, unless the integration disables &#x60;autoRefund&#x60;, its API key lacks the optional Refunds: Write permission (&#x60;canRefund&#x60;), or &#x60;refund&#x60; is &#x60;false&#x60;: the refund is its price paid, taxes included, and its id is set as &#x60;stripeRefundId&#x60;. The customer is emailed a confirmation, and the owners and admins of the organization are told about the cancellation and its refund. In test products, the customer is only emailed when their email is a member&#39;s of the organization.  Records a &#x60;license.canceled&#x60; event, then a &#x60;license.refunded&#x60; or &#x60;license.refund_failed&#x60; one once the refund is done.  **Token access**: customer, license tokens with the &#x60;license:cancel&#x60; permission (or the matching write one). A token reaches the license it&#39;s scoped to, or the licenses of its customer.  **Required role permission**: &#x60;license:cancel&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     * @param id  (required)
+     * @param cancelLicense  (required)
+     * @return APIcancelLicenseRequest
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Canceled license </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+        <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> License not found </td><td>  -  </td></tr>
+        <tr><td> 409 </td><td> &#x60;already_canceled&#x60;: the license is already canceled. &#x60;not_cancellable&#x60;: for tokens, the license has no money back guarantee, or it has ended </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+        <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+     </table>
+     */
+    public APIcancelLicenseRequest cancelLicense(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull CancelLicense cancelLicense) {
+        return new APIcancelLicenseRequest(id, cancelLicense);
+    }
     private okhttp3.Call createLicenseCall(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull CreateLicense createLicense, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
@@ -267,7 +471,7 @@ public class LicensesApi {
 
     /**
      * Create a license
-     * Without a &#x60;key&#x60;, the license gets a random one, like &#x60;7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF&#x60;: 5 groups of 5 characters separated by dashes, each character an upper case letter or a digit other than &#x60;O&#x60;, &#x60;0&#x60;, &#x60;I&#x60; and &#x60;1&#x60;. That&#39;s 32 possible characters encoding 5 bits each, for 125 random bits.  Without a &#x60;policyId&#x60;, the license follows the product&#39;s default policy.  Without an &#x60;expiresAt&#x60;, the license expires after the duration of its policy, or never when the policy has none. &#x60;expiresAt: null&#x60; makes it never expire.  Without a &#x60;price&#x60;, the price paid for the license is unknown: it&#39;s left out of the revenue stats.  The values of &#x60;maxVersion&#x60; left out are taken from the max version of the policy: its hard-coded version, or the times after the creation of the license its versions lock.  The license belongs to the product&#39;s customer with the given &#x60;email&#x60;, which is created when there&#39;s none.  With &#x60;sendKey: true&#x60;, the key is emailed to the customer once the license is created.  The license copies the settings of its policy when it&#39;s created: later changes to the policy don&#39;t affect it. Its key, policy and customer can&#39;t be changed afterwards.  **Required role permission**: &#x60;license:create&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     * Without a &#x60;key&#x60;, the license gets a random one, like &#x60;7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF&#x60;: 5 groups of 5 characters separated by dashes, each character an upper case letter or a digit other than &#x60;O&#x60;, &#x60;0&#x60;, &#x60;I&#x60; and &#x60;1&#x60;. That&#39;s 32 possible characters encoding 5 bits each, for 125 random bits.  Without a &#x60;policyId&#x60;, the license follows the product&#39;s default policy.  Without an &#x60;expiresAt&#x60;, the license expires after the duration of its policy, or never when the policy has none. &#x60;expiresAt: null&#x60; makes it never expire.  Without a &#x60;price&#x60;, the price paid for the license is unknown: it&#39;s left out of the revenue stats.  Without a &#x60;cancellableUntil&#x60;, the customer can cancel the license during the policy&#39;s &#x60;moneyBackGuaranteeDays&#x60; after its creation, or never when the policy has none.  The values of &#x60;maxVersion&#x60; left out are taken from the max version of the policy: its hard-coded version, or the times after the creation of the license its versions lock.  The license belongs to the product&#39;s customer with the given &#x60;email&#x60;, which is created when there&#39;s none.  With &#x60;sendKey: true&#x60;, the key is emailed to the customer once the license is created.  The license copies the settings of its policy when it&#39;s created: later changes to the policy don&#39;t affect it. Its key, policy and customer can&#39;t be changed afterwards.  **Required role permission**: &#x60;license:create&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
      * @param productId  (required)
      * @param createLicense  (required)
      * @return APIcreateLicenseRequest
@@ -2457,7 +2661,7 @@ public class LicensesApi {
 
     /**
      * Update a license
-     * The key, policy and customer of a license can&#39;t be changed: sending them does nothing.  The changes apply to the next validations of the key, not to the license tokens &#x60;validateKey&#x60; already returned, which stay valid until they expire. Lowering &#x60;maxMachines&#x60; doesn&#39;t deactivate machines: the ones already active keep validating, and new ones are refused until enough are deactivated.  **Required role permission**: &#x60;license:update&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     * The key, policy and customer of a license can&#39;t be changed: sending them does nothing.  The changes apply to the next validations of the key, not to the license tokens &#x60;validateKey&#x60; already returned, which stay valid until they expire. Lowering &#x60;maxMachines&#x60; doesn&#39;t deactivate machines: the ones already active keep validating, and new ones replace them one at a time when the product has &#x60;autoMachineChange&#x60;, or are refused until enough are deactivated.  **Required role permission**: &#x60;license:update&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
      * @param id  (required)
      * @param updateLicense  (required)
      * @return APIupdateLicenseRequest
@@ -2576,7 +2780,7 @@ public class LicensesApi {
             <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
             <tr><td> 200 </td><td> Signed license token </td><td>  -  </td></tr>
             <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period </td><td>  -  </td></tr>
-            <tr><td> 403 </td><td> &#x60;license_expired&#x60;: the license has expired. &#x60;version_not_allowed&#x60;: the license doesn&#39;t allow the version, with the &#x60;latestAllowedVersion&#x60;. &#x60;machine_limit_reached&#x60;: the license is already active on its maximum number of machines </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;license_expired&#x60;: the license has expired, or was canceled. &#x60;version_not_allowed&#x60;: the license doesn&#39;t allow the version, with the &#x60;latestAllowedVersion&#x60;. &#x60;machine_locked&#x60;: the machine was locked after the machine it overrode came back. &#x60;machine_limit_reached&#x60;: the license is already active on its maximum number of machines, and the product disables &#x60;autoMachineChange&#x60; or the machine isn&#39;t new </td><td>  -  </td></tr>
             <tr><td> 404 </td><td> &#x60;not_found&#x60;: the product doesn&#39;t exist, or has no license with this key </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body </td><td>  -  </td></tr>
          </table>
@@ -2595,7 +2799,7 @@ public class LicensesApi {
             <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
             <tr><td> 200 </td><td> Signed license token </td><td>  -  </td></tr>
             <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period </td><td>  -  </td></tr>
-            <tr><td> 403 </td><td> &#x60;license_expired&#x60;: the license has expired. &#x60;version_not_allowed&#x60;: the license doesn&#39;t allow the version, with the &#x60;latestAllowedVersion&#x60;. &#x60;machine_limit_reached&#x60;: the license is already active on its maximum number of machines </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;license_expired&#x60;: the license has expired, or was canceled. &#x60;version_not_allowed&#x60;: the license doesn&#39;t allow the version, with the &#x60;latestAllowedVersion&#x60;. &#x60;machine_locked&#x60;: the machine was locked after the machine it overrode came back. &#x60;machine_limit_reached&#x60;: the license is already active on its maximum number of machines, and the product disables &#x60;autoMachineChange&#x60; or the machine isn&#39;t new </td><td>  -  </td></tr>
             <tr><td> 404 </td><td> &#x60;not_found&#x60;: the product doesn&#39;t exist, or has no license with this key </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body </td><td>  -  </td></tr>
          </table>
@@ -2615,7 +2819,7 @@ public class LicensesApi {
             <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
             <tr><td> 200 </td><td> Signed license token </td><td>  -  </td></tr>
             <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period </td><td>  -  </td></tr>
-            <tr><td> 403 </td><td> &#x60;license_expired&#x60;: the license has expired. &#x60;version_not_allowed&#x60;: the license doesn&#39;t allow the version, with the &#x60;latestAllowedVersion&#x60;. &#x60;machine_limit_reached&#x60;: the license is already active on its maximum number of machines </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;license_expired&#x60;: the license has expired, or was canceled. &#x60;version_not_allowed&#x60;: the license doesn&#39;t allow the version, with the &#x60;latestAllowedVersion&#x60;. &#x60;machine_locked&#x60;: the machine was locked after the machine it overrode came back. &#x60;machine_limit_reached&#x60;: the license is already active on its maximum number of machines, and the product disables &#x60;autoMachineChange&#x60; or the machine isn&#39;t new </td><td>  -  </td></tr>
             <tr><td> 404 </td><td> &#x60;not_found&#x60;: the product doesn&#39;t exist, or has no license with this key </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body </td><td>  -  </td></tr>
          </table>
@@ -2635,7 +2839,7 @@ public class LicensesApi {
             <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
             <tr><td> 200 </td><td> Signed license token </td><td>  -  </td></tr>
             <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period </td><td>  -  </td></tr>
-            <tr><td> 403 </td><td> &#x60;license_expired&#x60;: the license has expired. &#x60;version_not_allowed&#x60;: the license doesn&#39;t allow the version, with the &#x60;latestAllowedVersion&#x60;. &#x60;machine_limit_reached&#x60;: the license is already active on its maximum number of machines </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;license_expired&#x60;: the license has expired, or was canceled. &#x60;version_not_allowed&#x60;: the license doesn&#39;t allow the version, with the &#x60;latestAllowedVersion&#x60;. &#x60;machine_locked&#x60;: the machine was locked after the machine it overrode came back. &#x60;machine_limit_reached&#x60;: the license is already active on its maximum number of machines, and the product disables &#x60;autoMachineChange&#x60; or the machine isn&#39;t new </td><td>  -  </td></tr>
             <tr><td> 404 </td><td> &#x60;not_found&#x60;: the product doesn&#39;t exist, or has no license with this key </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body </td><td>  -  </td></tr>
          </table>
@@ -2647,7 +2851,7 @@ public class LicensesApi {
 
     /**
      * Validate a license key
-     * Checks the license key of the product on a machine and returns a token the application can verify offline with the organization&#39;s public key. Doesn&#39;t need authentication.  The license must allow the &#x60;version&#x60;: up to its &#x60;maxVersion.version&#x60; when it has one, like &#x60;\&quot;2.3\&quot;&#x60; for every 2.3.z version and older. Its &#x60;maxVersion.lockMajorAt&#x60; and &#x60;maxVersion.lockMinorAt&#x60; are enforced once they hard-code &#x60;maxVersion.version&#x60;, within the hour they&#39;re reached. When it doesn&#39;t, the error&#39;s &#x60;latestAllowedVersion&#x60; is the latest release of the product the license allows, so the application can offer to install it.  The machine with the &#x60;fingerprint&#x60; is created when the license has none, and activated when it&#39;s deactivated, unless the license is already active on its maximum number of machines. A machine that&#39;s already active is never refused for the maximum number of machines, even when it was lowered below the number of active machines. Its &#x60;version&#x60;, and its &#x60;name&#x60; and &#x60;platform&#x60; when given, are updated: they can&#39;t be cleared.  The checks run in this order, and the first one failing answers: the license has expired, then it doesn&#39;t allow the version, then it&#39;s on its maximum number of machines. Each failure is recorded as a &#x60;license.validation_failed&#x60; event, except for keys that don&#39;t exist.  Changes to the license, like deactivating the machine or shortening its expiration, don&#39;t revoke the tokens already returned: the application only sees them when it validates its key again, at the latest when its token expires.
+     * Checks the license key of the product on a machine and returns a token the application can verify offline with the organization&#39;s public key. Doesn&#39;t need authentication.  The license must allow the &#x60;version&#x60;: up to its &#x60;maxVersion.version&#x60; when it has one, like &#x60;\&quot;2.3\&quot;&#x60; for every 2.3.z version and older. Its &#x60;maxVersion.lockMajorAt&#x60; and &#x60;maxVersion.lockMinorAt&#x60; are enforced once they hard-code &#x60;maxVersion.version&#x60;, within the hour they&#39;re reached. When it doesn&#39;t, the error&#39;s &#x60;latestAllowedVersion&#x60; is the latest release of the product the license allows, so the application can offer to install it.  The machine with the &#x60;fingerprint&#x60; is created when the license has none, and activated when it&#39;s deactivated, unless the license is already active on its maximum number of machines. A machine that&#39;s already active is never refused for the maximum number of machines, even when it was lowered below the number of active machines. Its &#x60;version&#x60;, and its &#x60;name&#x60; and &#x60;platform&#x60; when given, are updated: they can&#39;t be cleared.  Unless the product disables &#x60;autoMachineChange&#x60;, a new machine isn&#39;t refused when the license is on its maximum number of machines: it takes the place of the active machine validated the longest ago, which is deactivated with its &#x60;overriddenByMachineId&#x60; set to the new machine, and recorded as a &#x60;machine.deactivated&#x60; event. When a machine deactivated this way is validated again, it takes its place back: the machine that overrode it, and the ones that overrode that one in turn, are locked, with their &#x60;overriddenByMachineId&#x60; set to the machine coming back. A locked machine is always refused, so two machines can&#39;t take turns on one place.  The checks run in this order, and the first one failing answers: the license has expired or was canceled, then it doesn&#39;t allow the version, then the machine is locked, then it&#39;s on its maximum number of machines. Each failure is recorded as a &#x60;license.validation_failed&#x60; event, except for keys that don&#39;t exist.  Changes to the license, like deactivating the machine or shortening its expiration, don&#39;t revoke the tokens already returned: the application only sees them when it validates its key again, at the latest when its token expires.
      * @param productId  (required)
      * @param validateKey  (required)
      * @return APIvalidateKeyRequest
@@ -2657,7 +2861,7 @@ public class LicensesApi {
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Signed license token </td><td>  -  </td></tr>
         <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period </td><td>  -  </td></tr>
-        <tr><td> 403 </td><td> &#x60;license_expired&#x60;: the license has expired. &#x60;version_not_allowed&#x60;: the license doesn&#39;t allow the version, with the &#x60;latestAllowedVersion&#x60;. &#x60;machine_limit_reached&#x60;: the license is already active on its maximum number of machines </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> &#x60;license_expired&#x60;: the license has expired, or was canceled. &#x60;version_not_allowed&#x60;: the license doesn&#39;t allow the version, with the &#x60;latestAllowedVersion&#x60;. &#x60;machine_locked&#x60;: the machine was locked after the machine it overrode came back. &#x60;machine_limit_reached&#x60;: the license is already active on its maximum number of machines, and the product disables &#x60;autoMachineChange&#x60; or the machine isn&#39;t new </td><td>  -  </td></tr>
         <tr><td> 404 </td><td> &#x60;not_found&#x60;: the product doesn&#39;t exist, or has no license with this key </td><td>  -  </td></tr>
         <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body </td><td>  -  </td></tr>
      </table>

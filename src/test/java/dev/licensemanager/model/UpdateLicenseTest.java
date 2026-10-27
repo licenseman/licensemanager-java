@@ -91,4 +91,12 @@ public class UpdateLicenseTest {
         // TODO: test price
     }
 
+    /**
+     * Test the property 'cancellableUntil'
+     */
+    @Test
+    public void cancellableUntilTest() {
+        // TODO: test cancellableUntil
+    }
+
 }

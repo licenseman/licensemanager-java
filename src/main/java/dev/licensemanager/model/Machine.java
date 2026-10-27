@@ -78,13 +78,15 @@ public class Machine {
   private String name;
 
   /**
-   * Whether the machine counts as using the license.
+   * Whether the machine counts as using the license. A &#x60;locked&#x60; machine doesn&#39;t, and its validations are refused with &#x60;machine_locked&#x60;: it overrode a machine that came back. See &#x60;validateKey&#x60;.
    */
   @JsonAdapter(StatusEnum.Adapter.class)
   public enum StatusEnum {
     ACTIVE("active"),
     
     DEACTIVATED("deactivated"),
+    
+    LOCKED("locked"),
     
     UNKNOWN_DEFAULT_OPEN_API("unknown_default_open_api");
 
@@ -140,6 +142,11 @@ public class Machine {
   @SerializedName(SERIALIZED_NAME_VERSION)
   @javax.annotation.Nullable
   private String version;
+
+  public static final String SERIALIZED_NAME_OVERRIDDEN_BY_MACHINE_ID = "overriddenByMachineId";
+  @SerializedName(SERIALIZED_NAME_OVERRIDDEN_BY_MACHINE_ID)
+  @javax.annotation.Nullable
+  private String overriddenByMachineId;
 
   public static final String SERIALIZED_NAME_LAST_VALIDATED_AT = "lastValidatedAt";
   @SerializedName(SERIALIZED_NAME_LAST_VALIDATED_AT)
@@ -260,7 +267,7 @@ public class Machine {
   }
 
   /**
-   * Whether the machine counts as using the license.
+   * Whether the machine counts as using the license. A &#x60;locked&#x60; machine doesn&#39;t, and its validations are refused with &#x60;machine_locked&#x60;: it overrode a machine that came back. See &#x60;validateKey&#x60;.
    * @return status
    */
   @javax.annotation.Nonnull
@@ -289,6 +296,25 @@ public class Machine {
 
   public void setVersion(@javax.annotation.Nullable String version) {
     this.version = version;
+  }
+
+
+  public Machine overriddenByMachineId(@javax.annotation.Nullable String overriddenByMachineId) {
+    this.overriddenByMachineId = overriddenByMachineId;
+    return this;
+  }
+
+  /**
+   * For a machine deactivated or locked by automatic machine changes, the machine that took its place. Validating the key on a deactivated machine that has one takes its place back. &#x60;null&#x60; otherwise.
+   * @return overriddenByMachineId
+   */
+  @javax.annotation.Nullable
+  public String getOverriddenByMachineId() {
+    return overriddenByMachineId;
+  }
+
+  public void setOverriddenByMachineId(@javax.annotation.Nullable String overriddenByMachineId) {
+    this.overriddenByMachineId = overriddenByMachineId;
   }
 
 
@@ -410,6 +436,7 @@ public class Machine {
         Objects.equals(this.name, machine.name) &&
         Objects.equals(this.status, machine.status) &&
         Objects.equals(this.version, machine.version) &&
+        Objects.equals(this.overriddenByMachineId, machine.overriddenByMachineId) &&
         Objects.equals(this.lastValidatedAt, machine.lastValidatedAt) &&
         Objects.equals(this.createdAt, machine.createdAt) &&
         Objects.equals(this.updatedAt, machine.updatedAt)&&
@@ -418,7 +445,7 @@ public class Machine {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, licenseId, fingerprint, platform, name, status, version, lastValidatedAt, createdAt, updatedAt, additionalProperties);
+    return Objects.hash(id, licenseId, fingerprint, platform, name, status, version, overriddenByMachineId, lastValidatedAt, createdAt, updatedAt, additionalProperties);
   }
 
   @Override
@@ -432,6 +459,7 @@ public class Machine {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
+    sb.append("    overriddenByMachineId: ").append(toIndentedString(overriddenByMachineId)).append("\n");
     sb.append("    lastValidatedAt: ").append(toIndentedString(lastValidatedAt)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
@@ -454,10 +482,10 @@ public class Machine {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("id", "licenseId", "fingerprint", "platform", "name", "status", "version", "lastValidatedAt", "createdAt", "updatedAt"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "licenseId", "fingerprint", "platform", "name", "status", "version", "overriddenByMachineId", "lastValidatedAt", "createdAt", "updatedAt"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "licenseId", "fingerprint", "platform", "name", "status", "version", "lastValidatedAt", "createdAt", "updatedAt"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "licenseId", "fingerprint", "platform", "name", "status", "version", "overriddenByMachineId", "lastValidatedAt", "createdAt", "updatedAt"));
   }
 
   /**
@@ -502,6 +530,9 @@ public class Machine {
       StatusEnum.validateJsonElement(jsonObj.get("status"));
       if ((jsonObj.get("version") != null && !jsonObj.get("version").isJsonNull()) && !jsonObj.get("version").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `version` to be a primitive type in the JSON string but got `%s`", jsonObj.get("version").toString()));
+      }
+      if ((jsonObj.get("overriddenByMachineId") != null && !jsonObj.get("overriddenByMachineId").isJsonNull()) && !jsonObj.get("overriddenByMachineId").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `overriddenByMachineId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("overriddenByMachineId").toString()));
       }
   }
 

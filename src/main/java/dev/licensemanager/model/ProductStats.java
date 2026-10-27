@@ -19,6 +19,7 @@ import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import dev.licensemanager.model.CancellationStats;
 import dev.licensemanager.model.ProductStatsActivationsByVersionInner;
 import dev.licensemanager.model.ProductStatsActiveMachinesByPlatformInner;
 import dev.licensemanager.model.ProductStatsActiveMachinesByVersionInner;
@@ -134,6 +135,11 @@ public class ProductStats {
   @javax.annotation.Nonnull
   private List<ProductStatsNewLicensesByPolicyInner> newLicensesByPolicy = new ArrayList<>();
 
+  public static final String SERIALIZED_NAME_CANCELLATION = "cancellation";
+  @SerializedName(SERIALIZED_NAME_CANCELLATION)
+  @javax.annotation.Nullable
+  private CancellationStats cancellation;
+
   public static final String SERIALIZED_NAME_REVENUE = "revenue";
   @SerializedName(SERIALIZED_NAME_REVENUE)
   @javax.annotation.Nonnull
@@ -182,7 +188,7 @@ public class ProductStats {
   }
 
   /**
-   * Number of licenses that haven&#39;t expired, and that a machine validated in the last 90 days.
+   * Number of licenses that haven&#39;t expired nor were canceled, and that a machine validated in the last 90 days.
    * @return activeLicenseCount
    */
   @javax.annotation.Nonnull
@@ -220,7 +226,7 @@ public class ProductStats {
   }
 
   /**
-   * Number of licenses expiring in the next 30 days.
+   * Number of licenses expiring in the next 30 days, canceled ones left out.
    * @return expiringLicenseCount
    */
   @javax.annotation.Nonnull
@@ -239,7 +245,7 @@ public class ProductStats {
   }
 
   /**
-   * Number of licenses that expired in the last 30 days.
+   * Number of licenses that expired in the last 30 days, canceled ones left out.
    * @return expiredLicenseCount
    */
   @javax.annotation.Nonnull
@@ -296,7 +302,7 @@ public class ProductStats {
   }
 
   /**
-   * Sum of the maximum numbers of machines of the licenses that haven&#39;t expired. Licenses without a maximum are left out.
+   * Sum of the maximum numbers of machines of the licenses that haven&#39;t expired nor were canceled. Licenses without a maximum are left out.
    * @return seatCount
    */
   @javax.annotation.Nonnull
@@ -482,6 +488,25 @@ public class ProductStats {
   }
 
 
+  public ProductStats cancellation(@javax.annotation.Nullable CancellationStats cancellation) {
+    this.cancellation = cancellation;
+    return this;
+  }
+
+  /**
+   * Cancellations of the licenses with a money back guarantee. &#x60;null&#x60; when no license of the product has one.
+   * @return cancellation
+   */
+  @javax.annotation.Nullable
+  public CancellationStats getCancellation() {
+    return cancellation;
+  }
+
+  public void setCancellation(@javax.annotation.Nullable CancellationStats cancellation) {
+    this.cancellation = cancellation;
+  }
+
+
   public ProductStats revenue(@javax.annotation.Nonnull List<Revenue> revenue) {
     this.revenue = revenue;
     return this;
@@ -659,6 +684,7 @@ public class ProductStats {
         Objects.equals(this.newLicensesByDay, productStats.newLicensesByDay) &&
         Objects.equals(this.newLicensesByMonth, productStats.newLicensesByMonth) &&
         Objects.equals(this.newLicensesByPolicy, productStats.newLicensesByPolicy) &&
+        Objects.equals(this.cancellation, productStats.cancellation) &&
         Objects.equals(this.revenue, productStats.revenue) &&
         Objects.equals(this.activationsByVersion, productStats.activationsByVersion) &&
         Objects.equals(this.activeMachinesByVersion, productStats.activeMachinesByVersion) &&
@@ -668,7 +694,7 @@ public class ProductStats {
 
   @Override
   public int hashCode() {
-    return Objects.hash(licenseCount, activeLicenseCount, newLicenseCount, expiringLicenseCount, expiredLicenseCount, activeMachineCount, inUseLicenseCount, seatCount, usedSeatCount, fullLicenseCount, days, months, newLicensesByDay, newLicensesByMonth, newLicensesByPolicy, revenue, activationsByVersion, activeMachinesByVersion, activeMachinesByPlatform, additionalProperties);
+    return Objects.hash(licenseCount, activeLicenseCount, newLicenseCount, expiringLicenseCount, expiredLicenseCount, activeMachineCount, inUseLicenseCount, seatCount, usedSeatCount, fullLicenseCount, days, months, newLicensesByDay, newLicensesByMonth, newLicensesByPolicy, cancellation, revenue, activationsByVersion, activeMachinesByVersion, activeMachinesByPlatform, additionalProperties);
   }
 
   @Override
@@ -690,6 +716,7 @@ public class ProductStats {
     sb.append("    newLicensesByDay: ").append(toIndentedString(newLicensesByDay)).append("\n");
     sb.append("    newLicensesByMonth: ").append(toIndentedString(newLicensesByMonth)).append("\n");
     sb.append("    newLicensesByPolicy: ").append(toIndentedString(newLicensesByPolicy)).append("\n");
+    sb.append("    cancellation: ").append(toIndentedString(cancellation)).append("\n");
     sb.append("    revenue: ").append(toIndentedString(revenue)).append("\n");
     sb.append("    activationsByVersion: ").append(toIndentedString(activationsByVersion)).append("\n");
     sb.append("    activeMachinesByVersion: ").append(toIndentedString(activeMachinesByVersion)).append("\n");
@@ -713,10 +740,10 @@ public class ProductStats {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("licenseCount", "activeLicenseCount", "newLicenseCount", "expiringLicenseCount", "expiredLicenseCount", "activeMachineCount", "inUseLicenseCount", "seatCount", "usedSeatCount", "fullLicenseCount", "days", "months", "newLicensesByDay", "newLicensesByMonth", "newLicensesByPolicy", "revenue", "activationsByVersion", "activeMachinesByVersion", "activeMachinesByPlatform"));
+    openapiFields = new HashSet<String>(Arrays.asList("licenseCount", "activeLicenseCount", "newLicenseCount", "expiringLicenseCount", "expiredLicenseCount", "activeMachineCount", "inUseLicenseCount", "seatCount", "usedSeatCount", "fullLicenseCount", "days", "months", "newLicensesByDay", "newLicensesByMonth", "newLicensesByPolicy", "cancellation", "revenue", "activationsByVersion", "activeMachinesByVersion", "activeMachinesByPlatform"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("licenseCount", "activeLicenseCount", "newLicenseCount", "expiringLicenseCount", "expiredLicenseCount", "activeMachineCount", "inUseLicenseCount", "seatCount", "usedSeatCount", "fullLicenseCount", "days", "months", "newLicensesByDay", "newLicensesByMonth", "newLicensesByPolicy", "revenue", "activationsByVersion", "activeMachinesByVersion", "activeMachinesByPlatform"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("licenseCount", "activeLicenseCount", "newLicenseCount", "expiringLicenseCount", "expiredLicenseCount", "activeMachineCount", "inUseLicenseCount", "seatCount", "usedSeatCount", "fullLicenseCount", "days", "months", "newLicensesByDay", "newLicensesByMonth", "newLicensesByPolicy", "cancellation", "revenue", "activationsByVersion", "activeMachinesByVersion", "activeMachinesByPlatform"));
   }
 
   /**
@@ -772,6 +799,10 @@ public class ProductStats {
         for (int i = 0; i < jsonArraynewLicensesByPolicy.size(); i++) {
           ProductStatsNewLicensesByPolicyInner.validateJsonElement(jsonArraynewLicensesByPolicy.get(i));
         }
+      }
+      if (jsonObj.get("cancellation") != null && !jsonObj.get("cancellation").isJsonNull()) {
+      // validate the required field `cancellation`
+      CancellationStats.validateJsonElement(jsonObj.get("cancellation"));
       }
       if (jsonObj.get("revenue") != null) {
         if (!jsonObj.get("revenue").isJsonArray()) {
