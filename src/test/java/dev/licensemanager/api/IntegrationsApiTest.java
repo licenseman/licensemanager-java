@@ -20,9 +20,13 @@ import dev.licensemanager.model.Error;
 import dev.licensemanager.model.Integration;
 import dev.licensemanager.model.IntegrationMapping;
 import dev.licensemanager.model.ListStripePrices200Response;
+import dev.licensemanager.model.SlackAuthorize;
+import dev.licensemanager.model.SlackConnection;
+import dev.licensemanager.model.SlackIntegration;
 import dev.licensemanager.model.StripeIntegration;
 import dev.licensemanager.model.UpdateIntegration;
 import dev.licensemanager.model.UpdateIntegrationMapping;
+import dev.licensemanager.model.UpdateSlackConnection;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -38,6 +42,21 @@ import java.util.Map;
 public class IntegrationsApiTest {
 
     private final IntegrationsApi api = new IntegrationsApi();
+
+    /**
+     * Start connecting a Slack channel
+     *
+     * Returns the URL of Slack&#39;s consent screen, where the user picks the channel getting the product&#39;s notifications. Slack then redirects to the app&#39;s integrations page. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:create&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     *
+     * @throws ApiException if the Api call fails
+     */
+    @Test
+    public void authorizeSlackTest() throws ApiException {
+        String productId = null;
+        SlackAuthorize response = api.authorizeSlack(productId)
+                .execute();
+        // TODO: test validations
+    }
 
     /**
      * Check an integration
@@ -87,6 +106,21 @@ public class IntegrationsApiTest {
     }
 
     /**
+     * Remove a Slack connection
+     *
+     * Stops posting to the channel and revokes the installation&#39;s token in Slack. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:delete&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     *
+     * @throws ApiException if the Api call fails
+     */
+    @Test
+    public void deleteSlackConnectionTest() throws ApiException {
+        String id = null;
+        api.deleteSlackConnection(id)
+                .execute();
+        // TODO: test validations
+    }
+
+    /**
      * Delete a mapping
      *
      * Paying the price no longer creates licenses. The licenses it created stay. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:update&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
@@ -112,6 +146,21 @@ public class IntegrationsApiTest {
     public void disconnectIntegrationTest() throws ApiException {
         String id = null;
         api.disconnectIntegration(id)
+                .execute();
+        // TODO: test validations
+    }
+
+    /**
+     * Get the Slack integration of a product
+     *
+     * Slack channels getting notifications about the product&#39;s licenses: purchases, renewals, failed payments and cancellations. Doesn&#39;t accept tokens: only API keys and sessions.
+     *
+     * @throws ApiException if the Api call fails
+     */
+    @Test
+    public void getSlackIntegrationTest() throws ApiException {
+        String productId = null;
+        SlackIntegration response = api.getSlackIntegration(productId)
                 .execute();
         // TODO: test validations
     }
@@ -147,6 +196,21 @@ public class IntegrationsApiTest {
     }
 
     /**
+     * Send a test message to a Slack channel
+     *
+     * Posts a message to the channel, to check it gets the notifications. Marks the connection &#x60;revoked&#x60; when Slack says it won&#39;t work again. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:update&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     *
+     * @throws ApiException if the Api call fails
+     */
+    @Test
+    public void testSlackConnectionTest() throws ApiException {
+        String id = null;
+        SlackConnection response = api.testSlackConnection(id)
+                .execute();
+        // TODO: test validations
+    }
+
+    /**
      * Update an integration
      *
      * Changes the settings of the integration, for every product of its mode. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:update&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
@@ -158,6 +222,22 @@ public class IntegrationsApiTest {
         String id = null;
         UpdateIntegration updateIntegration = null;
         Integration response = api.updateIntegration(id, updateIntegration)
+                .execute();
+        // TODO: test validations
+    }
+
+    /**
+     * Update a Slack connection
+     *
+     * Changes the notifications the channel gets. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:update&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     *
+     * @throws ApiException if the Api call fails
+     */
+    @Test
+    public void updateSlackConnectionTest() throws ApiException {
+        String id = null;
+        UpdateSlackConnection updateSlackConnection = null;
+        SlackConnection response = api.updateSlackConnection(id, updateSlackConnection)
                 .execute();
         // TODO: test validations
     }

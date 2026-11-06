@@ -45,4 +45,12 @@ public class UpdateIntegrationTest {
         // TODO: test autoRefund
     }
 
+    /**
+     * Test the property 'subscriptionGraceDays'
+     */
+    @Test
+    public void subscriptionGraceDaysTest() {
+        // TODO: test subscriptionGraceDays
+    }
+
 }

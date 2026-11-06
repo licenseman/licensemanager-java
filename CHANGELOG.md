@@ -1,5 +1,88 @@
 # Changelog
 
+## 0.3.0 (2026-11-06)
+
+### Breaking changes
+
+- `POST /v1/customers/{id}/tokens`: added the new `customer:billing` enum value to the `scope/items/` response property for the response status `201`
+- `GET /v1/licenses/{id}/events`: added the new `license.payment_failed` enum value to the `data/items/type` response property for the response status `200`
+- `GET /v1/licenses/{id}/events`: added the new `license.payment_succeeded` enum value to the `data/items/type` response property for the response status `200`
+- `GET /v1/licenses/{id}/events`: added the new `license.subscription_ended` enum value to the `data/items/type` response property for the response status `200`
+- `POST /v1/licenses/{id}/tokens`: added the new `customer:billing` enum value to the `scope/items/` response property for the response status `201`
+- `POST /v1/machines/{id}/tokens`: added the new `customer:billing` enum value to the `scope/items/` response property for the response status `201`
+- `GET /v1/policies/{id}/events`: added the new `license.payment_failed` enum value to the `data/items/type` response property for the response status `200`
+- `GET /v1/policies/{id}/events`: added the new `license.payment_succeeded` enum value to the `data/items/type` response property for the response status `200`
+- `GET /v1/policies/{id}/events`: added the new `license.subscription_ended` enum value to the `data/items/type` response property for the response status `200`
+
+### Potentially breaking changes
+
+- `GET /v1/customers/{customerId}/licenses`: removed `#/components/schemas/CancellationReason, subschema #2` from the `data/items/cancellationReason` response property `allOf` list for the response status `200`
+- `GET /v1/customers/{customerId}/licenses`: added `#/components/schemas/CancellationReason, subschema #2` to the `data/items/cancellationReason` response property `anyOf` list for the response status `200`
+- `GET /v1/licenses/{id}`: removed `#/components/schemas/CancellationReason, subschema #2` from the `cancellationReason` response property `allOf` list for the response status `200`
+- `GET /v1/licenses/{id}`: added `#/components/schemas/CancellationReason, subschema #2` to the `cancellationReason` response property `anyOf` list for the response status `200`
+- `PATCH /v1/licenses/{id}`: removed `#/components/schemas/CancellationReason, subschema #2` from the `cancellationReason` response property `allOf` list for the response status `200`
+- `PATCH /v1/licenses/{id}`: added `#/components/schemas/CancellationReason, subschema #2` to the `cancellationReason` response property `anyOf` list for the response status `200`
+- `POST /v1/licenses/{id}/cancel`: removed `#/components/schemas/CancellationReason, subschema #2` from the `cancellationReason` response property `allOf` list for the response status `200`
+- `POST /v1/licenses/{id}/cancel`: added `#/components/schemas/CancellationReason, subschema #2` to the `cancellationReason` response property `anyOf` list for the response status `200`
+- `GET /v1/products/{productId}/licenses`: removed `#/components/schemas/CancellationReason, subschema #2` from the `data/items/cancellationReason` response property `allOf` list for the response status `200`
+- `GET /v1/products/{productId}/licenses`: added `#/components/schemas/CancellationReason, subschema #2` to the `data/items/cancellationReason` response property `anyOf` list for the response status `200`
+- `POST /v1/products/{productId}/licenses`: removed `#/components/schemas/CancellationReason, subschema #2` from the `cancellationReason` response property `allOf` list for the response status `201`
+- `POST /v1/products/{productId}/licenses`: added `#/components/schemas/CancellationReason, subschema #2` to the `cancellationReason` response property `anyOf` list for the response status `201`
+
+### Changes
+
+- `GET /v1/customers/{customerId}/licenses`: added the required property `data/items/customer` to the response with the `200` status
+- `GET /v1/customers/{customerId}/licenses`: added the required property `data/items/subscription` to the response with the `200` status
+- `POST /v1/customers/{id}/billing-portal-sessions`: endpoint added
+- `POST /v1/customers/{id}/tokens`: added the new `customer:billing` enum value to the request property `scope/items/`
+- `PATCH /v1/integration-mappings/{id}`: added the required property `recurring` to the response with the `200` status
+- `PATCH /v1/integrations/{id}`: added the new optional request property `subscriptionGraceDays`
+- `PATCH /v1/integrations/{id}`: added the required property `canBillingPortal` to the response with the `200` status
+- `PATCH /v1/integrations/{id}`: added the required property `canManageSubscriptions` to the response with the `200` status
+- `PATCH /v1/integrations/{id}`: added the required property `subscriptionGraceDays` to the response with the `200` status
+- `POST /v1/integrations/{id}/check`: added the required property `canBillingPortal` to the response with the `200` status
+- `POST /v1/integrations/{id}/check`: added the required property `canManageSubscriptions` to the response with the `200` status
+- `POST /v1/integrations/{id}/check`: added the required property `subscriptionGraceDays` to the response with the `200` status
+- `GET /v1/integrations/{id}/stripe/prices`: added the required property `data/items/recurring` to the response with the `200` status
+- `GET /v1/licenses/{id}`: added the required property `customer` to the response with the `200` status
+- `GET /v1/licenses/{id}`: added the required property `subscription` to the response with the `200` status
+- `PATCH /v1/licenses/{id}`: added the non-success response with the status `409`
+- `PATCH /v1/licenses/{id}`: added the required property `customer` to the response with the `200` status
+- `PATCH /v1/licenses/{id}`: added the required property `subscription` to the response with the `200` status
+- `POST /v1/licenses/{id}/cancel`: added the required property `customer` to the response with the `200` status
+- `POST /v1/licenses/{id}/cancel`: added the required property `subscription` to the response with the `200` status
+- `GET /v1/licenses/{id}/events`: added the enum value `license.payment_failed` to the property `anyOf[#/components/schemas/EventType]/` of the `query` request parameter `type` (shared schema: `EventType`, also at `anyOf[#/components/schemas/EventType]`, `anyOf[subschema #2]/items`)
+- `GET /v1/licenses/{id}/events`: added the enum value `license.payment_succeeded` to the property `anyOf[#/components/schemas/EventType]/` of the `query` request parameter `type` (shared schema: `EventType`, also at `anyOf[#/components/schemas/EventType]`, `anyOf[subschema #2]/items`)
+- `GET /v1/licenses/{id}/events`: added the enum value `license.subscription_ended` to the property `anyOf[#/components/schemas/EventType]/` of the `query` request parameter `type` (shared schema: `EventType`, also at `anyOf[#/components/schemas/EventType]`, `anyOf[subschema #2]/items`)
+- `POST /v1/licenses/{id}/tokens`: added the new `customer:billing` enum value to the request property `scope/items/`
+- `POST /v1/machines/{id}/tokens`: added the new `customer:billing` enum value to the request property `scope/items/`
+- `GET /v1/policies/{id}/events`: added the enum value `license.payment_failed` to the property `anyOf[#/components/schemas/EventType]/` of the `query` request parameter `type` (shared schema: `EventType`, also at `anyOf[#/components/schemas/EventType]`, `anyOf[subschema #2]/items`)
+- `GET /v1/policies/{id}/events`: added the enum value `license.payment_succeeded` to the property `anyOf[#/components/schemas/EventType]/` of the `query` request parameter `type` (shared schema: `EventType`, also at `anyOf[#/components/schemas/EventType]`, `anyOf[subschema #2]/items`)
+- `GET /v1/policies/{id}/events`: added the enum value `license.subscription_ended` to the property `anyOf[#/components/schemas/EventType]/` of the `query` request parameter `type` (shared schema: `EventType`, also at `anyOf[#/components/schemas/EventType]`, `anyOf[subschema #2]/items`)
+- `GET /v1/products/{id}/stats`: added the required property `revenue/items/paymentCount` to the response with the `200` status
+- `GET /v1/products/{id}/stats`: added the required property `revenue/items/subscriptionTotal` to the response with the `200` status
+- `GET /v1/products/{id}/stats`: added the required property `subscriptions` to the response with the `200` status
+- `GET /v1/products/{productId}/integrations/slack`: endpoint added
+- `POST /v1/products/{productId}/integrations/slack/authorize`: endpoint added
+- `GET /v1/products/{productId}/integrations/stripe`: added the required property `integration/anyOf[#/components/schemas/Integration]/canBillingPortal` to the response with the `200` status
+- `GET /v1/products/{productId}/integrations/stripe`: added the required property `integration/anyOf[#/components/schemas/Integration]/canManageSubscriptions` to the response with the `200` status
+- `GET /v1/products/{productId}/integrations/stripe`: added the required property `integration/anyOf[#/components/schemas/Integration]/subscriptionGraceDays` to the response with the `200` status
+- `GET /v1/products/{productId}/integrations/stripe`: added the required property `mappings/items/recurring` to the response with the `200` status
+- `GET /v1/products/{productId}/integrations/stripe`: added the required property `requiredPermissions/items/subscriptions` to the response with the `200` status
+- `PUT /v1/products/{productId}/integrations/stripe`: added the required property `integration/anyOf[#/components/schemas/Integration]/canBillingPortal` to the response with the `200` status
+- `PUT /v1/products/{productId}/integrations/stripe`: added the required property `integration/anyOf[#/components/schemas/Integration]/canManageSubscriptions` to the response with the `200` status
+- `PUT /v1/products/{productId}/integrations/stripe`: added the required property `integration/anyOf[#/components/schemas/Integration]/subscriptionGraceDays` to the response with the `200` status
+- `PUT /v1/products/{productId}/integrations/stripe`: added the required property `mappings/items/recurring` to the response with the `200` status
+- `PUT /v1/products/{productId}/integrations/stripe`: added the required property `requiredPermissions/items/subscriptions` to the response with the `200` status
+- `POST /v1/products/{productId}/integrations/stripe/mappings`: added the required property `recurring` to the response with the `201` status
+- `GET /v1/products/{productId}/licenses`: added the required property `data/items/customer` to the response with the `200` status
+- `GET /v1/products/{productId}/licenses`: added the required property `data/items/subscription` to the response with the `200` status
+- `POST /v1/products/{productId}/licenses`: added the required property `customer` to the response with the `201` status
+- `POST /v1/products/{productId}/licenses`: added the required property `subscription` to the response with the `201` status
+- `DELETE /v1/slack-connections/{id}`: endpoint added
+- `PATCH /v1/slack-connections/{id}`: endpoint added
+- `POST /v1/slack-connections/{id}/test`: endpoint added
+
 ## 0.2.0 (2026-10-27)
 
 ### Breaking changes

@@ -19,6 +19,7 @@ import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import dev.licensemanager.model.IntegrationMappingRecurring;
 import dev.licensemanager.model.Price;
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -92,6 +93,11 @@ public class IntegrationMapping {
   @SerializedName(SERIALIZED_NAME_PRICE)
   @javax.annotation.Nullable
   private Price price;
+
+  public static final String SERIALIZED_NAME_RECURRING = "recurring";
+  @SerializedName(SERIALIZED_NAME_RECURRING)
+  @javax.annotation.Nullable
+  private IntegrationMappingRecurring recurring;
 
   /**
    * &#x60;error&#x60; when the price can no longer be paid, explained by &#x60;statusReason&#x60;.
@@ -317,6 +323,25 @@ public class IntegrationMapping {
   }
 
 
+  public IntegrationMapping recurring(@javax.annotation.Nullable IntegrationMappingRecurring recurring) {
+    this.recurring = recurring;
+    return this;
+  }
+
+  /**
+   * Get recurring
+   * @return recurring
+   */
+  @javax.annotation.Nullable
+  public IntegrationMappingRecurring getRecurring() {
+    return recurring;
+  }
+
+  public void setRecurring(@javax.annotation.Nullable IntegrationMappingRecurring recurring) {
+    this.recurring = recurring;
+  }
+
+
   public IntegrationMapping status(@javax.annotation.Nonnull StatusEnum status) {
     this.status = status;
     return this;
@@ -436,6 +461,7 @@ public class IntegrationMapping {
         Objects.equals(this.stripePriceId, integrationMapping.stripePriceId) &&
         Objects.equals(this.productName, integrationMapping.productName) &&
         Objects.equals(this.price, integrationMapping.price) &&
+        Objects.equals(this.recurring, integrationMapping.recurring) &&
         Objects.equals(this.status, integrationMapping.status) &&
         Objects.equals(this.statusReason, integrationMapping.statusReason) &&
         Objects.equals(this.createdAt, integrationMapping.createdAt)&&
@@ -444,7 +470,7 @@ public class IntegrationMapping {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, integrationId, productId, policyId, stripeProductId, stripePriceId, productName, price, status, statusReason, createdAt, additionalProperties);
+    return Objects.hash(id, integrationId, productId, policyId, stripeProductId, stripePriceId, productName, price, recurring, status, statusReason, createdAt, additionalProperties);
   }
 
   @Override
@@ -459,6 +485,7 @@ public class IntegrationMapping {
     sb.append("    stripePriceId: ").append(toIndentedString(stripePriceId)).append("\n");
     sb.append("    productName: ").append(toIndentedString(productName)).append("\n");
     sb.append("    price: ").append(toIndentedString(price)).append("\n");
+    sb.append("    recurring: ").append(toIndentedString(recurring)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    statusReason: ").append(toIndentedString(statusReason)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
@@ -481,10 +508,10 @@ public class IntegrationMapping {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("id", "integrationId", "productId", "policyId", "stripeProductId", "stripePriceId", "productName", "price", "status", "statusReason", "createdAt"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "integrationId", "productId", "policyId", "stripeProductId", "stripePriceId", "productName", "price", "recurring", "status", "statusReason", "createdAt"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "integrationId", "productId", "policyId", "stripeProductId", "stripePriceId", "productName", "price", "status", "statusReason", "createdAt"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "integrationId", "productId", "policyId", "stripeProductId", "stripePriceId", "productName", "price", "recurring", "status", "statusReason", "createdAt"));
   }
 
   /**
@@ -531,6 +558,10 @@ public class IntegrationMapping {
       if (jsonObj.get("price") != null && !jsonObj.get("price").isJsonNull()) {
       // validate the required field `price`
       Price.validateJsonElement(jsonObj.get("price"));
+      }
+      if (jsonObj.get("recurring") != null && !jsonObj.get("recurring").isJsonNull()) {
+      // validate the required field `recurring`
+      IntegrationMappingRecurring.validateJsonElement(jsonObj.get("recurring"));
       }
       if (!jsonObj.get("status").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `status` to be a primitive type in the JSON string but got `%s`", jsonObj.get("status").toString()));

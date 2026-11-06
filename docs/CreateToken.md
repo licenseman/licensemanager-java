@@ -18,6 +18,7 @@
 |---- | -----|
 | CUSTOMER_READ | &quot;customer:read&quot; |
 | CUSTOMER_WRITE | &quot;customer:write&quot; |
+| CUSTOMER_BILLING | &quot;customer:billing&quot; |
 | LICENSE_READ | &quot;license:read&quot; |
 | LICENSE_WRITE | &quot;license:write&quot; |
 | LICENSE_CANCEL | &quot;license:cancel&quot; |

@@ -24,6 +24,7 @@ import dev.licensemanager.model.ProductStatsActiveMachinesByPlatformInner;
 import dev.licensemanager.model.ProductStatsActiveMachinesByVersionInner;
 import dev.licensemanager.model.ProductStatsNewLicensesByPolicyInner;
 import dev.licensemanager.model.Revenue;
+import dev.licensemanager.model.SubscriptionStats;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -172,6 +173,14 @@ public class ProductStatsTest {
     @Test
     public void cancellationTest() {
         // TODO: test cancellation
+    }
+
+    /**
+     * Test the property 'subscriptions'
+     */
+    @Test
+    public void subscriptionsTest() {
+        // TODO: test subscriptions
     }
 
     /**

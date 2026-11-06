@@ -23,6 +23,12 @@
 
 * `LICENSE_REFUND_FAILED` (value: `"license.refund_failed"`)
 
+* `LICENSE_PAYMENT_SUCCEEDED` (value: `"license.payment_succeeded"`)
+
+* `LICENSE_PAYMENT_FAILED` (value: `"license.payment_failed"`)
+
+* `LICENSE_SUBSCRIPTION_ENDED` (value: `"license.subscription_ended"`)
+
 * `MACHINE_DEACTIVATED` (value: `"machine.deactivated"`)
 
 * `UNKNOWN_DEFAULT_OPEN_API` (value: `"unknown_default_open_api"`)

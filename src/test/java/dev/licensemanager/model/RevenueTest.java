@@ -66,6 +66,22 @@ public class RevenueTest {
     }
 
     /**
+     * Test the property 'subscriptionTotal'
+     */
+    @Test
+    public void subscriptionTotalTest() {
+        // TODO: test subscriptionTotal
+    }
+
+    /**
+     * Test the property 'paymentCount'
+     */
+    @Test
+    public void paymentCountTest() {
+        // TODO: test paymentCount
+    }
+
+    /**
      * Test the property 'canceledLicenseCount'
      */
     @Test

@@ -18,6 +18,7 @@ import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import dev.licensemanager.model.IntegrationMappingRecurring;
 import dev.licensemanager.model.Price;
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -101,6 +102,14 @@ public class IntegrationMappingTest {
     @Test
     public void priceTest() {
         // TODO: test price
+    }
+
+    /**
+     * Test the property 'recurring'
+     */
+    @Test
+    public void recurringTest() {
+        // TODO: test recurring
     }
 
     /**

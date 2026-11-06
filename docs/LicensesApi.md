@@ -23,7 +23,7 @@ All URIs are relative to *https://api.licensemanager.dev*
 
 Cancel a license
 
-Cancels the license right away: validating its key then fails with &#x60;license_expired&#x60;, like an expired license, and its status is &#x60;canceled&#x60;. A cancellation can&#39;t be undone.  Customers can cancel their licenses until their &#x60;cancellableUntil&#x60;, the end of their money back guarantee: tokens can&#39;t cancel a license past it, or without one. API keys and sessions can cancel any license.  When the license was bought through the Stripe integration, its payment is refunded in the background, unless the integration disables &#x60;autoRefund&#x60;, its API key lacks the optional Refunds: Write permission (&#x60;canRefund&#x60;), or &#x60;refund&#x60; is &#x60;false&#x60;: the refund is its price paid, taxes included, and its id is set as &#x60;stripeRefundId&#x60;. The customer is emailed a confirmation, and the owners and admins of the organization are told about the cancellation and its refund. In test products, the customer is only emailed when their email is a member&#39;s of the organization.  Records a &#x60;license.canceled&#x60; event, then a &#x60;license.refunded&#x60; or &#x60;license.refund_failed&#x60; one once the refund is done.  **Token access**: customer, license tokens with the &#x60;license:cancel&#x60; permission (or the matching write one). A token reaches the license it&#39;s scoped to, or the licenses of its customer.  **Required role permission**: &#x60;license:cancel&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+Cancels the license right away: validating its key then fails with &#x60;license_expired&#x60;, like an expired license, and its status is &#x60;canceled&#x60;. A cancellation can&#39;t be undone.  Customers can cancel their licenses until their &#x60;cancellableUntil&#x60;, the end of their money back guarantee: tokens can&#39;t cancel a license past it, or without one. API keys and sessions can cancel any license.  When the license was bought through the Stripe integration, its payment is refunded in the background, unless the integration disables &#x60;autoRefund&#x60;, its API key lacks the optional Refunds: Write permission (&#x60;canRefund&#x60;), or &#x60;refund&#x60; is &#x60;false&#x60;: the refund is its price paid, taxes included, and its id is set as &#x60;stripeRefundId&#x60;. The customer is emailed a confirmation, and the owners and admins of the organization are told about the cancellation and its refund. In test products, the customer is only emailed when their email is a member&#39;s of the organization.  A subscription license isn&#39;t refunded: its Stripe subscription is canceled at once, without proration, which needs the integration&#39;s &#x60;canManageSubscriptions&#x60;.  Records a &#x60;license.canceled&#x60; event, then a &#x60;license.refunded&#x60; or &#x60;license.refund_failed&#x60; one once the refund is done.  **Token access**: customer, license tokens with the &#x60;license:cancel&#x60; permission (or the matching write one). A token reaches the license it&#39;s scoped to, or the licenses of its customer.  **Required role permission**: &#x60;license:cancel&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
 
 ### Example
 ```java
@@ -96,7 +96,7 @@ public class Example {
 | **402** | &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit |  -  |
 | **403** | &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested |  -  |
 | **404** | License not found |  -  |
-| **409** | &#x60;already_canceled&#x60;: the license is already canceled. &#x60;not_cancellable&#x60;: for tokens, the license has no money back guarantee, or it has ended |  -  |
+| **409** | &#x60;already_canceled&#x60;: the license is already canceled. &#x60;not_cancellable&#x60;: for tokens, the license has no money back guarantee, or it has ended, as subscription licenses have none. &#x60;subscription_managed&#x60;: the license is a subscription license, and the Stripe API key lacks the Subscriptions: Write permission to cancel its subscription |  -  |
 | **422** | &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; |  -  |
 | **429** | &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds |  -  |
 
@@ -520,7 +520,7 @@ public class Example {
     Integer page = 1; // Integer | Page to return. Pages are numbered from 1: `1` is the first page. A page past the last one returns an empty `data`, not an error. Defaults to `1`.
     Integer pageSize = 20; // Integer | Maximum number of items per page, from 1 to 100. Every page holds this many items except the last one, which can hold fewer. Defaults to `20`.
     String sort = "key"; // String | Field to sort by, prefixed with `-` for descending order. Defaults to `-createdAt`.
-    String search = "X9ZPA"; // String | Case-insensitive text the key contains.
+    String search = "X9ZPA"; // String | Case-insensitive text the key or the email of the customer contains.
     String key = "7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF"; // String | Only returns the license with this exact key, case included. Keys of test products start with `TEST-`.
     String policyId = "p4Rt8LmQ"; // String | Only returns the licenses following this policy.
     String machineVersion = "2.3.1"; // String | Only returns the licenses with at least one active machine running this version of the product.
@@ -582,7 +582,7 @@ public class Example {
 | **page** | **Integer**| Page to return. Pages are numbered from 1: &#x60;1&#x60; is the first page. A page past the last one returns an empty &#x60;data&#x60;, not an error. Defaults to &#x60;1&#x60;. | [optional] [default to 1] |
 | **pageSize** | **Integer**| Maximum number of items per page, from 1 to 100. Every page holds this many items except the last one, which can hold fewer. Defaults to &#x60;20&#x60;. | [optional] [default to 20] |
 | **sort** | **String**| Field to sort by, prefixed with &#x60;-&#x60; for descending order. Defaults to &#x60;-createdAt&#x60;. | [optional] [default to -createdAt] [enum: key, -key, createdAt, -createdAt, expiresAt, -expiresAt, maxMachines, -maxMachines, maxOfflineDurationSeconds, -maxOfflineDurationSeconds, lastActivatedAt, -lastActivatedAt, lockMajorAt, -lockMajorAt, lockMinorAt, -lockMinorAt, updatedAt, -updatedAt, price, -price] |
-| **search** | **String**| Case-insensitive text the key contains. | [optional] |
+| **search** | **String**| Case-insensitive text the key or the email of the customer contains. | [optional] |
 | **key** | **String**| Only returns the license with this exact key, case included. Keys of test products start with &#x60;TEST-&#x60;. | [optional] |
 | **policyId** | **String**| Only returns the licenses following this policy. | [optional] |
 | **machineVersion** | **String**| Only returns the licenses with at least one active machine running this version of the product. | [optional] |
@@ -659,7 +659,7 @@ public class Example {
     Integer page = 1; // Integer | Page to return. Pages are numbered from 1: `1` is the first page. A page past the last one returns an empty `data`, not an error. Defaults to `1`.
     Integer pageSize = 20; // Integer | Maximum number of items per page, from 1 to 100. Every page holds this many items except the last one, which can hold fewer. Defaults to `20`.
     String sort = "key"; // String | Field to sort by, prefixed with `-` for descending order. Defaults to `-createdAt`.
-    String search = "X9ZPA"; // String | Case-insensitive text the key contains.
+    String search = "X9ZPA"; // String | Case-insensitive text the key or the email of the customer contains.
     String key = "7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF"; // String | Only returns the license with this exact key, case included. Keys of test products start with `TEST-`.
     String policyId = "p4Rt8LmQ"; // String | Only returns the licenses following this policy.
     String customerId = "c9Wd3RtE"; // String | Only returns the licenses of this customer.
@@ -723,7 +723,7 @@ public class Example {
 | **page** | **Integer**| Page to return. Pages are numbered from 1: &#x60;1&#x60; is the first page. A page past the last one returns an empty &#x60;data&#x60;, not an error. Defaults to &#x60;1&#x60;. | [optional] [default to 1] |
 | **pageSize** | **Integer**| Maximum number of items per page, from 1 to 100. Every page holds this many items except the last one, which can hold fewer. Defaults to &#x60;20&#x60;. | [optional] [default to 20] |
 | **sort** | **String**| Field to sort by, prefixed with &#x60;-&#x60; for descending order. Defaults to &#x60;-createdAt&#x60;. | [optional] [default to -createdAt] [enum: key, -key, createdAt, -createdAt, expiresAt, -expiresAt, maxMachines, -maxMachines, maxOfflineDurationSeconds, -maxOfflineDurationSeconds, lastActivatedAt, -lastActivatedAt, lockMajorAt, -lockMajorAt, lockMinorAt, -lockMinorAt, updatedAt, -updatedAt, price, -price] |
-| **search** | **String**| Case-insensitive text the key contains. | [optional] |
+| **search** | **String**| Case-insensitive text the key or the email of the customer contains. | [optional] |
 | **key** | **String**| Only returns the license with this exact key, case included. Keys of test products start with &#x60;TEST-&#x60;. | [optional] |
 | **policyId** | **String**| Only returns the licenses following this policy. | [optional] |
 | **customerId** | **String**| Only returns the licenses of this customer. | [optional] |
@@ -918,6 +918,7 @@ public class Example {
 | **402** | &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit |  -  |
 | **403** | &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested |  -  |
 | **404** | License not found |  -  |
+| **409** | &#x60;subscription_managed&#x60;: the license is a subscription license, whose &#x60;expiresAt&#x60;, &#x60;price&#x60;, &#x60;maxVersion&#x60; and &#x60;cancellableUntil&#x60; follow its Stripe subscription |  -  |
 | **422** | &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; |  -  |
 | **429** | &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds |  -  |
 

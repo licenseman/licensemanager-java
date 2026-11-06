@@ -15,6 +15,7 @@
 |**stripePriceId** | **String** |  |  |
 |**productName** | **String** | Name of the Stripe product when it was mapped. |  |
 |**price** | [**Price**](Price.md) |  |  |
+|**recurring** | [**IntegrationMappingRecurring**](IntegrationMappingRecurring.md) |  |  |
 |**status** | [**StatusEnum**](#StatusEnum) | &#x60;error&#x60; when the price can no longer be paid, explained by &#x60;statusReason&#x60;. |  |
 |**statusReason** | **String** |  |  |
 |**createdAt** | **OffsetDateTime** |  |  |

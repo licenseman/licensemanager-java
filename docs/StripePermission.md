@@ -11,6 +11,7 @@
 |**access** | [**AccessEnum**](#AccessEnum) |  |  |
 |**reason** | **String** |  |  |
 |**optional** | **Boolean** | Whether the key can connect without it, losing what it&#39;s for, explained by &#x60;reason&#x60;. |  |
+|**subscriptions** | **Boolean** | Whether it&#39;s only needed to sell subscriptions: checked once a recurring price is mapped. |  |
 
 
 

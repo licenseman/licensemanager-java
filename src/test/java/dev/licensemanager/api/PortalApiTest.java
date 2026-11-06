@@ -14,6 +14,8 @@
 package dev.licensemanager.api;
 
 import dev.licensemanager.ApiException;
+import dev.licensemanager.model.BillingPortalSession;
+import dev.licensemanager.model.CreateBillingPortalSession;
 import dev.licensemanager.model.CreatePortalLink;
 import dev.licensemanager.model.Error;
 import dev.licensemanager.model.Portal;
@@ -36,6 +38,23 @@ import java.util.Map;
 public class PortalApiTest {
 
     private final PortalApi api = new PortalApi();
+
+    /**
+     * Open the Stripe customer portal of a customer
+     *
+     * Link to the Stripe customer portal of the customer&#39;s Stripe customer, where they manage their subscriptions: change their plan or payment method, see their invoices, cancel. Needs the Stripe integration&#39;s &#x60;canBillingPortal&#x60;, and the customer portal configured in the Stripe account&#39;s settings. The changes come back through the integration&#39;s webhook, keeping the subscription licenses in line.  **Token access**: customer tokens with the &#x60;customer:billing&#x60; permission (or the matching write one). A customer token reaches its own customer.  **Required role permission**: &#x60;portalLink:create&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     *
+     * @throws ApiException if the Api call fails
+     */
+    @Test
+    public void createBillingPortalSessionTest() throws ApiException {
+        String id = null;
+        CreateBillingPortalSession createBillingPortalSession = null;
+        BillingPortalSession response = api.createBillingPortalSession(id)
+                .createBillingPortalSession(createBillingPortalSession)
+                .execute();
+        // TODO: test validations
+    }
 
     /**
      * Create a link to the customer portal

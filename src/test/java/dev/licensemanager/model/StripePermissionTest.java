@@ -69,4 +69,12 @@ public class StripePermissionTest {
         // TODO: test optional
     }
 
+    /**
+     * Test the property 'subscriptions'
+     */
+    @Test
+    public void subscriptionsTest() {
+        // TODO: test subscriptions
+    }
+
 }

@@ -20,6 +20,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import dev.licensemanager.model.Price;
+import dev.licensemanager.model.StripePriceRecurring;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -76,6 +77,11 @@ public class StripePrice {
   @SerializedName(SERIALIZED_NAME_PRICE)
   @javax.annotation.Nullable
   private Price price;
+
+  public static final String SERIALIZED_NAME_RECURRING = "recurring";
+  @SerializedName(SERIALIZED_NAME_RECURRING)
+  @javax.annotation.Nullable
+  private StripePriceRecurring recurring;
 
   public static final String SERIALIZED_NAME_MAPPED = "mapped";
   @SerializedName(SERIALIZED_NAME_MAPPED)
@@ -180,6 +186,25 @@ public class StripePrice {
   }
 
 
+  public StripePrice recurring(@javax.annotation.Nullable StripePriceRecurring recurring) {
+    this.recurring = recurring;
+    return this;
+  }
+
+  /**
+   * Get recurring
+   * @return recurring
+   */
+  @javax.annotation.Nullable
+  public StripePriceRecurring getRecurring() {
+    return recurring;
+  }
+
+  public void setRecurring(@javax.annotation.Nullable StripePriceRecurring recurring) {
+    this.recurring = recurring;
+  }
+
+
   public StripePrice mapped(@javax.annotation.Nonnull Boolean mapped) {
     this.mapped = mapped;
     return this;
@@ -258,13 +283,14 @@ public class StripePrice {
         Objects.equals(this.productName, stripePrice.productName) &&
         Objects.equals(this.nickname, stripePrice.nickname) &&
         Objects.equals(this.price, stripePrice.price) &&
+        Objects.equals(this.recurring, stripePrice.recurring) &&
         Objects.equals(this.mapped, stripePrice.mapped)&&
         Objects.equals(this.additionalProperties, stripePrice.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, productId, productName, nickname, price, mapped, additionalProperties);
+    return Objects.hash(id, productId, productName, nickname, price, recurring, mapped, additionalProperties);
   }
 
   @Override
@@ -276,6 +302,7 @@ public class StripePrice {
     sb.append("    productName: ").append(toIndentedString(productName)).append("\n");
     sb.append("    nickname: ").append(toIndentedString(nickname)).append("\n");
     sb.append("    price: ").append(toIndentedString(price)).append("\n");
+    sb.append("    recurring: ").append(toIndentedString(recurring)).append("\n");
     sb.append("    mapped: ").append(toIndentedString(mapped)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
@@ -296,10 +323,10 @@ public class StripePrice {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("id", "productId", "productName", "nickname", "price", "mapped"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "productId", "productName", "nickname", "price", "recurring", "mapped"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "productId", "productName", "nickname", "price", "mapped"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "productId", "productName", "nickname", "price", "recurring", "mapped"));
   }
 
   /**
@@ -337,6 +364,10 @@ public class StripePrice {
       if (jsonObj.get("price") != null && !jsonObj.get("price").isJsonNull()) {
       // validate the required field `price`
       Price.validateJsonElement(jsonObj.get("price"));
+      }
+      if (jsonObj.get("recurring") != null && !jsonObj.get("recurring").isJsonNull()) {
+      // validate the required field `recurring`
+      StripePriceRecurring.validateJsonElement(jsonObj.get("recurring"));
       }
   }
 

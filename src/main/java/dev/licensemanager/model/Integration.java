@@ -165,6 +165,21 @@ public class Integration {
   @javax.annotation.Nonnull
   private Boolean canRefund;
 
+  public static final String SERIALIZED_NAME_CAN_MANAGE_SUBSCRIPTIONS = "canManageSubscriptions";
+  @SerializedName(SERIALIZED_NAME_CAN_MANAGE_SUBSCRIPTIONS)
+  @javax.annotation.Nonnull
+  private Boolean canManageSubscriptions;
+
+  public static final String SERIALIZED_NAME_CAN_BILLING_PORTAL = "canBillingPortal";
+  @SerializedName(SERIALIZED_NAME_CAN_BILLING_PORTAL)
+  @javax.annotation.Nonnull
+  private Boolean canBillingPortal;
+
+  public static final String SERIALIZED_NAME_SUBSCRIPTION_GRACE_DAYS = "subscriptionGraceDays";
+  @SerializedName(SERIALIZED_NAME_SUBSCRIPTION_GRACE_DAYS)
+  @javax.annotation.Nonnull
+  private Integer subscriptionGraceDays;
+
   public static final String SERIALIZED_NAME_CREATED_AT = "createdAt";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
   @javax.annotation.Nonnull
@@ -401,6 +416,63 @@ public class Integration {
   }
 
 
+  public Integration canManageSubscriptions(@javax.annotation.Nonnull Boolean canManageSubscriptions) {
+    this.canManageSubscriptions = canManageSubscriptions;
+    return this;
+  }
+
+  /**
+   * Whether the API key has the optional Subscriptions: Write permission, checked when connecting and every day. Without it, subscription licenses can&#39;t be canceled from the app: cancel their subscriptions from Stripe.
+   * @return canManageSubscriptions
+   */
+  @javax.annotation.Nonnull
+  public Boolean getCanManageSubscriptions() {
+    return canManageSubscriptions;
+  }
+
+  public void setCanManageSubscriptions(@javax.annotation.Nonnull Boolean canManageSubscriptions) {
+    this.canManageSubscriptions = canManageSubscriptions;
+  }
+
+
+  public Integration canBillingPortal(@javax.annotation.Nonnull Boolean canBillingPortal) {
+    this.canBillingPortal = canBillingPortal;
+    return this;
+  }
+
+  /**
+   * Whether the API key has the optional Customer portal: Write permission, checked when connecting and every day. Without it, the license portal doesn&#39;t link to the Stripe customer portal.
+   * @return canBillingPortal
+   */
+  @javax.annotation.Nonnull
+  public Boolean getCanBillingPortal() {
+    return canBillingPortal;
+  }
+
+  public void setCanBillingPortal(@javax.annotation.Nonnull Boolean canBillingPortal) {
+    this.canBillingPortal = canBillingPortal;
+  }
+
+
+  public Integration subscriptionGraceDays(@javax.annotation.Nonnull Integer subscriptionGraceDays) {
+    this.subscriptionGraceDays = subscriptionGraceDays;
+    return this;
+  }
+
+  /**
+   * Days a subscription license stays valid after its period ends while its renewal is unpaid, as Stripe retries the payment. 7 by default.
+   * @return subscriptionGraceDays
+   */
+  @javax.annotation.Nonnull
+  public Integer getSubscriptionGraceDays() {
+    return subscriptionGraceDays;
+  }
+
+  public void setSubscriptionGraceDays(@javax.annotation.Nonnull Integer subscriptionGraceDays) {
+    this.subscriptionGraceDays = subscriptionGraceDays;
+  }
+
+
   public Integration createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
@@ -486,13 +558,16 @@ public class Integration {
         Objects.equals(this.lastEventAt, integration.lastEventAt) &&
         Objects.equals(this.autoRefund, integration.autoRefund) &&
         Objects.equals(this.canRefund, integration.canRefund) &&
+        Objects.equals(this.canManageSubscriptions, integration.canManageSubscriptions) &&
+        Objects.equals(this.canBillingPortal, integration.canBillingPortal) &&
+        Objects.equals(this.subscriptionGraceDays, integration.subscriptionGraceDays) &&
         Objects.equals(this.createdAt, integration.createdAt)&&
         Objects.equals(this.additionalProperties, integration.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, provider, livemode, accountName, apiKeyHint, webhookUrl, status, statusReason, lastCheckedAt, lastEventAt, autoRefund, canRefund, createdAt, additionalProperties);
+    return Objects.hash(id, provider, livemode, accountName, apiKeyHint, webhookUrl, status, statusReason, lastCheckedAt, lastEventAt, autoRefund, canRefund, canManageSubscriptions, canBillingPortal, subscriptionGraceDays, createdAt, additionalProperties);
   }
 
   @Override
@@ -511,6 +586,9 @@ public class Integration {
     sb.append("    lastEventAt: ").append(toIndentedString(lastEventAt)).append("\n");
     sb.append("    autoRefund: ").append(toIndentedString(autoRefund)).append("\n");
     sb.append("    canRefund: ").append(toIndentedString(canRefund)).append("\n");
+    sb.append("    canManageSubscriptions: ").append(toIndentedString(canManageSubscriptions)).append("\n");
+    sb.append("    canBillingPortal: ").append(toIndentedString(canBillingPortal)).append("\n");
+    sb.append("    subscriptionGraceDays: ").append(toIndentedString(subscriptionGraceDays)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
@@ -531,10 +609,10 @@ public class Integration {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("id", "provider", "livemode", "accountName", "apiKeyHint", "webhookUrl", "status", "statusReason", "lastCheckedAt", "lastEventAt", "autoRefund", "canRefund", "createdAt"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "provider", "livemode", "accountName", "apiKeyHint", "webhookUrl", "status", "statusReason", "lastCheckedAt", "lastEventAt", "autoRefund", "canRefund", "canManageSubscriptions", "canBillingPortal", "subscriptionGraceDays", "createdAt"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "provider", "livemode", "accountName", "apiKeyHint", "webhookUrl", "status", "statusReason", "lastCheckedAt", "lastEventAt", "autoRefund", "canRefund", "createdAt"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "provider", "livemode", "accountName", "apiKeyHint", "webhookUrl", "status", "statusReason", "lastCheckedAt", "lastEventAt", "autoRefund", "canRefund", "canManageSubscriptions", "canBillingPortal", "subscriptionGraceDays", "createdAt"));
   }
 
   /**

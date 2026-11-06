@@ -129,6 +129,8 @@ public class Token {
     
     CUSTOMER_WRITE("customer:write"),
     
+    CUSTOMER_BILLING("customer:billing"),
+    
     LICENSE_READ("license:read"),
     
     LICENSE_WRITE("license:write"),

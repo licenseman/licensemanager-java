@@ -125,6 +125,11 @@ public class StripePermission {
   @javax.annotation.Nonnull
   private Boolean optional;
 
+  public static final String SERIALIZED_NAME_SUBSCRIPTIONS = "subscriptions";
+  @SerializedName(SERIALIZED_NAME_SUBSCRIPTIONS)
+  @javax.annotation.Nonnull
+  private Boolean subscriptions;
+
   public StripePermission() {
   }
 
@@ -203,6 +208,25 @@ public class StripePermission {
     this.optional = optional;
   }
 
+
+  public StripePermission subscriptions(@javax.annotation.Nonnull Boolean subscriptions) {
+    this.subscriptions = subscriptions;
+    return this;
+  }
+
+  /**
+   * Whether it&#39;s only needed to sell subscriptions: checked once a recurring price is mapped.
+   * @return subscriptions
+   */
+  @javax.annotation.Nonnull
+  public Boolean getSubscriptions() {
+    return subscriptions;
+  }
+
+  public void setSubscriptions(@javax.annotation.Nonnull Boolean subscriptions) {
+    this.subscriptions = subscriptions;
+  }
+
   /**
    * A container for additional, undeclared properties.
    * This is a holder for any undeclared properties as specified with
@@ -261,13 +285,14 @@ public class StripePermission {
     return Objects.equals(this.resource, stripePermission.resource) &&
         Objects.equals(this.access, stripePermission.access) &&
         Objects.equals(this.reason, stripePermission.reason) &&
-        Objects.equals(this.optional, stripePermission.optional)&&
+        Objects.equals(this.optional, stripePermission.optional) &&
+        Objects.equals(this.subscriptions, stripePermission.subscriptions)&&
         Objects.equals(this.additionalProperties, stripePermission.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(resource, access, reason, optional, additionalProperties);
+    return Objects.hash(resource, access, reason, optional, subscriptions, additionalProperties);
   }
 
   @Override
@@ -278,6 +303,7 @@ public class StripePermission {
     sb.append("    access: ").append(toIndentedString(access)).append("\n");
     sb.append("    reason: ").append(toIndentedString(reason)).append("\n");
     sb.append("    optional: ").append(toIndentedString(optional)).append("\n");
+    sb.append("    subscriptions: ").append(toIndentedString(subscriptions)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -297,10 +323,10 @@ public class StripePermission {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("resource", "access", "reason", "optional"));
+    openapiFields = new HashSet<String>(Arrays.asList("resource", "access", "reason", "optional", "subscriptions"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("resource", "access", "reason", "optional"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("resource", "access", "reason", "optional", "subscriptions"));
   }
 
   /**

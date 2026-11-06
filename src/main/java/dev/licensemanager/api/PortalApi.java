@@ -27,6 +27,8 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 
 
+import dev.licensemanager.model.BillingPortalSession;
+import dev.licensemanager.model.CreateBillingPortalSession;
 import dev.licensemanager.model.CreatePortalLink;
 import dev.licensemanager.model.Error;
 import dev.licensemanager.model.Portal;
@@ -78,6 +80,217 @@ public class PortalApi {
         this.localCustomBaseUrl = customBaseUrl;
     }
 
+    private okhttp3.Call createBillingPortalSessionCall(@javax.annotation.Nonnull String id, @javax.annotation.Nullable CreateBillingPortalSession createBillingPortalSession, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = createBillingPortalSession;
+
+        // create path and map variables
+        String localVarPath = "/v1/customers/{id}/billing-portal-sessions"
+            .replace("{" + "id" + "}", localVarApiClient.escapeString(id.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "apiKey", "token" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call createBillingPortalSessionValidateBeforeCall(@javax.annotation.Nonnull String id, @javax.annotation.Nullable CreateBillingPortalSession createBillingPortalSession, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'id' is set
+        if (id == null) {
+            throw new ApiException("Missing the required parameter 'id' when calling createBillingPortalSession(Async)");
+        }
+
+        return createBillingPortalSessionCall(id, createBillingPortalSession, _callback);
+
+    }
+
+
+    private ApiResponse<BillingPortalSession> createBillingPortalSessionWithHttpInfo(@javax.annotation.Nonnull String id, @javax.annotation.Nullable CreateBillingPortalSession createBillingPortalSession) throws ApiException {
+        okhttp3.Call localVarCall = createBillingPortalSessionValidateBeforeCall(id, createBillingPortalSession, null);
+        Type localVarReturnType = new TypeToken<BillingPortalSession>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    private okhttp3.Call createBillingPortalSessionAsync(@javax.annotation.Nonnull String id, @javax.annotation.Nullable CreateBillingPortalSession createBillingPortalSession, final ApiCallback<BillingPortalSession> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = createBillingPortalSessionValidateBeforeCall(id, createBillingPortalSession, _callback);
+        Type localVarReturnType = new TypeToken<BillingPortalSession>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+
+    public class APIcreateBillingPortalSessionRequest {
+        @javax.annotation.Nonnull
+        private final String id;
+        @javax.annotation.Nullable
+        private CreateBillingPortalSession createBillingPortalSession;
+
+        private APIcreateBillingPortalSessionRequest(@javax.annotation.Nonnull String id) {
+            this.id = id;
+        }
+
+        /**
+         * Set createBillingPortalSession
+         * @param createBillingPortalSession  (optional)
+         * @return APIcreateBillingPortalSessionRequest
+         */
+        public APIcreateBillingPortalSessionRequest createBillingPortalSession(@javax.annotation.Nullable CreateBillingPortalSession createBillingPortalSession) {
+            this.createBillingPortalSession = createBillingPortalSession;
+            return this;
+        }
+
+        /**
+         * Build call for createBillingPortalSession
+         * @param _callback ApiCallback API callback
+         * @return Call to execute
+         * @throws ApiException If fail to serialize the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 201 </td><td> Created session </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Customer not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;no_stripe_customer&#x60;: the customer didn&#39;t pay through the Stripe integration. &#x60;billing_portal_unavailable&#x60;: the Stripe integration isn&#39;t connected, or its API key lacks the Customer portal: Write permission </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe refused or couldn&#39;t be reached, like when its customer portal isn&#39;t configured </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
+            return createBillingPortalSessionCall(id, createBillingPortalSession, _callback);
+        }
+
+        /**
+         * Execute createBillingPortalSession request
+         * @return BillingPortalSession
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 201 </td><td> Created session </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Customer not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;no_stripe_customer&#x60;: the customer didn&#39;t pay through the Stripe integration. &#x60;billing_portal_unavailable&#x60;: the Stripe integration isn&#39;t connected, or its API key lacks the Customer portal: Write permission </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe refused or couldn&#39;t be reached, like when its customer portal isn&#39;t configured </td><td>  -  </td></tr>
+         </table>
+         */
+        public BillingPortalSession execute() throws ApiException {
+            ApiResponse<BillingPortalSession> localVarResp = createBillingPortalSessionWithHttpInfo(id, createBillingPortalSession);
+            return localVarResp.getData();
+        }
+
+        /**
+         * Execute createBillingPortalSession request with HTTP info returned
+         * @return ApiResponse&lt;BillingPortalSession&gt;
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 201 </td><td> Created session </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Customer not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;no_stripe_customer&#x60;: the customer didn&#39;t pay through the Stripe integration. &#x60;billing_portal_unavailable&#x60;: the Stripe integration isn&#39;t connected, or its API key lacks the Customer portal: Write permission </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe refused or couldn&#39;t be reached, like when its customer portal isn&#39;t configured </td><td>  -  </td></tr>
+         </table>
+         */
+        public ApiResponse<BillingPortalSession> executeWithHttpInfo() throws ApiException {
+            return createBillingPortalSessionWithHttpInfo(id, createBillingPortalSession);
+        }
+
+        /**
+         * Execute createBillingPortalSession request (asynchronously)
+         * @param _callback The callback to be executed when the API call finishes
+         * @return The request call
+         * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 201 </td><td> Created session </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Customer not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;no_stripe_customer&#x60;: the customer didn&#39;t pay through the Stripe integration. &#x60;billing_portal_unavailable&#x60;: the Stripe integration isn&#39;t connected, or its API key lacks the Customer portal: Write permission </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe refused or couldn&#39;t be reached, like when its customer portal isn&#39;t configured </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call executeAsync(final ApiCallback<BillingPortalSession> _callback) throws ApiException {
+            return createBillingPortalSessionAsync(id, createBillingPortalSession, _callback);
+        }
+    }
+
+    /**
+     * Open the Stripe customer portal of a customer
+     * Link to the Stripe customer portal of the customer&#39;s Stripe customer, where they manage their subscriptions: change their plan or payment method, see their invoices, cancel. Needs the Stripe integration&#39;s &#x60;canBillingPortal&#x60;, and the customer portal configured in the Stripe account&#39;s settings. The changes come back through the integration&#39;s webhook, keeping the subscription licenses in line.  **Token access**: customer tokens with the &#x60;customer:billing&#x60; permission (or the matching write one). A customer token reaches its own customer.  **Required role permission**: &#x60;portalLink:create&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     * @param id  (required)
+     * @return APIcreateBillingPortalSessionRequest
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 201 </td><td> Created session </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+        <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Customer not found </td><td>  -  </td></tr>
+        <tr><td> 409 </td><td> &#x60;no_stripe_customer&#x60;: the customer didn&#39;t pay through the Stripe integration. &#x60;billing_portal_unavailable&#x60;: the Stripe integration isn&#39;t connected, or its API key lacks the Customer portal: Write permission </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+        <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+        <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe refused or couldn&#39;t be reached, like when its customer portal isn&#39;t configured </td><td>  -  </td></tr>
+     </table>
+     */
+    public APIcreateBillingPortalSessionRequest createBillingPortalSession(@javax.annotation.Nonnull String id) {
+        return new APIcreateBillingPortalSessionRequest(id);
+    }
     private okhttp3.Call createPortalLinkCall(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull CreatePortalLink createPortalLink, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers

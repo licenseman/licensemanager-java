@@ -2121,13 +2121,14 @@ paths:
           example: -createdAt
           type: string
         style: form
-      - description: Case-insensitive text the key contains.
+      - description: Case-insensitive text the key or the email of the customer contains.
         explode: true
         in: query
         name: search
         required: false
         schema:
-          description: Case-insensitive text the key contains.
+          description: Case-insensitive text the key or the email of the customer
+            contains.
           example: X9ZPA
           maxLength: 200
           minLength: 1
@@ -2606,13 +2607,14 @@ paths:
           example: -createdAt
           type: string
         style: form
-      - description: Case-insensitive text the key contains.
+      - description: Case-insensitive text the key or the email of the customer contains.
         explode: true
         in: query
         name: search
         required: false
         schema:
-          description: Case-insensitive text the key contains.
+          description: Case-insensitive text the key or the email of the customer
+            contains.
           example: X9ZPA
           maxLength: 200
           minLength: 1
@@ -3115,6 +3117,14 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: License not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`subscription_managed`: the license is a subscription license,\
+            \ whose `expiresAt`, `price`, `maxVersion` and `cancellableUntil` follow\
+            \ its Stripe subscription"
         "422":
           content:
             application/json:
@@ -3220,6 +3230,8 @@ paths:
 
         When the license was bought through the Stripe integration, its payment is refunded in the background, unless the integration disables `autoRefund`, its API key lacks the optional Refunds: Write permission (`canRefund`), or `refund` is `false`: the refund is its price paid, taxes included, and its id is set as `stripeRefundId`. The customer is emailed a confirmation, and the owners and admins of the organization are told about the cancellation and its refund. In test products, the customer is only emailed when their email is a member's of the organization.
 
+        A subscription license isn't refunded: its Stripe subscription is canceled at once, without proration, which needs the integration's `canManageSubscriptions`.
+
         Records a `license.canceled` event, then a `license.refunded` or `license.refund_failed` one once the refund is done.
 
         **Token access**: customer, license tokens with the `license:cancel` permission (or the matching write one). A token reaches the license it's scoped to, or the licenses of its customer.
@@ -3287,7 +3299,10 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "`already_canceled`: the license is already canceled. `not_cancellable`:\
-            \ for tokens, the license has no money back guarantee, or it has ended"
+            \ for tokens, the license has no money back guarantee, or it has ended,\
+            \ as subscription licenses have none. `subscription_managed`: the license\
+            \ is a subscription license, and the Stripe API key lacks the Subscriptions:\
+            \ Write permission to cancel its subscription"
         "422":
           content:
             application/json:
@@ -3805,6 +3820,111 @@ paths:
           description: "`rate_limited`: the API key made more than 10 requests in\
             \ the last second. Wait for the `Retry-After` seconds"
       summary: Create a link to the customer portal
+      tags:
+      - Portal
+      x-required-permissions:
+      - portalLink:create
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/customers/{id}/billing-portal-sessions:
+    post:
+      description: |-
+        Link to the Stripe customer portal of the customer's Stripe customer, where they manage their subscriptions: change their plan or payment method, see their invoices, cancel. Needs the Stripe integration's `canBillingPortal`, and the customer portal configured in the Stripe account's settings. The changes come back through the integration's webhook, keeping the subscription licenses in line.
+
+        **Token access**: customer tokens with the `customer:billing` permission (or the matching write one). A customer token reaches its own customer.
+
+        **Required role permission**: `portalLink:create` when called with a session, granted by the member's role. API keys aren't limited by roles.
+      operationId: createBillingPortalSession
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          example: c9Wd3RtE
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBillingPortalSession"
+        required: false
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BillingPortalSession"
+          description: Created session
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`unauthorized`: no credentials. `invalid_api_key`: the API\
+            \ key doesn't exist, was revoked or has expired. `invalid_token`: the\
+            \ token's signature is invalid, it has expired, or the resource it's scoped\
+            \ to was deleted"
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`plan_limit_exceeded`: the organization stayed over its plan's\
+            \ limits after the grace period, its API is blocked until it upgrades.\
+            \ `plan_limit_reached`: creating the resource would go over the plan's\
+            \ limit"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`token_not_allowed`: the endpoint doesn't accept tokens, or\
+            \ not of this type. `insufficient_scope`: the token lacks the permission.\
+            \ `no_active_organization` or `forbidden`: the session has no organization,\
+            \ or isn't a member of the one requested"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Customer not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`no_stripe_customer`: the customer didn't pay through the\
+            \ Stripe integration. `billing_portal_unavailable`: the Stripe integration\
+            \ isn't connected, or its API key lacks the Customer portal: Write permission"
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`validation_error`: invalid path, query or body, with the\
+            \ `issues`"
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`rate_limited`: the API key made more than 10 requests in\
+            \ the last second. Wait for the `Retry-After` seconds"
+        "502":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`provider_unavailable`: Stripe refused or couldn't be reached,\
+            \ like when its customer portal isn't configured"
+      security:
+      - apiKey: []
+      - token:
+        - customer:billing
+      summary: Open the Stripe customer portal of a customer
       tags:
       - Portal
       x-required-permissions:
@@ -5779,6 +5899,403 @@ paths:
       x-content-type: application/json
       x-accepts:
       - application/json
+  /v1/products/{productId}/integrations/slack:
+    get:
+      description: "Slack channels getting notifications about the product's licenses:\
+        \ purchases, renewals, failed payments and cancellations. Doesn't accept tokens:\
+        \ only API keys and sessions."
+      operationId: getSlackIntegration
+      parameters:
+      - explode: false
+        in: path
+        name: productId
+        required: true
+        schema:
+          example: x7Kp2QaZ
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SlackIntegration"
+          description: Slack integration
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`unauthorized`: no credentials. `invalid_api_key`: the API\
+            \ key doesn't exist, was revoked or has expired. `invalid_token`: the\
+            \ token's signature is invalid, it has expired, or the resource it's scoped\
+            \ to was deleted"
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`plan_limit_exceeded`: the organization stayed over its plan's\
+            \ limits after the grace period, its API is blocked until it upgrades.\
+            \ `plan_limit_reached`: creating the resource would go over the plan's\
+            \ limit"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`token_not_allowed`: the endpoint doesn't accept tokens, or\
+            \ not of this type. `insufficient_scope`: the token lacks the permission.\
+            \ `no_active_organization` or `forbidden`: the session has no organization,\
+            \ or isn't a member of the one requested"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Product not found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`validation_error`: invalid path, query or body, with the\
+            \ `issues`"
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`rate_limited`: the API key made more than 10 requests in\
+            \ the last second. Wait for the `Retry-After` seconds"
+      summary: Get the Slack integration of a product
+      tags:
+      - Integrations
+      x-accepts:
+      - application/json
+  /v1/products/{productId}/integrations/slack/authorize:
+    post:
+      description: |-
+        Returns the URL of Slack's consent screen, where the user picks the channel getting the product's notifications. Slack then redirects to the app's integrations page. Doesn't accept tokens: only API keys and sessions.
+
+        **Required role permission**: `integration:create` when called with a session, granted by the member's role. API keys aren't limited by roles.
+      operationId: authorizeSlack
+      parameters:
+      - explode: false
+        in: path
+        name: productId
+        required: true
+        schema:
+          example: x7Kp2QaZ
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SlackAuthorize"
+          description: Consent screen
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`unauthorized`: no credentials. `invalid_api_key`: the API\
+            \ key doesn't exist, was revoked or has expired. `invalid_token`: the\
+            \ token's signature is invalid, it has expired, or the resource it's scoped\
+            \ to was deleted"
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`plan_limit_exceeded`: the organization stayed over its plan's\
+            \ limits after the grace period, its API is blocked until it upgrades.\
+            \ `plan_limit_reached`: creating the resource would go over the plan's\
+            \ limit"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`token_not_allowed`: the endpoint doesn't accept tokens, or\
+            \ not of this type. `insufficient_scope`: the token lacks the permission.\
+            \ `no_active_organization` or `forbidden`: the session has no organization,\
+            \ or isn't a member of the one requested"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Product not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`slack_not_configured`: the server has no Slack app (`SLACK_CLIENT_ID`\
+            \ and `SLACK_CLIENT_SECRET`)"
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`validation_error`: invalid path, query or body, with the\
+            \ `issues`"
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`rate_limited`: the API key made more than 10 requests in\
+            \ the last second. Wait for the `Retry-After` seconds"
+      summary: Start connecting a Slack channel
+      tags:
+      - Integrations
+      x-required-permissions:
+      - integration:create
+      x-accepts:
+      - application/json
+  /v1/slack-connections/{id}:
+    delete:
+      description: |-
+        Stops posting to the channel and revokes the installation's token in Slack. Doesn't accept tokens: only API keys and sessions.
+
+        **Required role permission**: `integration:delete` when called with a session, granted by the member's role. API keys aren't limited by roles.
+      operationId: deleteSlackConnection
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          example: s4Hq8ZpLm
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Removed
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`unauthorized`: no credentials. `invalid_api_key`: the API\
+            \ key doesn't exist, was revoked or has expired. `invalid_token`: the\
+            \ token's signature is invalid, it has expired, or the resource it's scoped\
+            \ to was deleted"
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`plan_limit_exceeded`: the organization stayed over its plan's\
+            \ limits after the grace period, its API is blocked until it upgrades.\
+            \ `plan_limit_reached`: creating the resource would go over the plan's\
+            \ limit"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`token_not_allowed`: the endpoint doesn't accept tokens, or\
+            \ not of this type. `insufficient_scope`: the token lacks the permission.\
+            \ `no_active_organization` or `forbidden`: the session has no organization,\
+            \ or isn't a member of the one requested"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Slack connection not found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`validation_error`: invalid path, query or body, with the\
+            \ `issues`"
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`rate_limited`: the API key made more than 10 requests in\
+            \ the last second. Wait for the `Retry-After` seconds"
+      summary: Remove a Slack connection
+      tags:
+      - Integrations
+      x-required-permissions:
+      - integration:delete
+      x-accepts:
+      - application/json
+    patch:
+      description: |-
+        Changes the notifications the channel gets. Doesn't accept tokens: only API keys and sessions.
+
+        **Required role permission**: `integration:update` when called with a session, granted by the member's role. API keys aren't limited by roles.
+      operationId: updateSlackConnection
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          example: s4Hq8ZpLm
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSlackConnection"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SlackConnection"
+          description: Updated Slack connection
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`unauthorized`: no credentials. `invalid_api_key`: the API\
+            \ key doesn't exist, was revoked or has expired. `invalid_token`: the\
+            \ token's signature is invalid, it has expired, or the resource it's scoped\
+            \ to was deleted"
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`plan_limit_exceeded`: the organization stayed over its plan's\
+            \ limits after the grace period, its API is blocked until it upgrades.\
+            \ `plan_limit_reached`: creating the resource would go over the plan's\
+            \ limit"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`token_not_allowed`: the endpoint doesn't accept tokens, or\
+            \ not of this type. `insufficient_scope`: the token lacks the permission.\
+            \ `no_active_organization` or `forbidden`: the session has no organization,\
+            \ or isn't a member of the one requested"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Slack connection not found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`validation_error`: invalid path, query or body, with the\
+            \ `issues`"
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`rate_limited`: the API key made more than 10 requests in\
+            \ the last second. Wait for the `Retry-After` seconds"
+      summary: Update a Slack connection
+      tags:
+      - Integrations
+      x-required-permissions:
+      - integration:update
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/slack-connections/{id}/test:
+    post:
+      description: |-
+        Posts a message to the channel, to check it gets the notifications. Marks the connection `revoked` when Slack says it won't work again. Doesn't accept tokens: only API keys and sessions.
+
+        **Required role permission**: `integration:update` when called with a session, granted by the member's role. API keys aren't limited by roles.
+      operationId: testSlackConnection
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          example: s4Hq8ZpLm
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SlackConnection"
+          description: "Slack connection, after the test"
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`unauthorized`: no credentials. `invalid_api_key`: the API\
+            \ key doesn't exist, was revoked or has expired. `invalid_token`: the\
+            \ token's signature is invalid, it has expired, or the resource it's scoped\
+            \ to was deleted"
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`plan_limit_exceeded`: the organization stayed over its plan's\
+            \ limits after the grace period, its API is blocked until it upgrades.\
+            \ `plan_limit_reached`: creating the resource would go over the plan's\
+            \ limit"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`token_not_allowed`: the endpoint doesn't accept tokens, or\
+            \ not of this type. `insufficient_scope`: the token lacks the permission.\
+            \ `no_active_organization` or `forbidden`: the session has no organization,\
+            \ or isn't a member of the one requested"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Slack connection not found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`validation_error`: invalid path, query or body, with the\
+            \ `issues`"
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`rate_limited`: the API key made more than 10 requests in\
+            \ the last second. Wait for the `Retry-After` seconds"
+        "502":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`slack_error`: Slack refused the message"
+      summary: Send a test message to a Slack channel
+      tags:
+      - Integrations
+      x-required-permissions:
+      - integration:update
+      x-accepts:
+      - application/json
 components:
   parameters: {}
   schemas:
@@ -6411,10 +6928,13 @@ components:
           - 9
           - 12
         cancellation: ""
+        subscriptions: ""
         revenue:
         - currency: USD
           licenseCount: 42
           total: 2099.58
+          subscriptionTotal: 480
+          paymentCount: 48
           canceledLicenseCount: 2
           canceledTotal: 99.98
           thisMonth: 349.93
@@ -6450,6 +6970,8 @@ components:
         - currency: USD
           licenseCount: 42
           total: 2099.58
+          subscriptionTotal: 480
+          paymentCount: 48
           canceledLicenseCount: 2
           canceledTotal: 99.98
           thisMonth: 349.93
@@ -6603,6 +7125,12 @@ components:
           description: Cancellations of the licenses with a money back guarantee.
             `null` when no license of the product has one.
           nullable: true
+        subscriptions:
+          allOf:
+          - $ref: "#/components/schemas/SubscriptionStats"
+          description: Subscriptions of the product. `null` when it has never had
+            one.
+          nullable: true
         revenue:
           description: "Revenue in each currency licenses were sold in, from the one\
             \ with the most licenses sold. Amounts aren't converted between currencies."
@@ -6651,6 +7179,7 @@ components:
       - newLicensesByPolicy
       - revenue
       - seatCount
+      - subscriptions
       - usedSeatCount
     CancellationStats:
       description: Cancellations of the licenses with a money back guarantee. Licenses
@@ -6728,14 +7257,143 @@ components:
       - other
       example: too_expensive
       type: string
+    SubscriptionStats:
+      description: "Subscriptions to recurring Stripe prices, each with its subscription\
+        \ license."
+      properties:
+        activeCount:
+          description: "Number of ongoing subscriptions: `active`, `trialing` or `past_due`."
+          example: 120
+          type: integer
+        trialingCount:
+          example: 4
+          type: integer
+        pastDueCount:
+          description: "Number of them whose renewal failed, as Stripe retries it:\
+            \ their licenses stay valid for the integration's grace days."
+          example: 3
+          type: integer
+        cancelingCount:
+          description: Number of them set to end at the end of their period.
+          example: 5
+          type: integer
+        newCount:
+          description: Number of subscriptions started in the last 30 days.
+          example: 14
+          type: integer
+        endedCount:
+          description: Number of subscriptions that ended in the last 30 days.
+          example: 3
+          type: integer
+        churnRate:
+          description: "Share of the subscriptions ongoing 30 days ago that ended\
+            \ since, from 0 to 1."
+          example: 0.025
+          type: number
+        newByMonth:
+          description: "Number of subscriptions started each month, aligned on `months`."
+          example:
+          - 3
+          - 5
+          - 8
+          items:
+            type: integer
+          type: array
+          default: null
+        endedByMonth:
+          description: "Number of subscriptions that ended each month, aligned on\
+            \ `months`."
+          example:
+          - 0
+          - 1
+          - 2
+          items:
+            type: integer
+          type: array
+          default: null
+        activeByMonth:
+          description: "Number of ongoing subscriptions at the end of each month,\
+            \ aligned on `months`, today for this month."
+          example:
+          - 90
+          - 104
+          - 120
+          items:
+            type: integer
+          type: array
+          default: null
+        mrr:
+          description: "MRR in each currency, from the highest number of subscriptions.\
+            \ Amounts aren't converted between currencies."
+          items:
+            $ref: "#/components/schemas/Mrr"
+          type: array
+          default: null
+      required:
+      - activeByMonth
+      - activeCount
+      - cancelingCount
+      - churnRate
+      - endedByMonth
+      - endedCount
+      - mrr
+      - newByMonth
+      - newCount
+      - pastDueCount
+      - trialingCount
+    Mrr:
+      properties:
+        currency:
+          example: USD
+          type: string
+        mrr:
+          description: "Monthly recurring revenue: the price of every ongoing subscription\
+            \ in the currency, times its quantity, brought to one month (a year counts\
+            \ for a twelfth), before taxes and discounts."
+          example: 1240
+          type: number
+        byInterval:
+          description: "Ongoing subscriptions and MRR of each billing period, like\
+            \ monthly and yearly, from the highest MRR."
+          items:
+            $ref: "#/components/schemas/Mrr_byInterval_inner"
+          type: array
+          default: null
+        byPolicy:
+          description: "MRR of each policy, from the highest."
+          items:
+            $ref: "#/components/schemas/Mrr_byPolicy_inner"
+          type: array
+          default: null
+        byMonth:
+          description: "MRR at the end of each month, aligned on `months`, today for\
+            \ this month, at the current prices of the subscriptions."
+          example:
+          - 900
+          - 1100
+          - 1240
+          items:
+            type: number
+          type: array
+          default: null
+      required:
+      - byInterval
+      - byMonth
+      - byPolicy
+      - currency
+      - mrr
     Revenue:
-      description: "Revenue of the licenses sold in one currency, each license counting\
-        \ on the day it was created. Licenses without a price are left out, and so\
-        \ are canceled ones, but in `canceledLicenseCount` and `canceledTotal`."
+      description: "Revenue in one currency: the licenses sold once, each counting\
+        \ on the day it was created, and the payments of the subscription licenses,\
+        \ each counting on the day it was paid, with the license's policy. Licenses\
+        \ without a price are left out, and so are canceled ones, but in `canceledLicenseCount`\
+        \ and `canceledTotal`."
       example:
         currency: USD
         licenseCount: 42
         total: 2099.58
+        subscriptionTotal: 480
+        paymentCount: 48
         canceledLicenseCount: 2
         canceledTotal: 99.98
         thisMonth: 349.93
@@ -6774,22 +7432,32 @@ components:
           example: USD
           type: string
         licenseCount:
-          description: "Number of licenses sold in the currency, free ones included,\
-            \ canceled ones left out."
+          description: "Number of licenses sold once in the currency, free ones included,\
+            \ canceled ones and subscription licenses left out."
           example: 42
           type: integer
         total:
-          description: "Sum of the prices of the licenses sold in the currency, in\
-            \ major units, canceled ones left out."
+          description: "Revenue in the currency, in major units: the prices of the\
+            \ licenses sold once, canceled ones left out, plus the payments of the\
+            \ subscriptions, `subscriptionTotal`."
           example: 2099.58
           type: number
+        subscriptionTotal:
+          description: "Sum of the payments of the subscription licenses in the currency,\
+            \ before taxes, in major units."
+          example: 480
+          type: number
+        paymentCount:
+          description: Number of payments of the subscription licenses in the currency.
+          example: 48
+          type: integer
         canceledLicenseCount:
-          description: Number of canceled licenses sold in the currency.
+          description: Number of canceled licenses sold once in the currency.
           example: 2
           type: integer
         canceledTotal:
-          description: "Sum of the prices of the canceled licenses sold in the currency,\
-            \ in major units: revenue lost to cancellations."
+          description: "Sum of the prices of the canceled licenses sold once in the\
+            \ currency, in major units: revenue lost to cancellations."
           example: 99.98
           type: number
         thisMonth:
@@ -6841,6 +7509,8 @@ components:
       - last30Days
       - lastMonth
       - licenseCount
+      - paymentCount
+      - subscriptionTotal
       - thisMonth
       - total
     PolicyList:
@@ -7253,6 +7923,10 @@ components:
           productId: x7Kp2QaZ
           policyId: p4Rt8LmQ
           customerId: c9Wd3RtE
+          customer:
+            id: c9Wd3RtE
+            email: jane@example.com
+            name: Jane Doe
           key: 7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF
           createdAt: 2026-01-15T09:30:00.000Z
           expiresAt: 2027-01-15T09:30:00.000Z
@@ -7274,6 +7948,16 @@ components:
           cancellableUntil: 2026-02-14T09:30:00.000Z
           canceledAt: 2026-01-20T16:12:00.000Z
           cancellationReason: ""
+          subscription:
+            stripeSubscriptionId: sub_1MowQVLkdIwHu7ix
+            status: active
+            interval: day
+            intervalCount: 1
+            quantity: 1
+            price: ""
+            currentPeriodEnd: 2000-01-23T04:56:07.000+00:00
+            cancelAtPeriodEnd: true
+            endedAt: 2000-01-23T04:56:07.000+00:00
           cancellationComment: I only needed it for one project.
           stripeRefundId: re_3MtwBwLkdIwHu7ix0Bs5rA2b
           updatedAt: 2026-01-15T09:30:00.000Z
@@ -7281,6 +7965,10 @@ components:
           productId: x7Kp2QaZ
           policyId: p4Rt8LmQ
           customerId: c9Wd3RtE
+          customer:
+            id: c9Wd3RtE
+            email: jane@example.com
+            name: Jane Doe
           key: 7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF
           createdAt: 2026-01-15T09:30:00.000Z
           expiresAt: 2027-01-15T09:30:00.000Z
@@ -7302,6 +7990,16 @@ components:
           cancellableUntil: 2026-02-14T09:30:00.000Z
           canceledAt: 2026-01-20T16:12:00.000Z
           cancellationReason: ""
+          subscription:
+            stripeSubscriptionId: sub_1MowQVLkdIwHu7ix
+            status: active
+            interval: day
+            intervalCount: 1
+            quantity: 1
+            price: ""
+            currentPeriodEnd: 2000-01-23T04:56:07.000+00:00
+            cancelAtPeriodEnd: true
+            endedAt: 2000-01-23T04:56:07.000+00:00
           cancellationComment: I only needed it for one project.
           stripeRefundId: re_3MtwBwLkdIwHu7ix0Bs5rA2b
           updatedAt: 2026-01-15T09:30:00.000Z
@@ -7329,6 +8027,10 @@ components:
         productId: x7Kp2QaZ
         policyId: p4Rt8LmQ
         customerId: c9Wd3RtE
+        customer:
+          id: c9Wd3RtE
+          email: jane@example.com
+          name: Jane Doe
         key: 7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF
         createdAt: 2026-01-15T09:30:00.000Z
         expiresAt: 2027-01-15T09:30:00.000Z
@@ -7350,6 +8052,16 @@ components:
         cancellableUntil: 2026-02-14T09:30:00.000Z
         canceledAt: 2026-01-20T16:12:00.000Z
         cancellationReason: ""
+        subscription:
+          stripeSubscriptionId: sub_1MowQVLkdIwHu7ix
+          status: active
+          interval: day
+          intervalCount: 1
+          quantity: 1
+          price: ""
+          currentPeriodEnd: 2000-01-23T04:56:07.000+00:00
+          cancelAtPeriodEnd: true
+          endedAt: 2000-01-23T04:56:07.000+00:00
         cancellationComment: I only needed it for one project.
         stripeRefundId: re_3MtwBwLkdIwHu7ix0Bs5rA2b
         updatedAt: 2026-01-15T09:30:00.000Z
@@ -7366,6 +8078,8 @@ components:
         customerId:
           example: c9Wd3RtE
           type: string
+        customer:
+          $ref: "#/components/schemas/LicenseCustomer"
         key:
           description: "Unique within the product. Case sensitive: `validateKey` compares\
             \ keys exactly."
@@ -7445,9 +8159,10 @@ components:
         cancellationReason:
           allOf:
           - $ref: "#/components/schemas/CancellationReason"
-          - description: Why the license was canceled. `null` when it wasn't.
-            nullable: true
-            type: string
+          description: Why the license was canceled. `null` when it wasn't.
+          nullable: true
+        subscription:
+          $ref: "#/components/schemas/LicenseSubscription"
         cancellationComment:
           description: Comment given when the license was canceled. `null` when there's
             none.
@@ -7473,6 +8188,7 @@ components:
       - cancellationComment
       - cancellationReason
       - createdAt
+      - customer
       - customerId
       - expiresAt
       - id
@@ -7488,7 +8204,31 @@ components:
       - status
       - stripePaymentIntentId
       - stripeRefundId
+      - subscription
       - updatedAt
+    LicenseCustomer:
+      description: "Customer the license belongs to, the one of `customerId`."
+      example:
+        id: c9Wd3RtE
+        email: jane@example.com
+        name: Jane Doe
+      properties:
+        id:
+          example: c9Wd3RtE
+          type: string
+        email:
+          example: jane@example.com
+          format: email
+          type: string
+        name:
+          description: Display name of the customer. `null` when unknown.
+          example: Jane Doe
+          nullable: true
+          type: string
+      required:
+      - email
+      - id
+      - name
     LicenseMaxVersion:
       description: "Latest version of the product the license can use: its hard-coded\
         \ `version`, else the versions released before its locks. All `null` when\
@@ -7569,6 +8309,72 @@ components:
       - canceled
       example: active
       type: string
+    LicenseSubscription:
+      description: "The Stripe subscription keeping the license valid, `null` when\
+        \ it isn't a subscription license. The license expires when it stops being\
+        \ paid, includes every update, and can't be canceled during a money back guarantee."
+      example:
+        stripeSubscriptionId: sub_1MowQVLkdIwHu7ix
+        status: active
+        interval: day
+        intervalCount: 1
+        quantity: 1
+        price: ""
+        currentPeriodEnd: 2000-01-23T04:56:07.000+00:00
+        cancelAtPeriodEnd: true
+        endedAt: 2000-01-23T04:56:07.000+00:00
+      nullable: true
+      properties:
+        stripeSubscriptionId:
+          example: sub_1MowQVLkdIwHu7ix
+          type: string
+        status:
+          description: "Status of the subscription in Stripe: `active`, `trialing`,\
+            \ `past_due` while a failed payment is retried, `canceled`, `unpaid`,\
+            \ `paused`, `incomplete` or `incomplete_expired`."
+          example: active
+          type: string
+        interval:
+          enum:
+          - day
+          - week
+          - month
+          - year
+          type: string
+        intervalCount:
+          description: Number of intervals between payments.
+          example: 1
+          type: integer
+        quantity:
+          description: "Units subscribed, multiplying the policy's machines."
+          example: 1
+          type: integer
+        price:
+          allOf:
+          - $ref: "#/components/schemas/Price"
+          description: "Price of one unit for one period, before taxes."
+        currentPeriodEnd:
+          description: "End of the paid period, when the subscription renews or ends."
+          format: date-time
+          type: string
+        cancelAtPeriodEnd:
+          description: Whether the subscription ends at the end of the period.
+          type: boolean
+        endedAt:
+          format: date-time
+          nullable: true
+          type: string
+      required:
+      - cancelAtPeriodEnd
+      - currentPeriodEnd
+      - endedAt
+      - interval
+      - intervalCount
+      - price
+      - quantity
+      - status
+      - stripeSubscriptionId
+      type: object
     CreateLicense:
       example:
         email: jane@example.com
@@ -8067,6 +8873,28 @@ components:
           type: integer
       required:
       - expiresInSeconds
+    BillingPortalSession:
+      example:
+        url: https://billing.stripe.com/p/session/test_YWNjdF8x
+      properties:
+        url:
+          description: "Link to the Stripe customer portal, to open right away: it\
+            \ expires shortly."
+          example: https://billing.stripe.com/p/session/test_YWNjdF8x
+          type: string
+      required:
+      - url
+    CreateBillingPortalSession:
+      example:
+        returnUrl: https://example.com/account
+      properties:
+        returnUrl:
+          description: "Where the Stripe customer portal links back to: a page of\
+            \ the customer portal, or of one of the product's `returnDomains`. The\
+            \ customer portal of the product by default."
+          example: https://example.com/account
+          format: uri
+          type: string
     SendPortalLink:
       example:
         token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…
@@ -8256,6 +9084,7 @@ components:
             enum:
             - customer:read
             - customer:write
+            - customer:billing
             - license:read
             - license:write
             - license:cancel
@@ -8293,6 +9122,7 @@ components:
             enum:
             - customer:read
             - customer:write
+            - customer:billing
             - license:read
             - license:write
             - license:cancel
@@ -8449,6 +9279,9 @@ components:
         - `license.canceled`: the license was canceled. `payload` holds the cancellation `reason` and `comment`, and whether its Stripe payment is being refunded (`refund`).
         - `license.refunded`: the Stripe payment of a canceled license was refunded. `payload` holds the Stripe `refundId` and the `amount` refunded. Has the `integration` actor.
         - `license.refund_failed`: refunding the Stripe payment of a canceled license failed. `payload` holds the error `message`: refund it from Stripe. Has the `integration` actor.
+        - `license.payment_succeeded`: a payment of the license's Stripe subscription succeeded, its first one included. `payload` holds the Stripe `invoiceId`, the `amount` paid before taxes and its `currency`, Stripe's `billingReason` (`subscription_create`, `subscription_cycle`, `subscription_update`…) and the `periodStart` and `periodEnd` it pays for. Invoices with nothing to pay, like for a trial, record none. Has the `integration` actor.
+        - `license.payment_failed`: a payment of the license's Stripe subscription failed. `payload` holds the Stripe `invoiceId`, the `amount` due and its `currency`, the `attemptCount` and when Stripe tries again (`nextAttemptAt`, `null` when it won't). The license stays valid for the integration's grace days after its period ends. Has the `integration` actor.
+        - `license.subscription_ended`: the license's Stripe subscription ended, canceled or no longer paid, so the license expired. `payload` holds the subscription's `status` and Stripe's cancellation `reason`. Has the `integration` actor.
         - `machine.deactivated`: a machine was deactivated or locked, so it no longer counts as using the license. `payload` holds the machine's `fingerprint` and `name`, the `overriddenByMachineId` of the machine that took its place, `null` when it was deactivated through the API, and whether it was `locked`. Deactivations by validations have the `automation` actor. Linked to the license and the machine.
 
         An update that changes nothing records no event. Deletions record no events, and customers, products and releases have none.
@@ -8462,6 +9295,9 @@ components:
       - license.canceled
       - license.refunded
       - license.refund_failed
+      - license.payment_succeeded
+      - license.payment_failed
+      - license.subscription_ended
       - machine.deactivated
       example: license.validated
       type: string
@@ -8512,11 +9348,13 @@ components:
           reason: "Lists your prices so you can choose which ones create licenses,\
             \ and checks they can still be paid."
           optional: false
+          subscriptions: false
         - resource: Prices
           access: Read
           reason: "Lists your prices so you can choose which ones create licenses,\
             \ and checks they can still be paid."
           optional: false
+          subscriptions: false
         integration: ""
         mappings:
         - id: g2Lk7RwPa
@@ -8529,6 +9367,9 @@ components:
           price:
             amount: 49.99
             currency: USD
+          recurring:
+            interval: day
+            intervalCount: 1
           status: active
           statusReason: The price is archived in Stripe
           createdAt: 2000-01-23T04:56:07.000+00:00
@@ -8542,6 +9383,9 @@ components:
           price:
             amount: 49.99
             currency: USD
+          recurring:
+            interval: day
+            intervalCount: 1
           status: active
           statusReason: The price is archived in Stripe
           createdAt: 2000-01-23T04:56:07.000+00:00
@@ -8586,6 +9430,7 @@ components:
         reason: "Lists your prices so you can choose which ones create licenses, and\
           \ checks they can still be paid."
         optional: false
+        subscriptions: false
       properties:
         resource:
           example: Prices
@@ -8604,11 +9449,17 @@ components:
             \ explained by `reason`."
           example: false
           type: boolean
+        subscriptions:
+          description: "Whether it's only needed to sell subscriptions: checked once\
+            \ a recurring price is mapped."
+          example: false
+          type: boolean
       required:
       - access
       - optional
       - reason
       - resource
+      - subscriptions
     Integration:
       example:
         id: i8Fz4QnRt
@@ -8624,6 +9475,9 @@ components:
         lastEventAt: 2000-01-23T04:56:07.000+00:00
         autoRefund: true
         canRefund: true
+        canManageSubscriptions: true
+        canBillingPortal: true
+        subscriptionGraceDays: 7
         createdAt: 2000-01-23T04:56:07.000+00:00
       properties:
         id:
@@ -8680,6 +9534,24 @@ components:
             \ aren't refunded: refund their payments from Stripe."
           example: true
           type: boolean
+        canManageSubscriptions:
+          description: "Whether the API key has the optional Subscriptions: Write\
+            \ permission, checked when connecting and every day. Without it, subscription\
+            \ licenses can't be canceled from the app: cancel their subscriptions\
+            \ from Stripe."
+          example: true
+          type: boolean
+        canBillingPortal:
+          description: "Whether the API key has the optional Customer portal: Write\
+            \ permission, checked when connecting and every day. Without it, the license\
+            \ portal doesn't link to the Stripe customer portal."
+          example: true
+          type: boolean
+        subscriptionGraceDays:
+          description: "Days a subscription license stays valid after its period ends\
+            \ while its renewal is unpaid, as Stripe retries the payment. 7 by default."
+          example: 7
+          type: integer
         createdAt:
           format: date-time
           type: string
@@ -8687,6 +9559,8 @@ components:
       - accountName
       - apiKeyHint
       - autoRefund
+      - canBillingPortal
+      - canManageSubscriptions
       - canRefund
       - createdAt
       - id
@@ -8696,6 +9570,7 @@ components:
       - provider
       - status
       - statusReason
+      - subscriptionGraceDays
       - webhookUrl
     IntegrationStatus:
       description: "`active`: the integration works. `error`: something needs fixing,\
@@ -8719,6 +9594,9 @@ components:
         price:
           amount: 49.99
           currency: USD
+        recurring:
+          interval: day
+          intervalCount: 1
         status: active
         statusReason: The price is archived in Stripe
         createdAt: 2000-01-23T04:56:07.000+00:00
@@ -8747,6 +9625,8 @@ components:
           type: string
         price:
           $ref: "#/components/schemas/Price"
+        recurring:
+          $ref: "#/components/schemas/IntegrationMapping_recurring"
         status:
           description: "`error` when the price can no longer be paid, explained by\
             \ `statusReason`."
@@ -8769,6 +9649,7 @@ components:
       - price
       - productId
       - productName
+      - recurring
       - status
       - statusReason
       - stripePriceId
@@ -8791,6 +9672,7 @@ components:
     UpdateIntegration:
       example:
         autoRefund: false
+        subscriptionGraceDays: 7
       properties:
         autoRefund:
           description: "Whether canceling a license bought through Stripe refunds\
@@ -8798,6 +9680,13 @@ components:
             \ is true: the API key has the Refunds: Write permission."
           example: false
           type: boolean
+        subscriptionGraceDays:
+          description: "Days a subscription license stays valid after its period ends\
+            \ while its renewal is unpaid, as Stripe retries the payment."
+          example: 7
+          maximum: 60
+          minimum: 0
+          type: integer
     StripePrice:
       example:
         id: price_1MoBy5LkdIwHu7ix
@@ -8807,6 +9696,9 @@ components:
         price:
           amount: 49.99
           currency: USD
+        recurring:
+          interval: day
+          intervalCount: 1
         mapped: true
       properties:
         id:
@@ -8824,6 +9716,8 @@ components:
           type: string
         price:
           $ref: "#/components/schemas/Price"
+        recurring:
+          $ref: "#/components/schemas/StripePrice_recurring"
         mapped:
           description: Whether the price already creates licenses of a product.
           type: boolean
@@ -8834,13 +9728,14 @@ components:
       - price
       - productId
       - productName
+      - recurring
     CreateIntegrationMapping:
       example:
         stripePriceId: price_1MoBy5LkdIwHu7ix
         policyId: p4Rt8LmQ
       properties:
         stripePriceId:
-          description: Active one-time price of the Stripe account.
+          description: Active one-time or licensed recurring price of the Stripe account.
           example: price_1MoBy5LkdIwHu7ix
           minLength: 1
           type: string
@@ -8861,6 +9756,166 @@ components:
           type: string
       required:
       - policyId
+    SlackIntegration:
+      example:
+        configured: true
+        connections:
+        - id: s4Hq8ZpLm
+          teamId: T0123ABCD
+          teamName: Acme
+          channelId: C0456EFGH
+          channelName: "#sales"
+          configurationUrl: configurationUrl
+          events:
+          - purchased
+          - purchased
+          status: active
+          statusReason: statusReason
+          lastSentAt: 2000-01-23T04:56:07.000+00:00
+          createdAt: 2000-01-23T04:56:07.000+00:00
+        - id: s4Hq8ZpLm
+          teamId: T0123ABCD
+          teamName: Acme
+          channelId: C0456EFGH
+          channelName: "#sales"
+          configurationUrl: configurationUrl
+          events:
+          - purchased
+          - purchased
+          status: active
+          statusReason: statusReason
+          lastSentAt: 2000-01-23T04:56:07.000+00:00
+          createdAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        configured:
+          description: "Whether the server has a Slack app to connect channels with:\
+            \ `SLACK_CLIENT_ID` and `SLACK_CLIENT_SECRET` are set."
+          type: boolean
+        connections:
+          description: Slack channels getting the product's notifications.
+          items:
+            $ref: "#/components/schemas/SlackConnection"
+          type: array
+          default: null
+      required:
+      - configured
+      - connections
+    SlackConnection:
+      example:
+        id: s4Hq8ZpLm
+        teamId: T0123ABCD
+        teamName: Acme
+        channelId: C0456EFGH
+        channelName: "#sales"
+        configurationUrl: configurationUrl
+        events:
+        - purchased
+        - purchased
+        status: active
+        statusReason: statusReason
+        lastSentAt: 2000-01-23T04:56:07.000+00:00
+        createdAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        id:
+          example: s4Hq8ZpLm
+          type: string
+        teamId:
+          example: T0123ABCD
+          type: string
+        teamName:
+          example: Acme
+          nullable: true
+          type: string
+        channelId:
+          example: C0456EFGH
+          type: string
+        channelName:
+          description: "Name of the channel when it was connected, with its `#`."
+          example: "#sales"
+          nullable: true
+          type: string
+        configurationUrl:
+          description: Page of the installation in Slack.
+          nullable: true
+          type: string
+        events:
+          description: "Notifications the channel gets: `purchased` (a license bought\
+            \ through Stripe), `renewed` (a subscription renewal paid), `payment_failed`\
+            \ (a subscription payment failed) and `canceled` (a license canceled,\
+            \ or its subscription ended)."
+          items:
+            enum:
+            - purchased
+            - renewed
+            - payment_failed
+            - canceled
+            type: string
+          type: array
+          default: null
+        status:
+          description: "`revoked` once Slack refuses the messages, like when the app\
+            \ was removed from the workspace or the channel deleted: remove it and\
+            \ add it again."
+          enum:
+          - active
+          - revoked
+          type: string
+        statusReason:
+          nullable: true
+          type: string
+          example: null
+        lastSentAt:
+          format: date-time
+          nullable: true
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+      required:
+      - channelId
+      - channelName
+      - configurationUrl
+      - createdAt
+      - events
+      - id
+      - lastSentAt
+      - status
+      - statusReason
+      - teamId
+      - teamName
+    SlackAuthorize:
+      example:
+        url: https://slack.com/oauth/v2/authorize?client_id=…
+      properties:
+        url:
+          description: "Slack's consent screen: open it in the browser to pick the\
+            \ channel. Valid 10 minutes."
+          example: https://slack.com/oauth/v2/authorize?client_id=…
+          type: string
+      required:
+      - url
+    UpdateSlackConnection:
+      example:
+        events:
+        - purchased
+        - canceled
+      properties:
+        events:
+          description: Notifications the channel gets.
+          example:
+          - purchased
+          - canceled
+          items:
+            enum:
+            - purchased
+            - renewed
+            - payment_failed
+            - canceled
+            type: string
+          type: array
+          default: null
+      required:
+      - events
     listPolicyEvents_type_parameter:
       anyOf:
       - $ref: "#/components/schemas/EventType"
@@ -8880,6 +9935,9 @@ components:
           price:
             amount: 49.99
             currency: USD
+          recurring:
+            interval: day
+            intervalCount: 1
           mapped: true
         - id: price_1MoBy5LkdIwHu7ix
           productId: prod_NWjs8kKbJWmuuc
@@ -8888,6 +9946,9 @@ components:
           price:
             amount: 49.99
             currency: USD
+          recurring:
+            interval: day
+            intervalCount: 1
           mapped: true
       properties:
         data:
@@ -9239,6 +10300,44 @@ components:
       required:
       - count
       - reason
+    Mrr_byInterval_inner:
+      properties:
+        interval:
+          enum:
+          - day
+          - week
+          - month
+          - year
+          type: string
+        intervalCount:
+          example: 1
+          type: integer
+        subscriptionCount:
+          example: 80
+          type: integer
+        mrr:
+          example: 800
+          type: number
+      required:
+      - interval
+      - intervalCount
+      - mrr
+      - subscriptionCount
+    Mrr_byPolicy_inner:
+      properties:
+        policyId:
+          example: p4Rt8LmQ
+          type: string
+        subscriptionCount:
+          example: 80
+          type: integer
+        mrr:
+          example: 800
+          type: number
+      required:
+      - mrr
+      - policyId
+      - subscriptionCount
     Policy_duration:
       anyOf:
       - $ref: "#/components/schemas/PolicySettings_duration_anyOf"
@@ -9426,6 +10525,50 @@ components:
       - id
       - provider
       - type
+    IntegrationMapping_recurring:
+      description: "Billing period of a recurring price, `null` for a one-time price.\
+        \ Subscribing to a recurring price creates one subscription license, valid\
+        \ while it's paid."
+      example:
+        interval: day
+        intervalCount: 1
+      nullable: true
+      properties:
+        interval:
+          enum:
+          - day
+          - week
+          - month
+          - year
+          type: string
+        intervalCount:
+          example: 1
+          type: integer
+      required:
+      - interval
+      - intervalCount
+      type: object
+    StripePrice_recurring:
+      description: "Billing period of a recurring price, `null` for a one-time price."
+      example:
+        interval: day
+        intervalCount: 1
+      nullable: true
+      properties:
+        interval:
+          enum:
+          - day
+          - week
+          - month
+          - year
+          type: string
+        intervalCount:
+          example: 1
+          type: integer
+      required:
+      - interval
+      - intervalCount
+      type: object
   securitySchemes:
     apiKey:
       description: "Organization API key. `Authorization: Bearer <key>` is also accepted.\

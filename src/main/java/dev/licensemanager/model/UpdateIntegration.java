@@ -56,6 +56,11 @@ public class UpdateIntegration {
   @javax.annotation.Nullable
   private Boolean autoRefund;
 
+  public static final String SERIALIZED_NAME_SUBSCRIPTION_GRACE_DAYS = "subscriptionGraceDays";
+  @SerializedName(SERIALIZED_NAME_SUBSCRIPTION_GRACE_DAYS)
+  @javax.annotation.Nullable
+  private Integer subscriptionGraceDays;
+
   public UpdateIntegration() {
   }
 
@@ -75,6 +80,27 @@ public class UpdateIntegration {
 
   public void setAutoRefund(@javax.annotation.Nullable Boolean autoRefund) {
     this.autoRefund = autoRefund;
+  }
+
+
+  public UpdateIntegration subscriptionGraceDays(@javax.annotation.Nullable Integer subscriptionGraceDays) {
+    this.subscriptionGraceDays = subscriptionGraceDays;
+    return this;
+  }
+
+  /**
+   * Days a subscription license stays valid after its period ends while its renewal is unpaid, as Stripe retries the payment.
+   * minimum: 0
+   * maximum: 60
+   * @return subscriptionGraceDays
+   */
+  @javax.annotation.Nullable
+  public Integer getSubscriptionGraceDays() {
+    return subscriptionGraceDays;
+  }
+
+  public void setSubscriptionGraceDays(@javax.annotation.Nullable Integer subscriptionGraceDays) {
+    this.subscriptionGraceDays = subscriptionGraceDays;
   }
 
   /**
@@ -132,13 +158,14 @@ public class UpdateIntegration {
       return false;
     }
     UpdateIntegration updateIntegration = (UpdateIntegration) o;
-    return Objects.equals(this.autoRefund, updateIntegration.autoRefund)&&
+    return Objects.equals(this.autoRefund, updateIntegration.autoRefund) &&
+        Objects.equals(this.subscriptionGraceDays, updateIntegration.subscriptionGraceDays)&&
         Objects.equals(this.additionalProperties, updateIntegration.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(autoRefund, additionalProperties);
+    return Objects.hash(autoRefund, subscriptionGraceDays, additionalProperties);
   }
 
   @Override
@@ -146,6 +173,7 @@ public class UpdateIntegration {
     StringBuilder sb = new StringBuilder();
     sb.append("class UpdateIntegration {\n");
     sb.append("    autoRefund: ").append(toIndentedString(autoRefund)).append("\n");
+    sb.append("    subscriptionGraceDays: ").append(toIndentedString(subscriptionGraceDays)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -165,7 +193,7 @@ public class UpdateIntegration {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("autoRefund"));
+    openapiFields = new HashSet<String>(Arrays.asList("autoRefund", "subscriptionGraceDays"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);

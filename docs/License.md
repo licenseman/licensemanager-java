@@ -11,6 +11,7 @@
 |**productId** | **String** |  |  |
 |**policyId** | **String** |  |  |
 |**customerId** | **String** |  |  |
+|**customer** | [**LicenseCustomer**](LicenseCustomer.md) |  |  |
 |**key** | **String** | Unique within the product. Case sensitive: &#x60;validateKey&#x60; compares keys exactly. |  |
 |**createdAt** | **OffsetDateTime** |  |  |
 |**expiresAt** | **OffsetDateTime** | &#x60;null&#x60; when the license never expires. |  |
@@ -25,7 +26,8 @@
 |**status** | **LicenseStatus** |  |  |
 |**cancellableUntil** | **OffsetDateTime** | End of the money back guarantee: until then, the customer can cancel the license from the customer portal, or with a token. Set from the policy&#39;s &#x60;moneyBackGuaranteeDays&#x60; when the license is created. &#x60;null&#x60; when the customer can&#39;t cancel it. |  |
 |**canceledAt** | **OffsetDateTime** | When the license was canceled: validating its key fails since. &#x60;null&#x60; when it wasn&#39;t. |  |
-|**cancellationReason** | [**CancellationReason**](CancellationReason.md) |  |  |
+|**cancellationReason** | **CancellationReason** | Why the license was canceled. &#x60;null&#x60; when it wasn&#39;t. |  |
+|**subscription** | [**LicenseSubscription**](LicenseSubscription.md) |  |  |
 |**cancellationComment** | **String** | Comment given when the license was canceled. &#x60;null&#x60; when there&#39;s none. |  |
 |**stripeRefundId** | **String** | Id of the Stripe refund of the license&#39;s payment once it was canceled, through the Stripe integration. &#x60;null&#x60; otherwise. |  |
 |**updatedAt** | **OffsetDateTime** | Last time the license&#39;s settings were edited, not when its key was validated. |  |

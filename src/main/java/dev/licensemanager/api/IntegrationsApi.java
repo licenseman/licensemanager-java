@@ -33,9 +33,13 @@ import dev.licensemanager.model.Error;
 import dev.licensemanager.model.Integration;
 import dev.licensemanager.model.IntegrationMapping;
 import dev.licensemanager.model.ListStripePrices200Response;
+import dev.licensemanager.model.SlackAuthorize;
+import dev.licensemanager.model.SlackConnection;
+import dev.licensemanager.model.SlackIntegration;
 import dev.licensemanager.model.StripeIntegration;
 import dev.licensemanager.model.UpdateIntegration;
 import dev.licensemanager.model.UpdateIntegrationMapping;
+import dev.licensemanager.model.UpdateSlackConnection;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -80,6 +84,199 @@ public class IntegrationsApi {
         this.localCustomBaseUrl = customBaseUrl;
     }
 
+    private okhttp3.Call authorizeSlackCall(@javax.annotation.Nonnull String productId, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/v1/products/{productId}/integrations/slack/authorize"
+            .replace("{" + "productId" + "}", localVarApiClient.escapeString(productId.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "apiKey" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call authorizeSlackValidateBeforeCall(@javax.annotation.Nonnull String productId, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'productId' is set
+        if (productId == null) {
+            throw new ApiException("Missing the required parameter 'productId' when calling authorizeSlack(Async)");
+        }
+
+        return authorizeSlackCall(productId, _callback);
+
+    }
+
+
+    private ApiResponse<SlackAuthorize> authorizeSlackWithHttpInfo(@javax.annotation.Nonnull String productId) throws ApiException {
+        okhttp3.Call localVarCall = authorizeSlackValidateBeforeCall(productId, null);
+        Type localVarReturnType = new TypeToken<SlackAuthorize>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    private okhttp3.Call authorizeSlackAsync(@javax.annotation.Nonnull String productId, final ApiCallback<SlackAuthorize> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = authorizeSlackValidateBeforeCall(productId, _callback);
+        Type localVarReturnType = new TypeToken<SlackAuthorize>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+
+    public class APIauthorizeSlackRequest {
+        @javax.annotation.Nonnull
+        private final String productId;
+
+        private APIauthorizeSlackRequest(@javax.annotation.Nonnull String productId) {
+            this.productId = productId;
+        }
+
+        /**
+         * Build call for authorizeSlack
+         * @param _callback ApiCallback API callback
+         * @return Call to execute
+         * @throws ApiException If fail to serialize the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Consent screen </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;slack_not_configured&#x60;: the server has no Slack app (&#x60;SLACK_CLIENT_ID&#x60; and &#x60;SLACK_CLIENT_SECRET&#x60;) </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
+            return authorizeSlackCall(productId, _callback);
+        }
+
+        /**
+         * Execute authorizeSlack request
+         * @return SlackAuthorize
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Consent screen </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;slack_not_configured&#x60;: the server has no Slack app (&#x60;SLACK_CLIENT_ID&#x60; and &#x60;SLACK_CLIENT_SECRET&#x60;) </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public SlackAuthorize execute() throws ApiException {
+            ApiResponse<SlackAuthorize> localVarResp = authorizeSlackWithHttpInfo(productId);
+            return localVarResp.getData();
+        }
+
+        /**
+         * Execute authorizeSlack request with HTTP info returned
+         * @return ApiResponse&lt;SlackAuthorize&gt;
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Consent screen </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;slack_not_configured&#x60;: the server has no Slack app (&#x60;SLACK_CLIENT_ID&#x60; and &#x60;SLACK_CLIENT_SECRET&#x60;) </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public ApiResponse<SlackAuthorize> executeWithHttpInfo() throws ApiException {
+            return authorizeSlackWithHttpInfo(productId);
+        }
+
+        /**
+         * Execute authorizeSlack request (asynchronously)
+         * @param _callback The callback to be executed when the API call finishes
+         * @return The request call
+         * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Consent screen </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;slack_not_configured&#x60;: the server has no Slack app (&#x60;SLACK_CLIENT_ID&#x60; and &#x60;SLACK_CLIENT_SECRET&#x60;) </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call executeAsync(final ApiCallback<SlackAuthorize> _callback) throws ApiException {
+            return authorizeSlackAsync(productId, _callback);
+        }
+    }
+
+    /**
+     * Start connecting a Slack channel
+     * Returns the URL of Slack&#39;s consent screen, where the user picks the channel getting the product&#39;s notifications. Slack then redirects to the app&#39;s integrations page. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:create&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     * @param productId  (required)
+     * @return APIauthorizeSlackRequest
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Consent screen </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+        <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+        <tr><td> 409 </td><td> &#x60;slack_not_configured&#x60;: the server has no Slack app (&#x60;SLACK_CLIENT_ID&#x60; and &#x60;SLACK_CLIENT_SECRET&#x60;) </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+        <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+     </table>
+     */
+    public APIauthorizeSlackRequest authorizeSlack(@javax.annotation.Nonnull String productId) {
+        return new APIauthorizeSlackRequest(productId);
+    }
     private okhttp3.Call checkIntegrationCall(@javax.annotation.Nonnull String id, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
@@ -694,6 +891,190 @@ public class IntegrationsApi {
     public APIcreateStripeMappingRequest createStripeMapping(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull CreateIntegrationMapping createIntegrationMapping) {
         return new APIcreateStripeMappingRequest(productId, createIntegrationMapping);
     }
+    private okhttp3.Call deleteSlackConnectionCall(@javax.annotation.Nonnull String id, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/v1/slack-connections/{id}"
+            .replace("{" + "id" + "}", localVarApiClient.escapeString(id.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "apiKey" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "DELETE", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call deleteSlackConnectionValidateBeforeCall(@javax.annotation.Nonnull String id, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'id' is set
+        if (id == null) {
+            throw new ApiException("Missing the required parameter 'id' when calling deleteSlackConnection(Async)");
+        }
+
+        return deleteSlackConnectionCall(id, _callback);
+
+    }
+
+
+    private ApiResponse<Void> deleteSlackConnectionWithHttpInfo(@javax.annotation.Nonnull String id) throws ApiException {
+        okhttp3.Call localVarCall = deleteSlackConnectionValidateBeforeCall(id, null);
+        return localVarApiClient.execute(localVarCall);
+    }
+
+    private okhttp3.Call deleteSlackConnectionAsync(@javax.annotation.Nonnull String id, final ApiCallback<Void> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = deleteSlackConnectionValidateBeforeCall(id, _callback);
+        localVarApiClient.executeAsync(localVarCall, _callback);
+        return localVarCall;
+    }
+
+    public class APIdeleteSlackConnectionRequest {
+        @javax.annotation.Nonnull
+        private final String id;
+
+        private APIdeleteSlackConnectionRequest(@javax.annotation.Nonnull String id) {
+            this.id = id;
+        }
+
+        /**
+         * Build call for deleteSlackConnection
+         * @param _callback ApiCallback API callback
+         * @return Call to execute
+         * @throws ApiException If fail to serialize the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 204 </td><td> Removed </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Slack connection not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
+            return deleteSlackConnectionCall(id, _callback);
+        }
+
+        /**
+         * Execute deleteSlackConnection request
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 204 </td><td> Removed </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Slack connection not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public void execute() throws ApiException {
+            deleteSlackConnectionWithHttpInfo(id);
+        }
+
+        /**
+         * Execute deleteSlackConnection request with HTTP info returned
+         * @return ApiResponse&lt;Void&gt;
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 204 </td><td> Removed </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Slack connection not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public ApiResponse<Void> executeWithHttpInfo() throws ApiException {
+            return deleteSlackConnectionWithHttpInfo(id);
+        }
+
+        /**
+         * Execute deleteSlackConnection request (asynchronously)
+         * @param _callback The callback to be executed when the API call finishes
+         * @return The request call
+         * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 204 </td><td> Removed </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Slack connection not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call executeAsync(final ApiCallback<Void> _callback) throws ApiException {
+            return deleteSlackConnectionAsync(id, _callback);
+        }
+    }
+
+    /**
+     * Remove a Slack connection
+     * Stops posting to the channel and revokes the installation&#39;s token in Slack. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:delete&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     * @param id  (required)
+     * @return APIdeleteSlackConnectionRequest
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 204 </td><td> Removed </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+        <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Slack connection not found </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+        <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+     </table>
+     */
+    public APIdeleteSlackConnectionRequest deleteSlackConnection(@javax.annotation.Nonnull String id) {
+        return new APIdeleteSlackConnectionRequest(id);
+    }
     private okhttp3.Call deleteStripeMappingCall(@javax.annotation.Nonnull String id, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
@@ -1066,6 +1447,194 @@ public class IntegrationsApi {
      */
     public APIdisconnectIntegrationRequest disconnectIntegration(@javax.annotation.Nonnull String id) {
         return new APIdisconnectIntegrationRequest(id);
+    }
+    private okhttp3.Call getSlackIntegrationCall(@javax.annotation.Nonnull String productId, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/v1/products/{productId}/integrations/slack"
+            .replace("{" + "productId" + "}", localVarApiClient.escapeString(productId.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "apiKey" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call getSlackIntegrationValidateBeforeCall(@javax.annotation.Nonnull String productId, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'productId' is set
+        if (productId == null) {
+            throw new ApiException("Missing the required parameter 'productId' when calling getSlackIntegration(Async)");
+        }
+
+        return getSlackIntegrationCall(productId, _callback);
+
+    }
+
+
+    private ApiResponse<SlackIntegration> getSlackIntegrationWithHttpInfo(@javax.annotation.Nonnull String productId) throws ApiException {
+        okhttp3.Call localVarCall = getSlackIntegrationValidateBeforeCall(productId, null);
+        Type localVarReturnType = new TypeToken<SlackIntegration>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    private okhttp3.Call getSlackIntegrationAsync(@javax.annotation.Nonnull String productId, final ApiCallback<SlackIntegration> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = getSlackIntegrationValidateBeforeCall(productId, _callback);
+        Type localVarReturnType = new TypeToken<SlackIntegration>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+
+    public class APIgetSlackIntegrationRequest {
+        @javax.annotation.Nonnull
+        private final String productId;
+
+        private APIgetSlackIntegrationRequest(@javax.annotation.Nonnull String productId) {
+            this.productId = productId;
+        }
+
+        /**
+         * Build call for getSlackIntegration
+         * @param _callback ApiCallback API callback
+         * @return Call to execute
+         * @throws ApiException If fail to serialize the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Slack integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
+            return getSlackIntegrationCall(productId, _callback);
+        }
+
+        /**
+         * Execute getSlackIntegration request
+         * @return SlackIntegration
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Slack integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public SlackIntegration execute() throws ApiException {
+            ApiResponse<SlackIntegration> localVarResp = getSlackIntegrationWithHttpInfo(productId);
+            return localVarResp.getData();
+        }
+
+        /**
+         * Execute getSlackIntegration request with HTTP info returned
+         * @return ApiResponse&lt;SlackIntegration&gt;
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Slack integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public ApiResponse<SlackIntegration> executeWithHttpInfo() throws ApiException {
+            return getSlackIntegrationWithHttpInfo(productId);
+        }
+
+        /**
+         * Execute getSlackIntegration request (asynchronously)
+         * @param _callback The callback to be executed when the API call finishes
+         * @return The request call
+         * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Slack integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call executeAsync(final ApiCallback<SlackIntegration> _callback) throws ApiException {
+            return getSlackIntegrationAsync(productId, _callback);
+        }
+    }
+
+    /**
+     * Get the Slack integration of a product
+     * Slack channels getting notifications about the product&#39;s licenses: purchases, renewals, failed payments and cancellations. Doesn&#39;t accept tokens: only API keys and sessions.
+     * @param productId  (required)
+     * @return APIgetSlackIntegrationRequest
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Slack integration </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+        <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+        <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+     </table>
+     */
+    public APIgetSlackIntegrationRequest getSlackIntegration(@javax.annotation.Nonnull String productId) {
+        return new APIgetSlackIntegrationRequest(productId);
     }
     private okhttp3.Call getStripeIntegrationCall(@javax.annotation.Nonnull String productId, final ApiCallback _callback) throws ApiException {
         String basePath = null;
@@ -1448,6 +2017,199 @@ public class IntegrationsApi {
     public APIlistStripePricesRequest listStripePrices(@javax.annotation.Nonnull String id) {
         return new APIlistStripePricesRequest(id);
     }
+    private okhttp3.Call testSlackConnectionCall(@javax.annotation.Nonnull String id, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/v1/slack-connections/{id}/test"
+            .replace("{" + "id" + "}", localVarApiClient.escapeString(id.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "apiKey" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call testSlackConnectionValidateBeforeCall(@javax.annotation.Nonnull String id, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'id' is set
+        if (id == null) {
+            throw new ApiException("Missing the required parameter 'id' when calling testSlackConnection(Async)");
+        }
+
+        return testSlackConnectionCall(id, _callback);
+
+    }
+
+
+    private ApiResponse<SlackConnection> testSlackConnectionWithHttpInfo(@javax.annotation.Nonnull String id) throws ApiException {
+        okhttp3.Call localVarCall = testSlackConnectionValidateBeforeCall(id, null);
+        Type localVarReturnType = new TypeToken<SlackConnection>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    private okhttp3.Call testSlackConnectionAsync(@javax.annotation.Nonnull String id, final ApiCallback<SlackConnection> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = testSlackConnectionValidateBeforeCall(id, _callback);
+        Type localVarReturnType = new TypeToken<SlackConnection>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+
+    public class APItestSlackConnectionRequest {
+        @javax.annotation.Nonnull
+        private final String id;
+
+        private APItestSlackConnectionRequest(@javax.annotation.Nonnull String id) {
+            this.id = id;
+        }
+
+        /**
+         * Build call for testSlackConnection
+         * @param _callback ApiCallback API callback
+         * @return Call to execute
+         * @throws ApiException If fail to serialize the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Slack connection, after the test </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Slack connection not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;slack_error&#x60;: Slack refused the message </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
+            return testSlackConnectionCall(id, _callback);
+        }
+
+        /**
+         * Execute testSlackConnection request
+         * @return SlackConnection
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Slack connection, after the test </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Slack connection not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;slack_error&#x60;: Slack refused the message </td><td>  -  </td></tr>
+         </table>
+         */
+        public SlackConnection execute() throws ApiException {
+            ApiResponse<SlackConnection> localVarResp = testSlackConnectionWithHttpInfo(id);
+            return localVarResp.getData();
+        }
+
+        /**
+         * Execute testSlackConnection request with HTTP info returned
+         * @return ApiResponse&lt;SlackConnection&gt;
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Slack connection, after the test </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Slack connection not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;slack_error&#x60;: Slack refused the message </td><td>  -  </td></tr>
+         </table>
+         */
+        public ApiResponse<SlackConnection> executeWithHttpInfo() throws ApiException {
+            return testSlackConnectionWithHttpInfo(id);
+        }
+
+        /**
+         * Execute testSlackConnection request (asynchronously)
+         * @param _callback The callback to be executed when the API call finishes
+         * @return The request call
+         * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Slack connection, after the test </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Slack connection not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;slack_error&#x60;: Slack refused the message </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call executeAsync(final ApiCallback<SlackConnection> _callback) throws ApiException {
+            return testSlackConnectionAsync(id, _callback);
+        }
+    }
+
+    /**
+     * Send a test message to a Slack channel
+     * Posts a message to the channel, to check it gets the notifications. Marks the connection &#x60;revoked&#x60; when Slack says it won&#39;t work again. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:update&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     * @param id  (required)
+     * @return APItestSlackConnectionRequest
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Slack connection, after the test </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+        <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Slack connection not found </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+        <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+        <tr><td> 502 </td><td> &#x60;slack_error&#x60;: Slack refused the message </td><td>  -  </td></tr>
+     </table>
+     */
+    public APItestSlackConnectionRequest testSlackConnection(@javax.annotation.Nonnull String id) {
+        return new APItestSlackConnectionRequest(id);
+    }
     private okhttp3.Call updateIntegrationCall(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateIntegration updateIntegration, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
@@ -1645,6 +2407,204 @@ public class IntegrationsApi {
      */
     public APIupdateIntegrationRequest updateIntegration(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateIntegration updateIntegration) {
         return new APIupdateIntegrationRequest(id, updateIntegration);
+    }
+    private okhttp3.Call updateSlackConnectionCall(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateSlackConnection updateSlackConnection, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = updateSlackConnection;
+
+        // create path and map variables
+        String localVarPath = "/v1/slack-connections/{id}"
+            .replace("{" + "id" + "}", localVarApiClient.escapeString(id.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "apiKey" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "PATCH", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call updateSlackConnectionValidateBeforeCall(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateSlackConnection updateSlackConnection, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'id' is set
+        if (id == null) {
+            throw new ApiException("Missing the required parameter 'id' when calling updateSlackConnection(Async)");
+        }
+
+        // verify the required parameter 'updateSlackConnection' is set
+        if (updateSlackConnection == null) {
+            throw new ApiException("Missing the required parameter 'updateSlackConnection' when calling updateSlackConnection(Async)");
+        }
+
+        return updateSlackConnectionCall(id, updateSlackConnection, _callback);
+
+    }
+
+
+    private ApiResponse<SlackConnection> updateSlackConnectionWithHttpInfo(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateSlackConnection updateSlackConnection) throws ApiException {
+        okhttp3.Call localVarCall = updateSlackConnectionValidateBeforeCall(id, updateSlackConnection, null);
+        Type localVarReturnType = new TypeToken<SlackConnection>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    private okhttp3.Call updateSlackConnectionAsync(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateSlackConnection updateSlackConnection, final ApiCallback<SlackConnection> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = updateSlackConnectionValidateBeforeCall(id, updateSlackConnection, _callback);
+        Type localVarReturnType = new TypeToken<SlackConnection>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+
+    public class APIupdateSlackConnectionRequest {
+        @javax.annotation.Nonnull
+        private final String id;
+        @javax.annotation.Nonnull
+        private final UpdateSlackConnection updateSlackConnection;
+
+        private APIupdateSlackConnectionRequest(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateSlackConnection updateSlackConnection) {
+            this.id = id;
+            this.updateSlackConnection = updateSlackConnection;
+        }
+
+        /**
+         * Build call for updateSlackConnection
+         * @param _callback ApiCallback API callback
+         * @return Call to execute
+         * @throws ApiException If fail to serialize the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Updated Slack connection </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Slack connection not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
+            return updateSlackConnectionCall(id, updateSlackConnection, _callback);
+        }
+
+        /**
+         * Execute updateSlackConnection request
+         * @return SlackConnection
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Updated Slack connection </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Slack connection not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public SlackConnection execute() throws ApiException {
+            ApiResponse<SlackConnection> localVarResp = updateSlackConnectionWithHttpInfo(id, updateSlackConnection);
+            return localVarResp.getData();
+        }
+
+        /**
+         * Execute updateSlackConnection request with HTTP info returned
+         * @return ApiResponse&lt;SlackConnection&gt;
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Updated Slack connection </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Slack connection not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public ApiResponse<SlackConnection> executeWithHttpInfo() throws ApiException {
+            return updateSlackConnectionWithHttpInfo(id, updateSlackConnection);
+        }
+
+        /**
+         * Execute updateSlackConnection request (asynchronously)
+         * @param _callback The callback to be executed when the API call finishes
+         * @return The request call
+         * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Updated Slack connection </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Slack connection not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call executeAsync(final ApiCallback<SlackConnection> _callback) throws ApiException {
+            return updateSlackConnectionAsync(id, updateSlackConnection, _callback);
+        }
+    }
+
+    /**
+     * Update a Slack connection
+     * Changes the notifications the channel gets. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:update&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     * @param id  (required)
+     * @param updateSlackConnection  (required)
+     * @return APIupdateSlackConnectionRequest
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Updated Slack connection </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+        <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Slack connection not found </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+        <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+     </table>
+     */
+    public APIupdateSlackConnectionRequest updateSlackConnection(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateSlackConnection updateSlackConnection) {
+        return new APIupdateSlackConnectionRequest(id, updateSlackConnection);
     }
     private okhttp3.Call updateStripeMappingCall(@javax.annotation.Nonnull String id, @javax.annotation.Nonnull UpdateIntegrationMapping updateIntegrationMapping, final ApiCallback _callback) throws ApiException {
         String basePath = null;

@@ -20,8 +20,10 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import dev.licensemanager.model.CancellationReason;
+import dev.licensemanager.model.LicenseCustomer;
 import dev.licensemanager.model.LicenseMaxVersion;
 import dev.licensemanager.model.LicenseStatus;
+import dev.licensemanager.model.LicenseSubscription;
 import dev.licensemanager.model.Price;
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -77,6 +79,11 @@ public class License {
   @SerializedName(SERIALIZED_NAME_CUSTOMER_ID)
   @javax.annotation.Nonnull
   private String customerId;
+
+  public static final String SERIALIZED_NAME_CUSTOMER = "customer";
+  @SerializedName(SERIALIZED_NAME_CUSTOMER)
+  @javax.annotation.Nonnull
+  private LicenseCustomer customer;
 
   public static final String SERIALIZED_NAME_KEY = "key";
   @SerializedName(SERIALIZED_NAME_KEY)
@@ -150,8 +157,13 @@ public class License {
 
   public static final String SERIALIZED_NAME_CANCELLATION_REASON = "cancellationReason";
   @SerializedName(SERIALIZED_NAME_CANCELLATION_REASON)
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   private CancellationReason cancellationReason;
+
+  public static final String SERIALIZED_NAME_SUBSCRIPTION = "subscription";
+  @SerializedName(SERIALIZED_NAME_SUBSCRIPTION)
+  @javax.annotation.Nullable
+  private LicenseSubscription subscription;
 
   public static final String SERIALIZED_NAME_CANCELLATION_COMMENT = "cancellationComment";
   @SerializedName(SERIALIZED_NAME_CANCELLATION_COMMENT)
@@ -244,6 +256,25 @@ public class License {
 
   public void setCustomerId(@javax.annotation.Nonnull String customerId) {
     this.customerId = customerId;
+  }
+
+
+  public License customer(@javax.annotation.Nonnull LicenseCustomer customer) {
+    this.customer = customer;
+    return this;
+  }
+
+  /**
+   * Get customer
+   * @return customer
+   */
+  @javax.annotation.Nonnull
+  public LicenseCustomer getCustomer() {
+    return customer;
+  }
+
+  public void setCustomer(@javax.annotation.Nonnull LicenseCustomer customer) {
+    this.customer = customer;
   }
 
 
@@ -521,22 +552,41 @@ public class License {
   }
 
 
-  public License cancellationReason(@javax.annotation.Nonnull CancellationReason cancellationReason) {
+  public License cancellationReason(@javax.annotation.Nullable CancellationReason cancellationReason) {
     this.cancellationReason = cancellationReason;
     return this;
   }
 
   /**
-   * Get cancellationReason
+   * Why the license was canceled. &#x60;null&#x60; when it wasn&#39;t.
    * @return cancellationReason
    */
-  @javax.annotation.Nonnull
+  @javax.annotation.Nullable
   public CancellationReason getCancellationReason() {
     return cancellationReason;
   }
 
-  public void setCancellationReason(@javax.annotation.Nonnull CancellationReason cancellationReason) {
+  public void setCancellationReason(@javax.annotation.Nullable CancellationReason cancellationReason) {
     this.cancellationReason = cancellationReason;
+  }
+
+
+  public License subscription(@javax.annotation.Nullable LicenseSubscription subscription) {
+    this.subscription = subscription;
+    return this;
+  }
+
+  /**
+   * Get subscription
+   * @return subscription
+   */
+  @javax.annotation.Nullable
+  public LicenseSubscription getSubscription() {
+    return subscription;
+  }
+
+  public void setSubscription(@javax.annotation.Nullable LicenseSubscription subscription) {
+    this.subscription = subscription;
   }
 
 
@@ -655,6 +705,7 @@ public class License {
         Objects.equals(this.productId, license.productId) &&
         Objects.equals(this.policyId, license.policyId) &&
         Objects.equals(this.customerId, license.customerId) &&
+        Objects.equals(this.customer, license.customer) &&
         Objects.equals(this.key, license.key) &&
         Objects.equals(this.createdAt, license.createdAt) &&
         Objects.equals(this.expiresAt, license.expiresAt) &&
@@ -670,6 +721,7 @@ public class License {
         Objects.equals(this.cancellableUntil, license.cancellableUntil) &&
         Objects.equals(this.canceledAt, license.canceledAt) &&
         Objects.equals(this.cancellationReason, license.cancellationReason) &&
+        Objects.equals(this.subscription, license.subscription) &&
         Objects.equals(this.cancellationComment, license.cancellationComment) &&
         Objects.equals(this.stripeRefundId, license.stripeRefundId) &&
         Objects.equals(this.updatedAt, license.updatedAt)&&
@@ -678,7 +730,7 @@ public class License {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, productId, policyId, customerId, key, createdAt, expiresAt, meta, stripePaymentIntentId, maxMachines, maxOfflineDurationSeconds, activeMachineCount, lastActivatedAt, maxVersion, price, status, cancellableUntil, canceledAt, cancellationReason, cancellationComment, stripeRefundId, updatedAt, additionalProperties);
+    return Objects.hash(id, productId, policyId, customerId, customer, key, createdAt, expiresAt, meta, stripePaymentIntentId, maxMachines, maxOfflineDurationSeconds, activeMachineCount, lastActivatedAt, maxVersion, price, status, cancellableUntil, canceledAt, cancellationReason, subscription, cancellationComment, stripeRefundId, updatedAt, additionalProperties);
   }
 
   @Override
@@ -689,6 +741,7 @@ public class License {
     sb.append("    productId: ").append(toIndentedString(productId)).append("\n");
     sb.append("    policyId: ").append(toIndentedString(policyId)).append("\n");
     sb.append("    customerId: ").append(toIndentedString(customerId)).append("\n");
+    sb.append("    customer: ").append(toIndentedString(customer)).append("\n");
     sb.append("    key: ").append(toIndentedString(key)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("    expiresAt: ").append(toIndentedString(expiresAt)).append("\n");
@@ -704,6 +757,7 @@ public class License {
     sb.append("    cancellableUntil: ").append(toIndentedString(cancellableUntil)).append("\n");
     sb.append("    canceledAt: ").append(toIndentedString(canceledAt)).append("\n");
     sb.append("    cancellationReason: ").append(toIndentedString(cancellationReason)).append("\n");
+    sb.append("    subscription: ").append(toIndentedString(subscription)).append("\n");
     sb.append("    cancellationComment: ").append(toIndentedString(cancellationComment)).append("\n");
     sb.append("    stripeRefundId: ").append(toIndentedString(stripeRefundId)).append("\n");
     sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
@@ -726,10 +780,10 @@ public class License {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("id", "productId", "policyId", "customerId", "key", "createdAt", "expiresAt", "meta", "stripePaymentIntentId", "maxMachines", "maxOfflineDurationSeconds", "activeMachineCount", "lastActivatedAt", "maxVersion", "price", "status", "cancellableUntil", "canceledAt", "cancellationReason", "cancellationComment", "stripeRefundId", "updatedAt"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "productId", "policyId", "customerId", "customer", "key", "createdAt", "expiresAt", "meta", "stripePaymentIntentId", "maxMachines", "maxOfflineDurationSeconds", "activeMachineCount", "lastActivatedAt", "maxVersion", "price", "status", "cancellableUntil", "canceledAt", "cancellationReason", "subscription", "cancellationComment", "stripeRefundId", "updatedAt"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "productId", "policyId", "customerId", "key", "createdAt", "expiresAt", "meta", "stripePaymentIntentId", "maxMachines", "maxOfflineDurationSeconds", "activeMachineCount", "lastActivatedAt", "maxVersion", "price", "status", "cancellableUntil", "canceledAt", "cancellationReason", "cancellationComment", "stripeRefundId", "updatedAt"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "productId", "policyId", "customerId", "customer", "key", "createdAt", "expiresAt", "meta", "stripePaymentIntentId", "maxMachines", "maxOfflineDurationSeconds", "activeMachineCount", "lastActivatedAt", "maxVersion", "price", "status", "cancellableUntil", "canceledAt", "cancellationReason", "subscription", "cancellationComment", "stripeRefundId", "updatedAt"));
   }
 
   /**
@@ -764,6 +818,8 @@ public class License {
       if (!jsonObj.get("customerId").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `customerId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("customerId").toString()));
       }
+      // validate the required field `customer`
+      LicenseCustomer.validateJsonElement(jsonObj.get("customer"));
       if (!jsonObj.get("key").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `key` to be a primitive type in the JSON string but got `%s`", jsonObj.get("key").toString()));
       }
@@ -778,8 +834,14 @@ public class License {
       }
       // validate the required field `status`
       LicenseStatus.validateJsonElement(jsonObj.get("status"));
+      if (jsonObj.get("cancellationReason") != null && !jsonObj.get("cancellationReason").isJsonNull()) {
       // validate the required field `cancellationReason`
       CancellationReason.validateJsonElement(jsonObj.get("cancellationReason"));
+      }
+      if (jsonObj.get("subscription") != null && !jsonObj.get("subscription").isJsonNull()) {
+      // validate the required field `subscription`
+      LicenseSubscription.validateJsonElement(jsonObj.get("subscription"));
+      }
       if ((jsonObj.get("cancellationComment") != null && !jsonObj.get("cancellationComment").isJsonNull()) && !jsonObj.get("cancellationComment").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `cancellationComment` to be a primitive type in the JSON string but got `%s`", jsonObj.get("cancellationComment").toString()));
       }

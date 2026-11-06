@@ -19,8 +19,10 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import dev.licensemanager.model.CancellationReason;
+import dev.licensemanager.model.LicenseCustomer;
 import dev.licensemanager.model.LicenseMaxVersion;
 import dev.licensemanager.model.LicenseStatus;
+import dev.licensemanager.model.LicenseSubscription;
 import dev.licensemanager.model.Price;
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -74,6 +76,14 @@ public class LicenseTest {
     @Test
     public void customerIdTest() {
         // TODO: test customerId
+    }
+
+    /**
+     * Test the property 'customer'
+     */
+    @Test
+    public void customerTest() {
+        // TODO: test customer
     }
 
     /**
@@ -194,6 +204,14 @@ public class LicenseTest {
     @Test
     public void cancellationReasonTest() {
         // TODO: test cancellationReason
+    }
+
+    /**
+     * Test the property 'subscription'
+     */
+    @Test
+    public void subscriptionTest() {
+        // TODO: test subscription
     }
 
     /**

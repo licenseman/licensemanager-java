@@ -70,7 +70,7 @@ public class CreateIntegrationMapping {
   }
 
   /**
-   * Active one-time price of the Stripe account.
+   * Active one-time or licensed recurring price of the Stripe account.
    * @return stripePriceId
    */
   @javax.annotation.Nonnull

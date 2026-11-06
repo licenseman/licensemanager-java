@@ -4,16 +4,98 @@ All URIs are relative to *https://api.licensemanager.dev*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
+| [**authorizeSlack**](IntegrationsApi.md#authorizeSlack) | **POST** /v1/products/{productId}/integrations/slack/authorize | Start connecting a Slack channel |
 | [**checkIntegration**](IntegrationsApi.md#checkIntegration) | **POST** /v1/integrations/{id}/check | Check an integration |
 | [**connectStripe**](IntegrationsApi.md#connectStripe) | **PUT** /v1/products/{productId}/integrations/stripe | Connect Stripe |
 | [**createStripeMapping**](IntegrationsApi.md#createStripeMapping) | **POST** /v1/products/{productId}/integrations/stripe/mappings | Map a Stripe price to a policy |
+| [**deleteSlackConnection**](IntegrationsApi.md#deleteSlackConnection) | **DELETE** /v1/slack-connections/{id} | Remove a Slack connection |
 | [**deleteStripeMapping**](IntegrationsApi.md#deleteStripeMapping) | **DELETE** /v1/integration-mappings/{id} | Delete a mapping |
 | [**disconnectIntegration**](IntegrationsApi.md#disconnectIntegration) | **DELETE** /v1/integrations/{id} | Disconnect an integration |
+| [**getSlackIntegration**](IntegrationsApi.md#getSlackIntegration) | **GET** /v1/products/{productId}/integrations/slack | Get the Slack integration of a product |
 | [**getStripeIntegration**](IntegrationsApi.md#getStripeIntegration) | **GET** /v1/products/{productId}/integrations/stripe | Get the Stripe integration of a product |
 | [**listStripePrices**](IntegrationsApi.md#listStripePrices) | **GET** /v1/integrations/{id}/stripe/prices | List the Stripe prices of an integration |
+| [**testSlackConnection**](IntegrationsApi.md#testSlackConnection) | **POST** /v1/slack-connections/{id}/test | Send a test message to a Slack channel |
 | [**updateIntegration**](IntegrationsApi.md#updateIntegration) | **PATCH** /v1/integrations/{id} | Update an integration |
+| [**updateSlackConnection**](IntegrationsApi.md#updateSlackConnection) | **PATCH** /v1/slack-connections/{id} | Update a Slack connection |
 | [**updateStripeMapping**](IntegrationsApi.md#updateStripeMapping) | **PATCH** /v1/integration-mappings/{id} | Change the policy of a mapping |
 
+
+<a id="authorizeSlack"></a>
+# **authorizeSlack**
+> SlackAuthorize authorizeSlack(productId).execute();
+
+Start connecting a Slack channel
+
+Returns the URL of Slack&#39;s consent screen, where the user picks the channel getting the product&#39;s notifications. Slack then redirects to the app&#39;s integrations page. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:create&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+
+### Example
+```java
+// Import classes:
+import dev.licensemanager.ApiClient;
+import dev.licensemanager.ApiException;
+import dev.licensemanager.Configuration;
+import dev.licensemanager.auth.*;
+import dev.licensemanager.models.*;
+import dev.licensemanager.api.IntegrationsApi;
+
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("https://api.licensemanager.dev");
+    
+    // Configure API key authorization: apiKey
+    ApiKeyAuth apiKey = (ApiKeyAuth) defaultClient.getAuthentication("apiKey");
+    apiKey.setApiKey("YOUR API KEY");
+    // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+    //apiKey.setApiKeyPrefix("Token");
+
+    IntegrationsApi apiInstance = new IntegrationsApi(defaultClient);
+    String productId = "x7Kp2QaZ"; // String | 
+    try {
+      SlackAuthorize result = apiInstance.authorizeSlack(productId)
+            .execute();
+      System.out.println(result);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling IntegrationsApi#authorizeSlack");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
+}
+```
+
+### Parameters
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **productId** | **String**|  | |
+
+### Return type
+
+[**SlackAuthorize**](SlackAuthorize.md)
+
+### Authorization
+
+[apiKey](../README.md#apiKey)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | Consent screen |  -  |
+| **401** | &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted |  -  |
+| **402** | &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit |  -  |
+| **403** | &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested |  -  |
+| **404** | Product not found |  -  |
+| **409** | &#x60;slack_not_configured&#x60;: the server has no Slack app (&#x60;SLACK_CLIENT_ID&#x60; and &#x60;SLACK_CLIENT_SECRET&#x60;) |  -  |
+| **422** | &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; |  -  |
+| **429** | &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds |  -  |
 
 <a id="checkIntegration"></a>
 # **checkIntegration**
@@ -253,6 +335,81 @@ public class Example {
 | **429** | &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds |  -  |
 | **502** | &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached |  -  |
 
+<a id="deleteSlackConnection"></a>
+# **deleteSlackConnection**
+> deleteSlackConnection(id).execute();
+
+Remove a Slack connection
+
+Stops posting to the channel and revokes the installation&#39;s token in Slack. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:delete&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+
+### Example
+```java
+// Import classes:
+import dev.licensemanager.ApiClient;
+import dev.licensemanager.ApiException;
+import dev.licensemanager.Configuration;
+import dev.licensemanager.auth.*;
+import dev.licensemanager.models.*;
+import dev.licensemanager.api.IntegrationsApi;
+
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("https://api.licensemanager.dev");
+    
+    // Configure API key authorization: apiKey
+    ApiKeyAuth apiKey = (ApiKeyAuth) defaultClient.getAuthentication("apiKey");
+    apiKey.setApiKey("YOUR API KEY");
+    // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+    //apiKey.setApiKeyPrefix("Token");
+
+    IntegrationsApi apiInstance = new IntegrationsApi(defaultClient);
+    String id = "s4Hq8ZpLm"; // String | 
+    try {
+      apiInstance.deleteSlackConnection(id)
+            .execute();
+    } catch (ApiException e) {
+      System.err.println("Exception when calling IntegrationsApi#deleteSlackConnection");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
+}
+```
+
+### Parameters
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | **String**|  | |
+
+### Return type
+
+null (empty response body)
+
+### Authorization
+
+[apiKey](../README.md#apiKey)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | Removed |  -  |
+| **401** | &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted |  -  |
+| **402** | &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit |  -  |
+| **403** | &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested |  -  |
+| **404** | Slack connection not found |  -  |
+| **422** | &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; |  -  |
+| **429** | &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds |  -  |
+
 <a id="deleteStripeMapping"></a>
 # **deleteStripeMapping**
 > deleteStripeMapping(id).execute();
@@ -403,6 +560,82 @@ null (empty response body)
 | **422** | &#x60;missing_permission&#x60;: the key can&#39;t delete the webhook endpoint |  -  |
 | **429** | &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds |  -  |
 | **502** | &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached |  -  |
+
+<a id="getSlackIntegration"></a>
+# **getSlackIntegration**
+> SlackIntegration getSlackIntegration(productId).execute();
+
+Get the Slack integration of a product
+
+Slack channels getting notifications about the product&#39;s licenses: purchases, renewals, failed payments and cancellations. Doesn&#39;t accept tokens: only API keys and sessions.
+
+### Example
+```java
+// Import classes:
+import dev.licensemanager.ApiClient;
+import dev.licensemanager.ApiException;
+import dev.licensemanager.Configuration;
+import dev.licensemanager.auth.*;
+import dev.licensemanager.models.*;
+import dev.licensemanager.api.IntegrationsApi;
+
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("https://api.licensemanager.dev");
+    
+    // Configure API key authorization: apiKey
+    ApiKeyAuth apiKey = (ApiKeyAuth) defaultClient.getAuthentication("apiKey");
+    apiKey.setApiKey("YOUR API KEY");
+    // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+    //apiKey.setApiKeyPrefix("Token");
+
+    IntegrationsApi apiInstance = new IntegrationsApi(defaultClient);
+    String productId = "x7Kp2QaZ"; // String | 
+    try {
+      SlackIntegration result = apiInstance.getSlackIntegration(productId)
+            .execute();
+      System.out.println(result);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling IntegrationsApi#getSlackIntegration");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
+}
+```
+
+### Parameters
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **productId** | **String**|  | |
+
+### Return type
+
+[**SlackIntegration**](SlackIntegration.md)
+
+### Authorization
+
+[apiKey](../README.md#apiKey)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | Slack integration |  -  |
+| **401** | &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted |  -  |
+| **402** | &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit |  -  |
+| **403** | &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested |  -  |
+| **404** | Product not found |  -  |
+| **422** | &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; |  -  |
+| **429** | &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds |  -  |
 
 <a id="getStripeIntegration"></a>
 # **getStripeIntegration**
@@ -557,6 +790,83 @@ public class Example {
 | **429** | &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds |  -  |
 | **502** | &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached, or refused the request |  -  |
 
+<a id="testSlackConnection"></a>
+# **testSlackConnection**
+> SlackConnection testSlackConnection(id).execute();
+
+Send a test message to a Slack channel
+
+Posts a message to the channel, to check it gets the notifications. Marks the connection &#x60;revoked&#x60; when Slack says it won&#39;t work again. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:update&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+
+### Example
+```java
+// Import classes:
+import dev.licensemanager.ApiClient;
+import dev.licensemanager.ApiException;
+import dev.licensemanager.Configuration;
+import dev.licensemanager.auth.*;
+import dev.licensemanager.models.*;
+import dev.licensemanager.api.IntegrationsApi;
+
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("https://api.licensemanager.dev");
+    
+    // Configure API key authorization: apiKey
+    ApiKeyAuth apiKey = (ApiKeyAuth) defaultClient.getAuthentication("apiKey");
+    apiKey.setApiKey("YOUR API KEY");
+    // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+    //apiKey.setApiKeyPrefix("Token");
+
+    IntegrationsApi apiInstance = new IntegrationsApi(defaultClient);
+    String id = "s4Hq8ZpLm"; // String | 
+    try {
+      SlackConnection result = apiInstance.testSlackConnection(id)
+            .execute();
+      System.out.println(result);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling IntegrationsApi#testSlackConnection");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
+}
+```
+
+### Parameters
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | **String**|  | |
+
+### Return type
+
+[**SlackConnection**](SlackConnection.md)
+
+### Authorization
+
+[apiKey](../README.md#apiKey)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | Slack connection, after the test |  -  |
+| **401** | &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted |  -  |
+| **402** | &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit |  -  |
+| **403** | &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested |  -  |
+| **404** | Slack connection not found |  -  |
+| **422** | &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; |  -  |
+| **429** | &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds |  -  |
+| **502** | &#x60;slack_error&#x60;: Slack refused the message |  -  |
+
 <a id="updateIntegration"></a>
 # **updateIntegration**
 > Integration updateIntegration(id, updateIntegration).execute();
@@ -633,6 +943,84 @@ public class Example {
 | **403** | &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested |  -  |
 | **404** | Integration not found |  -  |
 | **422** | &#x60;validation_error&#x60;: invalid body. &#x60;missing_permission&#x60;: turning &#x60;autoRefund&#x60; on while the API key lacks the Refunds: Write permission |  -  |
+| **429** | &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds |  -  |
+
+<a id="updateSlackConnection"></a>
+# **updateSlackConnection**
+> SlackConnection updateSlackConnection(id, updateSlackConnection).execute();
+
+Update a Slack connection
+
+Changes the notifications the channel gets. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:update&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+
+### Example
+```java
+// Import classes:
+import dev.licensemanager.ApiClient;
+import dev.licensemanager.ApiException;
+import dev.licensemanager.Configuration;
+import dev.licensemanager.auth.*;
+import dev.licensemanager.models.*;
+import dev.licensemanager.api.IntegrationsApi;
+
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("https://api.licensemanager.dev");
+    
+    // Configure API key authorization: apiKey
+    ApiKeyAuth apiKey = (ApiKeyAuth) defaultClient.getAuthentication("apiKey");
+    apiKey.setApiKey("YOUR API KEY");
+    // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+    //apiKey.setApiKeyPrefix("Token");
+
+    IntegrationsApi apiInstance = new IntegrationsApi(defaultClient);
+    String id = "s4Hq8ZpLm"; // String | 
+    UpdateSlackConnection updateSlackConnection = new UpdateSlackConnection(); // UpdateSlackConnection | 
+    try {
+      SlackConnection result = apiInstance.updateSlackConnection(id, updateSlackConnection)
+            .execute();
+      System.out.println(result);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling IntegrationsApi#updateSlackConnection");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
+}
+```
+
+### Parameters
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | **String**|  | |
+| **updateSlackConnection** | [**UpdateSlackConnection**](UpdateSlackConnection.md)|  | |
+
+### Return type
+
+[**SlackConnection**](SlackConnection.md)
+
+### Authorization
+
+[apiKey](../README.md#apiKey)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | Updated Slack connection |  -  |
+| **401** | &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted |  -  |
+| **402** | &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit |  -  |
+| **403** | &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested |  -  |
+| **404** | Slack connection not found |  -  |
+| **422** | &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; |  -  |
 | **429** | &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds |  -  |
 
 <a id="updateStripeMapping"></a>

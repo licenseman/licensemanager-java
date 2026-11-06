@@ -136,6 +136,30 @@ public class IntegrationTest {
     }
 
     /**
+     * Test the property 'canManageSubscriptions'
+     */
+    @Test
+    public void canManageSubscriptionsTest() {
+        // TODO: test canManageSubscriptions
+    }
+
+    /**
+     * Test the property 'canBillingPortal'
+     */
+    @Test
+    public void canBillingPortalTest() {
+        // TODO: test canBillingPortal
+    }
+
+    /**
+     * Test the property 'subscriptionGraceDays'
+     */
+    @Test
+    public void subscriptionGraceDaysTest() {
+        // TODO: test subscriptionGraceDays
+    }
+
+    /**
      * Test the property 'createdAt'
      */
     @Test

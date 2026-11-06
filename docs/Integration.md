@@ -19,6 +19,9 @@
 |**lastEventAt** | **OffsetDateTime** | Last time it received an event from the provider. |  |
 |**autoRefund** | **Boolean** | Whether canceling a license bought through Stripe refunds its payment. On by default, always off when &#x60;canRefund&#x60; is false. |  |
 |**canRefund** | **Boolean** | Whether the API key has the optional Refunds: Write permission, checked when connecting and every day. Without it, canceled licenses aren&#39;t refunded: refund their payments from Stripe. |  |
+|**canManageSubscriptions** | **Boolean** | Whether the API key has the optional Subscriptions: Write permission, checked when connecting and every day. Without it, subscription licenses can&#39;t be canceled from the app: cancel their subscriptions from Stripe. |  |
+|**canBillingPortal** | **Boolean** | Whether the API key has the optional Customer portal: Write permission, checked when connecting and every day. Without it, the license portal doesn&#39;t link to the Stripe customer portal. |  |
+|**subscriptionGraceDays** | **Integer** | Days a subscription license stays valid after its period ends while its renewal is unpaid, as Stripe retries the payment. 7 by default. |  |
 |**createdAt** | **OffsetDateTime** |  |  |
 
 

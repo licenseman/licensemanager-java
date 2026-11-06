@@ -25,6 +25,7 @@ import dev.licensemanager.model.ProductStatsActiveMachinesByPlatformInner;
 import dev.licensemanager.model.ProductStatsActiveMachinesByVersionInner;
 import dev.licensemanager.model.ProductStatsNewLicensesByPolicyInner;
 import dev.licensemanager.model.Revenue;
+import dev.licensemanager.model.SubscriptionStats;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -139,6 +140,11 @@ public class ProductStats {
   @SerializedName(SERIALIZED_NAME_CANCELLATION)
   @javax.annotation.Nullable
   private CancellationStats cancellation;
+
+  public static final String SERIALIZED_NAME_SUBSCRIPTIONS = "subscriptions";
+  @SerializedName(SERIALIZED_NAME_SUBSCRIPTIONS)
+  @javax.annotation.Nullable
+  private SubscriptionStats subscriptions;
 
   public static final String SERIALIZED_NAME_REVENUE = "revenue";
   @SerializedName(SERIALIZED_NAME_REVENUE)
@@ -507,6 +513,25 @@ public class ProductStats {
   }
 
 
+  public ProductStats subscriptions(@javax.annotation.Nullable SubscriptionStats subscriptions) {
+    this.subscriptions = subscriptions;
+    return this;
+  }
+
+  /**
+   * Subscriptions of the product. &#x60;null&#x60; when it has never had one.
+   * @return subscriptions
+   */
+  @javax.annotation.Nullable
+  public SubscriptionStats getSubscriptions() {
+    return subscriptions;
+  }
+
+  public void setSubscriptions(@javax.annotation.Nullable SubscriptionStats subscriptions) {
+    this.subscriptions = subscriptions;
+  }
+
+
   public ProductStats revenue(@javax.annotation.Nonnull List<Revenue> revenue) {
     this.revenue = revenue;
     return this;
@@ -685,6 +710,7 @@ public class ProductStats {
         Objects.equals(this.newLicensesByMonth, productStats.newLicensesByMonth) &&
         Objects.equals(this.newLicensesByPolicy, productStats.newLicensesByPolicy) &&
         Objects.equals(this.cancellation, productStats.cancellation) &&
+        Objects.equals(this.subscriptions, productStats.subscriptions) &&
         Objects.equals(this.revenue, productStats.revenue) &&
         Objects.equals(this.activationsByVersion, productStats.activationsByVersion) &&
         Objects.equals(this.activeMachinesByVersion, productStats.activeMachinesByVersion) &&
@@ -694,7 +720,7 @@ public class ProductStats {
 
   @Override
   public int hashCode() {
-    return Objects.hash(licenseCount, activeLicenseCount, newLicenseCount, expiringLicenseCount, expiredLicenseCount, activeMachineCount, inUseLicenseCount, seatCount, usedSeatCount, fullLicenseCount, days, months, newLicensesByDay, newLicensesByMonth, newLicensesByPolicy, cancellation, revenue, activationsByVersion, activeMachinesByVersion, activeMachinesByPlatform, additionalProperties);
+    return Objects.hash(licenseCount, activeLicenseCount, newLicenseCount, expiringLicenseCount, expiredLicenseCount, activeMachineCount, inUseLicenseCount, seatCount, usedSeatCount, fullLicenseCount, days, months, newLicensesByDay, newLicensesByMonth, newLicensesByPolicy, cancellation, subscriptions, revenue, activationsByVersion, activeMachinesByVersion, activeMachinesByPlatform, additionalProperties);
   }
 
   @Override
@@ -717,6 +743,7 @@ public class ProductStats {
     sb.append("    newLicensesByMonth: ").append(toIndentedString(newLicensesByMonth)).append("\n");
     sb.append("    newLicensesByPolicy: ").append(toIndentedString(newLicensesByPolicy)).append("\n");
     sb.append("    cancellation: ").append(toIndentedString(cancellation)).append("\n");
+    sb.append("    subscriptions: ").append(toIndentedString(subscriptions)).append("\n");
     sb.append("    revenue: ").append(toIndentedString(revenue)).append("\n");
     sb.append("    activationsByVersion: ").append(toIndentedString(activationsByVersion)).append("\n");
     sb.append("    activeMachinesByVersion: ").append(toIndentedString(activeMachinesByVersion)).append("\n");
@@ -740,10 +767,10 @@ public class ProductStats {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("licenseCount", "activeLicenseCount", "newLicenseCount", "expiringLicenseCount", "expiredLicenseCount", "activeMachineCount", "inUseLicenseCount", "seatCount", "usedSeatCount", "fullLicenseCount", "days", "months", "newLicensesByDay", "newLicensesByMonth", "newLicensesByPolicy", "cancellation", "revenue", "activationsByVersion", "activeMachinesByVersion", "activeMachinesByPlatform"));
+    openapiFields = new HashSet<String>(Arrays.asList("licenseCount", "activeLicenseCount", "newLicenseCount", "expiringLicenseCount", "expiredLicenseCount", "activeMachineCount", "inUseLicenseCount", "seatCount", "usedSeatCount", "fullLicenseCount", "days", "months", "newLicensesByDay", "newLicensesByMonth", "newLicensesByPolicy", "cancellation", "subscriptions", "revenue", "activationsByVersion", "activeMachinesByVersion", "activeMachinesByPlatform"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("licenseCount", "activeLicenseCount", "newLicenseCount", "expiringLicenseCount", "expiredLicenseCount", "activeMachineCount", "inUseLicenseCount", "seatCount", "usedSeatCount", "fullLicenseCount", "days", "months", "newLicensesByDay", "newLicensesByMonth", "newLicensesByPolicy", "cancellation", "revenue", "activationsByVersion", "activeMachinesByVersion", "activeMachinesByPlatform"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("licenseCount", "activeLicenseCount", "newLicenseCount", "expiringLicenseCount", "expiredLicenseCount", "activeMachineCount", "inUseLicenseCount", "seatCount", "usedSeatCount", "fullLicenseCount", "days", "months", "newLicensesByDay", "newLicensesByMonth", "newLicensesByPolicy", "cancellation", "subscriptions", "revenue", "activationsByVersion", "activeMachinesByVersion", "activeMachinesByPlatform"));
   }
 
   /**
@@ -803,6 +830,10 @@ public class ProductStats {
       if (jsonObj.get("cancellation") != null && !jsonObj.get("cancellation").isJsonNull()) {
       // validate the required field `cancellation`
       CancellationStats.validateJsonElement(jsonObj.get("cancellation"));
+      }
+      if (jsonObj.get("subscriptions") != null && !jsonObj.get("subscriptions").isJsonNull()) {
+      // validate the required field `subscriptions`
+      SubscriptionStats.validateJsonElement(jsonObj.get("subscriptions"));
       }
       if (jsonObj.get("revenue") != null) {
         if (!jsonObj.get("revenue").isJsonArray()) {

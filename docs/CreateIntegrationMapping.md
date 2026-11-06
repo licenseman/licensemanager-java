@@ -7,7 +7,7 @@
 
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
-|**stripePriceId** | **String** | Active one-time price of the Stripe account. |  |
+|**stripePriceId** | **String** | Active one-time or licensed recurring price of the Stripe account. |  |
 |**policyId** | **String** |  |  |
 
 

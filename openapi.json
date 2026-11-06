@@ -1004,6 +1004,17 @@
             ],
             "description": "Cancellations of the licenses with a money back guarantee. `null` when no license of the product has one."
           },
+          "subscriptions": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SubscriptionStats"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Subscriptions of the product. `null` when it has never had one."
+          },
           "revenue": {
             "type": "array",
             "items": {
@@ -1112,6 +1123,7 @@
           "newLicensesByMonth",
           "newLicensesByPolicy",
           "cancellation",
+          "subscriptions",
           "revenue",
           "activationsByVersion",
           "activeMachinesByVersion",
@@ -1210,6 +1222,197 @@
         "description": "- `too_expensive`: too expensive.\n- `missing_features`: missing features i need.\n- `not_working`: doesn't work as expected.\n- `switched`: found an alternative.\n- `unused`: no longer needed.\n- `other`: other.",
         "example": "too_expensive"
       },
+      "SubscriptionStats": {
+        "type": "object",
+        "properties": {
+          "activeCount": {
+            "type": "integer",
+            "description": "Number of ongoing subscriptions: `active`, `trialing` or `past_due`.",
+            "example": 120
+          },
+          "trialingCount": {
+            "type": "integer",
+            "example": 4
+          },
+          "pastDueCount": {
+            "type": "integer",
+            "description": "Number of them whose renewal failed, as Stripe retries it: their licenses stay valid for the integration's grace days.",
+            "example": 3
+          },
+          "cancelingCount": {
+            "type": "integer",
+            "description": "Number of them set to end at the end of their period.",
+            "example": 5
+          },
+          "newCount": {
+            "type": "integer",
+            "description": "Number of subscriptions started in the last 30 days.",
+            "example": 14
+          },
+          "endedCount": {
+            "type": "integer",
+            "description": "Number of subscriptions that ended in the last 30 days.",
+            "example": 3
+          },
+          "churnRate": {
+            "type": "number",
+            "description": "Share of the subscriptions ongoing 30 days ago that ended since, from 0 to 1.",
+            "example": 0.025
+          },
+          "newByMonth": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Number of subscriptions started each month, aligned on `months`.",
+            "example": [
+              3,
+              5,
+              8
+            ]
+          },
+          "endedByMonth": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Number of subscriptions that ended each month, aligned on `months`.",
+            "example": [
+              0,
+              1,
+              2
+            ]
+          },
+          "activeByMonth": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Number of ongoing subscriptions at the end of each month, aligned on `months`, today for this month.",
+            "example": [
+              90,
+              104,
+              120
+            ]
+          },
+          "mrr": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Mrr"
+            },
+            "description": "MRR in each currency, from the highest number of subscriptions. Amounts aren't converted between currencies."
+          }
+        },
+        "required": [
+          "activeCount",
+          "trialingCount",
+          "pastDueCount",
+          "cancelingCount",
+          "newCount",
+          "endedCount",
+          "churnRate",
+          "newByMonth",
+          "endedByMonth",
+          "activeByMonth",
+          "mrr"
+        ],
+        "description": "Subscriptions to recurring Stripe prices, each with its subscription license."
+      },
+      "Mrr": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "example": "USD"
+          },
+          "mrr": {
+            "type": "number",
+            "description": "Monthly recurring revenue: the price of every ongoing subscription in the currency, times its quantity, brought to one month (a year counts for a twelfth), before taxes and discounts.",
+            "example": 1240
+          },
+          "byInterval": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "interval": {
+                  "type": "string",
+                  "enum": [
+                    "day",
+                    "week",
+                    "month",
+                    "year"
+                  ]
+                },
+                "intervalCount": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "subscriptionCount": {
+                  "type": "integer",
+                  "example": 80
+                },
+                "mrr": {
+                  "type": "number",
+                  "example": 800
+                }
+              },
+              "required": [
+                "interval",
+                "intervalCount",
+                "subscriptionCount",
+                "mrr"
+              ]
+            },
+            "description": "Ongoing subscriptions and MRR of each billing period, like monthly and yearly, from the highest MRR."
+          },
+          "byPolicy": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "policyId": {
+                  "type": "string",
+                  "example": "p4Rt8LmQ"
+                },
+                "subscriptionCount": {
+                  "type": "integer",
+                  "example": 80
+                },
+                "mrr": {
+                  "type": "number",
+                  "example": 800
+                }
+              },
+              "required": [
+                "policyId",
+                "subscriptionCount",
+                "mrr"
+              ]
+            },
+            "description": "MRR of each policy, from the highest."
+          },
+          "byMonth": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "MRR at the end of each month, aligned on `months`, today for this month, at the current prices of the subscriptions.",
+            "example": [
+              900,
+              1100,
+              1240
+            ]
+          }
+        },
+        "required": [
+          "currency",
+          "mrr",
+          "byInterval",
+          "byPolicy",
+          "byMonth"
+        ]
+      },
       "Revenue": {
         "type": "object",
         "properties": {
@@ -1220,22 +1423,32 @@
           },
           "licenseCount": {
             "type": "integer",
-            "description": "Number of licenses sold in the currency, free ones included, canceled ones left out.",
+            "description": "Number of licenses sold once in the currency, free ones included, canceled ones and subscription licenses left out.",
             "example": 42
           },
           "total": {
             "type": "number",
-            "description": "Sum of the prices of the licenses sold in the currency, in major units, canceled ones left out.",
+            "description": "Revenue in the currency, in major units: the prices of the licenses sold once, canceled ones left out, plus the payments of the subscriptions, `subscriptionTotal`.",
             "example": 2099.58
+          },
+          "subscriptionTotal": {
+            "type": "number",
+            "description": "Sum of the payments of the subscription licenses in the currency, before taxes, in major units.",
+            "example": 480
+          },
+          "paymentCount": {
+            "type": "integer",
+            "description": "Number of payments of the subscription licenses in the currency.",
+            "example": 48
           },
           "canceledLicenseCount": {
             "type": "integer",
-            "description": "Number of canceled licenses sold in the currency.",
+            "description": "Number of canceled licenses sold once in the currency.",
             "example": 2
           },
           "canceledTotal": {
             "type": "number",
-            "description": "Sum of the prices of the canceled licenses sold in the currency, in major units: revenue lost to cancellations.",
+            "description": "Sum of the prices of the canceled licenses sold once in the currency, in major units: revenue lost to cancellations.",
             "example": 99.98
           },
           "thisMonth": {
@@ -1324,6 +1537,8 @@
           "currency",
           "licenseCount",
           "total",
+          "subscriptionTotal",
+          "paymentCount",
           "canceledLicenseCount",
           "canceledTotal",
           "thisMonth",
@@ -1333,7 +1548,7 @@
           "byMonth",
           "byPolicy"
         ],
-        "description": "Revenue of the licenses sold in one currency, each license counting on the day it was created. Licenses without a price are left out, and so are canceled ones, but in `canceledLicenseCount` and `canceledTotal`."
+        "description": "Revenue in one currency: the licenses sold once, each counting on the day it was created, and the payments of the subscription licenses, each counting on the day it was paid, with the license's policy. Licenses without a price are left out, and so are canceled ones, but in `canceledLicenseCount` and `canceledTotal`."
       },
       "PolicyList": {
         "type": "object",
@@ -1888,6 +2103,9 @@
             "type": "string",
             "example": "c9Wd3RtE"
           },
+          "customer": {
+            "$ref": "#/components/schemas/LicenseCustomer"
+          },
           "key": {
             "type": "string",
             "description": "Unique within the product. Case sensitive: `validateKey` compares keys exactly.",
@@ -1981,18 +2199,18 @@
             "example": "2026-01-20T16:12:00.000Z"
           },
           "cancellationReason": {
-            "allOf": [
+            "anyOf": [
               {
                 "$ref": "#/components/schemas/CancellationReason"
               },
               {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "description": "Why the license was canceled. `null` when it wasn't."
+                "type": "null"
               }
-            ]
+            ],
+            "description": "Why the license was canceled. `null` when it wasn't."
+          },
+          "subscription": {
+            "$ref": "#/components/schemas/LicenseSubscription"
           },
           "cancellationComment": {
             "type": [
@@ -2022,6 +2240,7 @@
           "productId",
           "policyId",
           "customerId",
+          "customer",
           "key",
           "createdAt",
           "expiresAt",
@@ -2037,10 +2256,39 @@
           "cancellableUntil",
           "canceledAt",
           "cancellationReason",
+          "subscription",
           "cancellationComment",
           "stripeRefundId",
           "updatedAt"
         ]
+      },
+      "LicenseCustomer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "c9Wd3RtE"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "jane@example.com"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Display name of the customer. `null` when unknown.",
+            "example": "Jane Doe"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "name"
+        ],
+        "description": "Customer the license belongs to, the one of `customerId`."
       },
       "LicenseMaxVersion": {
         "type": "object",
@@ -2113,6 +2361,80 @@
         ],
         "description": "`canceled` when the license was canceled, `expired` when it has expired, `active` when a machine validated its key in the last 90 days, `inactive` otherwise.",
         "example": "active"
+      },
+      "LicenseSubscription": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "properties": {
+          "stripeSubscriptionId": {
+            "type": "string",
+            "example": "sub_1MowQVLkdIwHu7ix"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the subscription in Stripe: `active`, `trialing`, `past_due` while a failed payment is retried, `canceled`, `unpaid`, `paused`, `incomplete` or `incomplete_expired`.",
+            "example": "active"
+          },
+          "interval": {
+            "type": "string",
+            "enum": [
+              "day",
+              "week",
+              "month",
+              "year"
+            ]
+          },
+          "intervalCount": {
+            "type": "integer",
+            "description": "Number of intervals between payments.",
+            "example": 1
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Units subscribed, multiplying the policy's machines.",
+            "example": 1
+          },
+          "price": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Price"
+              },
+              {
+                "description": "Price of one unit for one period, before taxes."
+              }
+            ]
+          },
+          "currentPeriodEnd": {
+            "type": "string",
+            "format": "date-time",
+            "description": "End of the paid period, when the subscription renews or ends."
+          },
+          "cancelAtPeriodEnd": {
+            "type": "boolean",
+            "description": "Whether the subscription ends at the end of the period."
+          },
+          "endedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "stripeSubscriptionId",
+          "status",
+          "interval",
+          "intervalCount",
+          "quantity",
+          "price",
+          "currentPeriodEnd",
+          "cancelAtPeriodEnd",
+          "endedAt"
+        ],
+        "description": "The Stripe subscription keeping the license valid, `null` when it isn't a subscription license. The license expires when it stops being paid, includes every update, and can't be canceled during a money back guarantee."
       },
       "CreateLicense": {
         "type": "object",
@@ -2616,6 +2938,30 @@
           "expiresInSeconds"
         ]
       },
+      "BillingPortalSession": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Link to the Stripe customer portal, to open right away: it expires shortly.",
+            "example": "https://billing.stripe.com/p/session/test_YWNjdF8x"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "CreateBillingPortalSession": {
+        "type": "object",
+        "properties": {
+          "returnUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Where the Stripe customer portal links back to: a page of the customer portal, or of one of the product's `returnDomains`. The customer portal of the product by default.",
+            "example": "https://example.com/account"
+          }
+        }
+      },
       "SendPortalLink": {
         "type": "object",
         "properties": {
@@ -2786,6 +3132,7 @@
               "enum": [
                 "customer:read",
                 "customer:write",
+                "customer:billing",
                 "license:read",
                 "license:write",
                 "license:cancel",
@@ -2822,6 +3169,7 @@
               "enum": [
                 "customer:read",
                 "customer:write",
+                "customer:billing",
                 "license:read",
                 "license:write",
                 "license:cancel",
@@ -2944,9 +3292,12 @@
           "license.canceled",
           "license.refunded",
           "license.refund_failed",
+          "license.payment_succeeded",
+          "license.payment_failed",
+          "license.subscription_ended",
           "machine.deactivated"
         ],
-        "description": "- `policy.created`: `payload` holds the policy's settings.\n- `policy.updated`: `payload.changes` maps each changed field to its previous (`from`) and new (`to`) value. Making a policy the default also updates the previous default one.\n- `license.created`: `payload` holds the license's key, `policyId`, `customerId` and settings. Not linked to the policy.\n- `license.updated`: `payload.changes`, like `policy.updated`.\n- `license.validated`: a machine validated the license key. `payload` holds the machine's `fingerprint`, `name` and `version`, whether the validation created the machine (`machineCreated`) or activated it again (`machineActivated`), the `overriddenMachineId` of the machine it deactivated to take its place, `null` when none, and the `lockedMachineIds` of the machines it locked as it took its place back (see `validateKey`).\n- `license.validation_failed`: validating the license key failed. `payload` holds the error `code` and `message`, and the `fingerprint`, `name`, `platform` and `version` sent, the name and platform being the machine's when none is sent. Linked to the machine when it exists.\n- `license.canceled`: the license was canceled. `payload` holds the cancellation `reason` and `comment`, and whether its Stripe payment is being refunded (`refund`).\n- `license.refunded`: the Stripe payment of a canceled license was refunded. `payload` holds the Stripe `refundId` and the `amount` refunded. Has the `integration` actor.\n- `license.refund_failed`: refunding the Stripe payment of a canceled license failed. `payload` holds the error `message`: refund it from Stripe. Has the `integration` actor.\n- `machine.deactivated`: a machine was deactivated or locked, so it no longer counts as using the license. `payload` holds the machine's `fingerprint` and `name`, the `overriddenByMachineId` of the machine that took its place, `null` when it was deactivated through the API, and whether it was `locked`. Deactivations by validations have the `automation` actor. Linked to the license and the machine.\n\nAn update that changes nothing records no event. Deletions record no events, and customers, products and releases have none.",
+        "description": "- `policy.created`: `payload` holds the policy's settings.\n- `policy.updated`: `payload.changes` maps each changed field to its previous (`from`) and new (`to`) value. Making a policy the default also updates the previous default one.\n- `license.created`: `payload` holds the license's key, `policyId`, `customerId` and settings. Not linked to the policy.\n- `license.updated`: `payload.changes`, like `policy.updated`.\n- `license.validated`: a machine validated the license key. `payload` holds the machine's `fingerprint`, `name` and `version`, whether the validation created the machine (`machineCreated`) or activated it again (`machineActivated`), the `overriddenMachineId` of the machine it deactivated to take its place, `null` when none, and the `lockedMachineIds` of the machines it locked as it took its place back (see `validateKey`).\n- `license.validation_failed`: validating the license key failed. `payload` holds the error `code` and `message`, and the `fingerprint`, `name`, `platform` and `version` sent, the name and platform being the machine's when none is sent. Linked to the machine when it exists.\n- `license.canceled`: the license was canceled. `payload` holds the cancellation `reason` and `comment`, and whether its Stripe payment is being refunded (`refund`).\n- `license.refunded`: the Stripe payment of a canceled license was refunded. `payload` holds the Stripe `refundId` and the `amount` refunded. Has the `integration` actor.\n- `license.refund_failed`: refunding the Stripe payment of a canceled license failed. `payload` holds the error `message`: refund it from Stripe. Has the `integration` actor.\n- `license.payment_succeeded`: a payment of the license's Stripe subscription succeeded, its first one included. `payload` holds the Stripe `invoiceId`, the `amount` paid before taxes and its `currency`, Stripe's `billingReason` (`subscription_create`, `subscription_cycle`, `subscription_update`…) and the `periodStart` and `periodEnd` it pays for. Invoices with nothing to pay, like for a trial, record none. Has the `integration` actor.\n- `license.payment_failed`: a payment of the license's Stripe subscription failed. `payload` holds the Stripe `invoiceId`, the `amount` due and its `currency`, the `attemptCount` and when Stripe tries again (`nextAttemptAt`, `null` when it won't). The license stays valid for the integration's grace days after its period ends. Has the `integration` actor.\n- `license.subscription_ended`: the license's Stripe subscription ended, canceled or no longer paid, so the license expired. `payload` holds the subscription's `status` and Stripe's cancellation `reason`. Has the `integration` actor.\n- `machine.deactivated`: a machine was deactivated or locked, so it no longer counts as using the license. `payload` holds the machine's `fingerprint` and `name`, the `overriddenByMachineId` of the machine that took its place, `null` when it was deactivated through the API, and whether it was `locked`. Deactivations by validations have the `automation` actor. Linked to the license and the machine.\n\nAn update that changes nothing records no event. Deletions record no events, and customers, products and releases have none.",
         "example": "license.validated"
       },
       "EventMachine": {
@@ -3216,13 +3567,19 @@
             "type": "boolean",
             "description": "Whether the key can connect without it, losing what it's for, explained by `reason`.",
             "example": false
+          },
+          "subscriptions": {
+            "type": "boolean",
+            "description": "Whether it's only needed to sell subscriptions: checked once a recurring price is mapped.",
+            "example": false
           }
         },
         "required": [
           "resource",
           "access",
           "reason",
-          "optional"
+          "optional",
+          "subscriptions"
         ]
       },
       "Integration": {
@@ -3297,6 +3654,21 @@
             "description": "Whether the API key has the optional Refunds: Write permission, checked when connecting and every day. Without it, canceled licenses aren't refunded: refund their payments from Stripe.",
             "example": true
           },
+          "canManageSubscriptions": {
+            "type": "boolean",
+            "description": "Whether the API key has the optional Subscriptions: Write permission, checked when connecting and every day. Without it, subscription licenses can't be canceled from the app: cancel their subscriptions from Stripe.",
+            "example": true
+          },
+          "canBillingPortal": {
+            "type": "boolean",
+            "description": "Whether the API key has the optional Customer portal: Write permission, checked when connecting and every day. Without it, the license portal doesn't link to the Stripe customer portal.",
+            "example": true
+          },
+          "subscriptionGraceDays": {
+            "type": "integer",
+            "description": "Days a subscription license stays valid after its period ends while its renewal is unpaid, as Stripe retries the payment. 7 by default.",
+            "example": 7
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -3315,6 +3687,9 @@
           "lastEventAt",
           "autoRefund",
           "canRefund",
+          "canManageSubscriptions",
+          "canBillingPortal",
+          "subscriptionGraceDays",
           "createdAt"
         ]
       },
@@ -3362,6 +3737,32 @@
           "price": {
             "$ref": "#/components/schemas/Price"
           },
+          "recurring": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "interval": {
+                "type": "string",
+                "enum": [
+                  "day",
+                  "week",
+                  "month",
+                  "year"
+                ]
+              },
+              "intervalCount": {
+                "type": "integer",
+                "example": 1
+              }
+            },
+            "required": [
+              "interval",
+              "intervalCount"
+            ],
+            "description": "Billing period of a recurring price, `null` for a one-time price. Subscribing to a recurring price creates one subscription license, valid while it's paid."
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -3391,6 +3792,7 @@
           "stripePriceId",
           "productName",
           "price",
+          "recurring",
           "status",
           "statusReason",
           "createdAt"
@@ -3417,6 +3819,13 @@
             "type": "boolean",
             "description": "Whether canceling a license bought through Stripe refunds its payment. Can only be turned on when the integration's `canRefund` is true: the API key has the Refunds: Write permission.",
             "example": false
+          },
+          "subscriptionGraceDays": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 60,
+            "description": "Days a subscription license stays valid after its period ends while its renewal is unpaid, as Stripe retries the payment.",
+            "example": 7
           }
         }
       },
@@ -3445,6 +3854,32 @@
           "price": {
             "$ref": "#/components/schemas/Price"
           },
+          "recurring": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "interval": {
+                "type": "string",
+                "enum": [
+                  "day",
+                  "week",
+                  "month",
+                  "year"
+                ]
+              },
+              "intervalCount": {
+                "type": "integer",
+                "example": 1
+              }
+            },
+            "required": [
+              "interval",
+              "intervalCount"
+            ],
+            "description": "Billing period of a recurring price, `null` for a one-time price."
+          },
           "mapped": {
             "type": "boolean",
             "description": "Whether the price already creates licenses of a product."
@@ -3456,6 +3891,7 @@
           "productName",
           "nickname",
           "price",
+          "recurring",
           "mapped"
         ]
       },
@@ -3465,7 +3901,7 @@
           "stripePriceId": {
             "type": "string",
             "minLength": 1,
-            "description": "Active one-time price of the Stripe account.",
+            "description": "Active one-time or licensed recurring price of the Stripe account.",
             "example": "price_1MoBy5LkdIwHu7ix"
           },
           "policyId": {
@@ -3490,6 +3926,154 @@
         },
         "required": [
           "policyId"
+        ]
+      },
+      "SlackIntegration": {
+        "type": "object",
+        "properties": {
+          "configured": {
+            "type": "boolean",
+            "description": "Whether the server has a Slack app to connect channels with: `SLACK_CLIENT_ID` and `SLACK_CLIENT_SECRET` are set."
+          },
+          "connections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SlackConnection"
+            },
+            "description": "Slack channels getting the product's notifications."
+          }
+        },
+        "required": [
+          "configured",
+          "connections"
+        ]
+      },
+      "SlackConnection": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "s4Hq8ZpLm"
+          },
+          "teamId": {
+            "type": "string",
+            "example": "T0123ABCD"
+          },
+          "teamName": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "Acme"
+          },
+          "channelId": {
+            "type": "string",
+            "example": "C0456EFGH"
+          },
+          "channelName": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Name of the channel when it was connected, with its `#`.",
+            "example": "#sales"
+          },
+          "configurationUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Page of the installation in Slack."
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "purchased",
+                "renewed",
+                "payment_failed",
+                "canceled"
+              ]
+            },
+            "description": "Notifications the channel gets: `purchased` (a license bought through Stripe), `renewed` (a subscription renewal paid), `payment_failed` (a subscription payment failed) and `canceled` (a license canceled, or its subscription ended)."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "revoked"
+            ],
+            "description": "`revoked` once Slack refuses the messages, like when the app was removed from the workspace or the channel deleted: remove it and add it again."
+          },
+          "statusReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lastSentAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "teamId",
+          "teamName",
+          "channelId",
+          "channelName",
+          "configurationUrl",
+          "events",
+          "status",
+          "statusReason",
+          "lastSentAt",
+          "createdAt"
+        ]
+      },
+      "SlackAuthorize": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Slack's consent screen: open it in the browser to pick the channel. Valid 10 minutes.",
+            "example": "https://slack.com/oauth/v2/authorize?client_id=…"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "UpdateSlackConnection": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "purchased",
+                "renewed",
+                "payment_failed",
+                "canceled"
+              ]
+            },
+            "description": "Notifications the channel gets.",
+            "example": [
+              "purchased",
+              "canceled"
+            ]
+          }
+        },
+        "required": [
+          "events"
         ]
       }
     },
@@ -5995,11 +6579,11 @@
               "type": "string",
               "minLength": 1,
               "maxLength": 200,
-              "description": "Case-insensitive text the key contains.",
+              "description": "Case-insensitive text the key or the email of the customer contains.",
               "example": "X9ZPA"
             },
             "required": false,
-            "description": "Case-insensitive text the key contains.",
+            "description": "Case-insensitive text the key or the email of the customer contains.",
             "name": "search",
             "in": "query"
           },
@@ -6507,11 +7091,11 @@
               "type": "string",
               "minLength": 1,
               "maxLength": 200,
-              "description": "Case-insensitive text the key contains.",
+              "description": "Case-insensitive text the key or the email of the customer contains.",
               "example": "X9ZPA"
             },
             "required": false,
-            "description": "Case-insensitive text the key contains.",
+            "description": "Case-insensitive text the key or the email of the customer contains.",
             "name": "search",
             "in": "query"
           },
@@ -6984,6 +7568,16 @@
               }
             }
           },
+          "409": {
+            "description": "`subscription_managed`: the license is a subscription license, whose `expiresAt`, `price`, `maxVersion` and `cancellableUntil` follow its Stripe subscription",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "422": {
             "description": "`validation_error`: invalid path, query or body, with the `issues`",
             "content": {
@@ -7204,7 +7798,7 @@
         ],
         "operationId": "cancelLicense",
         "summary": "Cancel a license",
-        "description": "Cancels the license right away: validating its key then fails with `license_expired`, like an expired license, and its status is `canceled`. A cancellation can't be undone.\n\nCustomers can cancel their licenses until their `cancellableUntil`, the end of their money back guarantee: tokens can't cancel a license past it, or without one. API keys and sessions can cancel any license.\n\nWhen the license was bought through the Stripe integration, its payment is refunded in the background, unless the integration disables `autoRefund`, its API key lacks the optional Refunds: Write permission (`canRefund`), or `refund` is `false`: the refund is its price paid, taxes included, and its id is set as `stripeRefundId`. The customer is emailed a confirmation, and the owners and admins of the organization are told about the cancellation and its refund. In test products, the customer is only emailed when their email is a member's of the organization.\n\nRecords a `license.canceled` event, then a `license.refunded` or `license.refund_failed` one once the refund is done.\n\n**Token access**: customer, license tokens with the `license:cancel` permission (or the matching write one). A token reaches the license it's scoped to, or the licenses of its customer.\n\n**Required role permission**: `license:cancel` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "description": "Cancels the license right away: validating its key then fails with `license_expired`, like an expired license, and its status is `canceled`. A cancellation can't be undone.\n\nCustomers can cancel their licenses until their `cancellableUntil`, the end of their money back guarantee: tokens can't cancel a license past it, or without one. API keys and sessions can cancel any license.\n\nWhen the license was bought through the Stripe integration, its payment is refunded in the background, unless the integration disables `autoRefund`, its API key lacks the optional Refunds: Write permission (`canRefund`), or `refund` is `false`: the refund is its price paid, taxes included, and its id is set as `stripeRefundId`. The customer is emailed a confirmation, and the owners and admins of the organization are told about the cancellation and its refund. In test products, the customer is only emailed when their email is a member's of the organization.\n\nA subscription license isn't refunded: its Stripe subscription is canceled at once, without proration, which needs the integration's `canManageSubscriptions`.\n\nRecords a `license.canceled` event, then a `license.refunded` or `license.refund_failed` one once the refund is done.\n\n**Token access**: customer, license tokens with the `license:cancel` permission (or the matching write one). A token reaches the license it's scoped to, or the licenses of its customer.\n\n**Required role permission**: `license:cancel` when called with a session, granted by the member's role. API keys aren't limited by roles.",
         "security": [
           {
             "apiKey": []
@@ -7291,7 +7885,7 @@
             }
           },
           "409": {
-            "description": "`already_canceled`: the license is already canceled. `not_cancellable`: for tokens, the license has no money back guarantee, or it has ended",
+            "description": "`already_canceled`: the license is already canceled. `not_cancellable`: for tokens, the license has no money back guarantee, or it has ended, as subscription licenses have none. `subscription_managed`: the license is a subscription license, and the Stripe API key lacks the Subscriptions: Write permission to cancel its subscription",
             "content": {
               "application/json": {
                 "schema": {
@@ -7917,6 +8511,142 @@
           },
           "429": {
             "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/customers/{id}/billing-portal-sessions": {
+      "post": {
+        "tags": [
+          "Portal"
+        ],
+        "operationId": "createBillingPortalSession",
+        "summary": "Open the Stripe customer portal of a customer",
+        "description": "Link to the Stripe customer portal of the customer's Stripe customer, where they manage their subscriptions: change their plan or payment method, see their invoices, cancel. Needs the Stripe integration's `canBillingPortal`, and the customer portal configured in the Stripe account's settings. The changes come back through the integration's webhook, keeping the subscription licenses in line.\n\n**Token access**: customer tokens with the `customer:billing` permission (or the matching write one). A customer token reaches its own customer.\n\n**Required role permission**: `portalLink:create` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "security": [
+          {
+            "apiKey": []
+          },
+          {
+            "token": [
+              "customer:billing"
+            ]
+          }
+        ],
+        "x-required-permissions": [
+          "portalLink:create"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "c9Wd3RtE"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBillingPortalSession"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingPortalSession"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: no credentials. `invalid_api_key`: the API key doesn't exist, was revoked or has expired. `invalid_token`: the token's signature is invalid, it has expired, or the resource it's scoped to was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "`plan_limit_exceeded`: the organization stayed over its plan's limits after the grace period, its API is blocked until it upgrades. `plan_limit_reached`: creating the resource would go over the plan's limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`token_not_allowed`: the endpoint doesn't accept tokens, or not of this type. `insufficient_scope`: the token lacks the permission. `no_active_organization` or `forbidden`: the session has no organization, or isn't a member of the one requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`no_stripe_customer`: the customer didn't pay through the Stripe integration. `billing_portal_unavailable`: the Stripe integration isn't connected, or its API key lacks the Customer portal: Write permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation_error`: invalid path, query or body, with the `issues`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "`provider_unavailable`: Stripe refused or couldn't be reached, like when its customer portal isn't configured",
             "content": {
               "application/json": {
                 "schema": {
@@ -10343,6 +11073,504 @@
           },
           "429": {
             "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/{productId}/integrations/slack": {
+      "get": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "getSlackIntegration",
+        "summary": "Get the Slack integration of a product",
+        "description": "Slack channels getting notifications about the product's licenses: purchases, renewals, failed payments and cancellations. Doesn't accept tokens: only API keys and sessions.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "x7Kp2QaZ"
+            },
+            "required": true,
+            "name": "productId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Slack integration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlackIntegration"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: no credentials. `invalid_api_key`: the API key doesn't exist, was revoked or has expired. `invalid_token`: the token's signature is invalid, it has expired, or the resource it's scoped to was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "`plan_limit_exceeded`: the organization stayed over its plan's limits after the grace period, its API is blocked until it upgrades. `plan_limit_reached`: creating the resource would go over the plan's limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`token_not_allowed`: the endpoint doesn't accept tokens, or not of this type. `insufficient_scope`: the token lacks the permission. `no_active_organization` or `forbidden`: the session has no organization, or isn't a member of the one requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation_error`: invalid path, query or body, with the `issues`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/{productId}/integrations/slack/authorize": {
+      "post": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "authorizeSlack",
+        "summary": "Start connecting a Slack channel",
+        "description": "Returns the URL of Slack's consent screen, where the user picks the channel getting the product's notifications. Slack then redirects to the app's integrations page. Doesn't accept tokens: only API keys and sessions.\n\n**Required role permission**: `integration:create` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "x-required-permissions": [
+          "integration:create"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "x7Kp2QaZ"
+            },
+            "required": true,
+            "name": "productId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consent screen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlackAuthorize"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: no credentials. `invalid_api_key`: the API key doesn't exist, was revoked or has expired. `invalid_token`: the token's signature is invalid, it has expired, or the resource it's scoped to was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "`plan_limit_exceeded`: the organization stayed over its plan's limits after the grace period, its API is blocked until it upgrades. `plan_limit_reached`: creating the resource would go over the plan's limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`token_not_allowed`: the endpoint doesn't accept tokens, or not of this type. `insufficient_scope`: the token lacks the permission. `no_active_organization` or `forbidden`: the session has no organization, or isn't a member of the one requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`slack_not_configured`: the server has no Slack app (`SLACK_CLIENT_ID` and `SLACK_CLIENT_SECRET`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation_error`: invalid path, query or body, with the `issues`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/slack-connections/{id}": {
+      "patch": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "updateSlackConnection",
+        "summary": "Update a Slack connection",
+        "description": "Changes the notifications the channel gets. Doesn't accept tokens: only API keys and sessions.\n\n**Required role permission**: `integration:update` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "x-required-permissions": [
+          "integration:update"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "s4Hq8ZpLm"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSlackConnection"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated Slack connection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlackConnection"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: no credentials. `invalid_api_key`: the API key doesn't exist, was revoked or has expired. `invalid_token`: the token's signature is invalid, it has expired, or the resource it's scoped to was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "`plan_limit_exceeded`: the organization stayed over its plan's limits after the grace period, its API is blocked until it upgrades. `plan_limit_reached`: creating the resource would go over the plan's limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`token_not_allowed`: the endpoint doesn't accept tokens, or not of this type. `insufficient_scope`: the token lacks the permission. `no_active_organization` or `forbidden`: the session has no organization, or isn't a member of the one requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Slack connection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation_error`: invalid path, query or body, with the `issues`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "deleteSlackConnection",
+        "summary": "Remove a Slack connection",
+        "description": "Stops posting to the channel and revokes the installation's token in Slack. Doesn't accept tokens: only API keys and sessions.\n\n**Required role permission**: `integration:delete` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "x-required-permissions": [
+          "integration:delete"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "s4Hq8ZpLm"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removed"
+          },
+          "401": {
+            "description": "`unauthorized`: no credentials. `invalid_api_key`: the API key doesn't exist, was revoked or has expired. `invalid_token`: the token's signature is invalid, it has expired, or the resource it's scoped to was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "`plan_limit_exceeded`: the organization stayed over its plan's limits after the grace period, its API is blocked until it upgrades. `plan_limit_reached`: creating the resource would go over the plan's limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`token_not_allowed`: the endpoint doesn't accept tokens, or not of this type. `insufficient_scope`: the token lacks the permission. `no_active_organization` or `forbidden`: the session has no organization, or isn't a member of the one requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Slack connection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation_error`: invalid path, query or body, with the `issues`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/slack-connections/{id}/test": {
+      "post": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "testSlackConnection",
+        "summary": "Send a test message to a Slack channel",
+        "description": "Posts a message to the channel, to check it gets the notifications. Marks the connection `revoked` when Slack says it won't work again. Doesn't accept tokens: only API keys and sessions.\n\n**Required role permission**: `integration:update` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "x-required-permissions": [
+          "integration:update"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "s4Hq8ZpLm"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Slack connection, after the test",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlackConnection"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: no credentials. `invalid_api_key`: the API key doesn't exist, was revoked or has expired. `invalid_token`: the token's signature is invalid, it has expired, or the resource it's scoped to was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "`plan_limit_exceeded`: the organization stayed over its plan's limits after the grace period, its API is blocked until it upgrades. `plan_limit_reached`: creating the resource would go over the plan's limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`token_not_allowed`: the endpoint doesn't accept tokens, or not of this type. `insufficient_scope`: the token lacks the permission. `no_active_organization` or `forbidden`: the session has no organization, or isn't a member of the one requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Slack connection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation_error`: invalid path, query or body, with the `issues`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "`slack_error`: Slack refused the message",
             "content": {
               "application/json": {
                 "schema": {
