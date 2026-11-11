@@ -6633,6 +6633,17 @@
           },
           {
             "schema": {
+              "type": "string",
+              "description": "Only returns the licenses with at least one active machine on this platform.",
+              "example": "macOS 15.1"
+            },
+            "required": false,
+            "description": "Only returns the licenses with at least one active machine on this platform.",
+            "name": "machinePlatform",
+            "in": "query"
+          },
+          {
+            "schema": {
               "allOf": [
                 {
                   "$ref": "#/components/schemas/LicenseStatus"
@@ -7130,6 +7141,17 @@
             "required": false,
             "description": "Only returns the licenses with at least one active machine running this version of the product.",
             "name": "machineVersion",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Only returns the licenses with at least one active machine on this platform.",
+              "example": "macOS 15.1"
+            },
+            "required": false,
+            "description": "Only returns the licenses with at least one active machine on this platform.",
+            "name": "machinePlatform",
             "in": "query"
           },
           {

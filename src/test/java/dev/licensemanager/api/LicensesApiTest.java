@@ -153,6 +153,7 @@ public class LicensesApiTest {
         String key = null;
         String policyId = null;
         String machineVersion = null;
+        String machinePlatform = null;
         LicenseStatus status = null;
         OffsetDateTime createdFrom = null;
         OffsetDateTime createdTo = null;
@@ -175,6 +176,7 @@ public class LicensesApiTest {
                 .key(key)
                 .policyId(policyId)
                 .machineVersion(machineVersion)
+                .machinePlatform(machinePlatform)
                 .status(status)
                 .createdFrom(createdFrom)
                 .createdTo(createdTo)
@@ -211,6 +213,7 @@ public class LicensesApiTest {
         String policyId = null;
         String customerId = null;
         String machineVersion = null;
+        String machinePlatform = null;
         LicenseStatus status = null;
         OffsetDateTime createdFrom = null;
         OffsetDateTime createdTo = null;
@@ -234,6 +237,7 @@ public class LicensesApiTest {
                 .policyId(policyId)
                 .customerId(customerId)
                 .machineVersion(machineVersion)
+                .machinePlatform(machinePlatform)
                 .status(status)
                 .createdFrom(createdFrom)
                 .createdTo(createdTo)

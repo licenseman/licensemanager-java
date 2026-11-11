@@ -484,7 +484,7 @@ This endpoint does not need any parameter.
 
 <a id="listCustomerLicenses"></a>
 # **listCustomerLicenses**
-> LicenseList listCustomerLicenses(customerId).page(page).pageSize(pageSize).sort(sort).search(search).key(key).policyId(policyId).machineVersion(machineVersion).status(status).createdFrom(createdFrom).createdTo(createdTo).lastActivatedFrom(lastActivatedFrom).lastActivatedTo(lastActivatedTo).neverActivated(neverActivated).expiresFrom(expiresFrom).expiresTo(expiresTo).neverExpires(neverExpires).currency(currency).price(price).priceMin(priceMin).priceMax(priceMax).hasPrice(hasPrice).execute();
+> LicenseList listCustomerLicenses(customerId).page(page).pageSize(pageSize).sort(sort).search(search).key(key).policyId(policyId).machineVersion(machineVersion).machinePlatform(machinePlatform).status(status).createdFrom(createdFrom).createdTo(createdTo).lastActivatedFrom(lastActivatedFrom).lastActivatedTo(lastActivatedTo).neverActivated(neverActivated).expiresFrom(expiresFrom).expiresTo(expiresTo).neverExpires(neverExpires).currency(currency).price(price).priceMin(priceMin).priceMax(priceMax).hasPrice(hasPrice).execute();
 
 List the licenses of a customer
 
@@ -524,6 +524,7 @@ public class Example {
     String key = "7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF"; // String | Only returns the license with this exact key, case included. Keys of test products start with `TEST-`.
     String policyId = "p4Rt8LmQ"; // String | Only returns the licenses following this policy.
     String machineVersion = "2.3.1"; // String | Only returns the licenses with at least one active machine running this version of the product.
+    String machinePlatform = "macOS 15.1"; // String | Only returns the licenses with at least one active machine on this platform.
     LicenseStatus status = LicenseStatus.fromValue("active"); // LicenseStatus | Only returns the licenses with this status.
     OffsetDateTime createdFrom = OffsetDateTime.parse("2026-01-01T00:00:00.000Z"); // OffsetDateTime | Only returns the licenses created at or after this date.
     OffsetDateTime createdTo = OffsetDateTime.parse("2026-02-01T00:00:00.000Z"); // OffsetDateTime | Only returns the licenses created at or before this date.
@@ -547,6 +548,7 @@ public class Example {
             .key(key)
             .policyId(policyId)
             .machineVersion(machineVersion)
+            .machinePlatform(machinePlatform)
             .status(status)
             .createdFrom(createdFrom)
             .createdTo(createdTo)
@@ -586,6 +588,7 @@ public class Example {
 | **key** | **String**| Only returns the license with this exact key, case included. Keys of test products start with &#x60;TEST-&#x60;. | [optional] |
 | **policyId** | **String**| Only returns the licenses following this policy. | [optional] |
 | **machineVersion** | **String**| Only returns the licenses with at least one active machine running this version of the product. | [optional] |
+| **machinePlatform** | **String**| Only returns the licenses with at least one active machine on this platform. | [optional] |
 | **status** | [**LicenseStatus**](.md)| Only returns the licenses with this status. | [optional] [enum: active, inactive, expired, canceled] |
 | **createdFrom** | **OffsetDateTime**| Only returns the licenses created at or after this date. | [optional] |
 | **createdTo** | **OffsetDateTime**| Only returns the licenses created at or before this date. | [optional] |
@@ -627,7 +630,7 @@ public class Example {
 
 <a id="listLicenses"></a>
 # **listLicenses**
-> LicenseList listLicenses(productId).page(page).pageSize(pageSize).sort(sort).search(search).key(key).policyId(policyId).customerId(customerId).machineVersion(machineVersion).status(status).createdFrom(createdFrom).createdTo(createdTo).lastActivatedFrom(lastActivatedFrom).lastActivatedTo(lastActivatedTo).neverActivated(neverActivated).expiresFrom(expiresFrom).expiresTo(expiresTo).neverExpires(neverExpires).currency(currency).price(price).priceMin(priceMin).priceMax(priceMax).hasPrice(hasPrice).execute();
+> LicenseList listLicenses(productId).page(page).pageSize(pageSize).sort(sort).search(search).key(key).policyId(policyId).customerId(customerId).machineVersion(machineVersion).machinePlatform(machinePlatform).status(status).createdFrom(createdFrom).createdTo(createdTo).lastActivatedFrom(lastActivatedFrom).lastActivatedTo(lastActivatedTo).neverActivated(neverActivated).expiresFrom(expiresFrom).expiresTo(expiresTo).neverExpires(neverExpires).currency(currency).price(price).priceMin(priceMin).priceMax(priceMax).hasPrice(hasPrice).execute();
 
 List the licenses of a product
 
@@ -664,6 +667,7 @@ public class Example {
     String policyId = "p4Rt8LmQ"; // String | Only returns the licenses following this policy.
     String customerId = "c9Wd3RtE"; // String | Only returns the licenses of this customer.
     String machineVersion = "2.3.1"; // String | Only returns the licenses with at least one active machine running this version of the product.
+    String machinePlatform = "macOS 15.1"; // String | Only returns the licenses with at least one active machine on this platform.
     LicenseStatus status = LicenseStatus.fromValue("active"); // LicenseStatus | Only returns the licenses with this status.
     OffsetDateTime createdFrom = OffsetDateTime.parse("2026-01-01T00:00:00.000Z"); // OffsetDateTime | Only returns the licenses created at or after this date.
     OffsetDateTime createdTo = OffsetDateTime.parse("2026-02-01T00:00:00.000Z"); // OffsetDateTime | Only returns the licenses created at or before this date.
@@ -688,6 +692,7 @@ public class Example {
             .policyId(policyId)
             .customerId(customerId)
             .machineVersion(machineVersion)
+            .machinePlatform(machinePlatform)
             .status(status)
             .createdFrom(createdFrom)
             .createdTo(createdTo)
@@ -728,6 +733,7 @@ public class Example {
 | **policyId** | **String**| Only returns the licenses following this policy. | [optional] |
 | **customerId** | **String**| Only returns the licenses of this customer. | [optional] |
 | **machineVersion** | **String**| Only returns the licenses with at least one active machine running this version of the product. | [optional] |
+| **machinePlatform** | **String**| Only returns the licenses with at least one active machine on this platform. | [optional] |
 | **status** | [**LicenseStatus**](.md)| Only returns the licenses with this status. | [optional] [enum: active, inactive, expired, canceled] |
 | **createdFrom** | **OffsetDateTime**| Only returns the licenses created at or after this date. | [optional] |
 | **createdTo** | **OffsetDateTime**| Only returns the licenses created at or before this date. | [optional] |

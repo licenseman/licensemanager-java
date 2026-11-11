@@ -2178,6 +2178,18 @@ paths:
           example: 2.3.1
           type: string
         style: form
+      - description: Only returns the licenses with at least one active machine on
+          this platform.
+        explode: true
+        in: query
+        name: machinePlatform
+        required: false
+        schema:
+          description: Only returns the licenses with at least one active machine
+            on this platform.
+          example: macOS 15.1
+          type: string
+        style: form
       - description: Only returns the licenses with this status.
         explode: true
         in: query
@@ -2652,6 +2664,18 @@ paths:
           description: Only returns the licenses with at least one active machine
             running this version of the product.
           example: 2.3.1
+          type: string
+        style: form
+      - description: Only returns the licenses with at least one active machine on
+          this platform.
+        explode: true
+        in: query
+        name: machinePlatform
+        required: false
+        schema:
+          description: Only returns the licenses with at least one active machine
+            on this platform.
+          example: macOS 15.1
           type: string
         style: form
       - description: Only returns the licenses with this status.

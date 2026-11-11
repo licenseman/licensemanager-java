@@ -1230,7 +1230,7 @@ public class LicensesApi {
     public APIgetSigningKeyRequest getSigningKey() {
         return new APIgetSigningKeyRequest();
     }
-    private okhttp3.Call listCustomerLicensesCall(@javax.annotation.Nonnull String customerId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call listCustomerLicensesCall(@javax.annotation.Nonnull String customerId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable String machinePlatform, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -1282,6 +1282,10 @@ public class LicensesApi {
 
         if (machineVersion != null) {
             localVarQueryParams.addAll(localVarApiClient.parameterToPair("machineVersion", machineVersion));
+        }
+
+        if (machinePlatform != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("machinePlatform", machinePlatform));
         }
 
         if (status != null) {
@@ -1360,26 +1364,26 @@ public class LicensesApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call listCustomerLicensesValidateBeforeCall(@javax.annotation.Nonnull String customerId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call listCustomerLicensesValidateBeforeCall(@javax.annotation.Nonnull String customerId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable String machinePlatform, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'customerId' is set
         if (customerId == null) {
             throw new ApiException("Missing the required parameter 'customerId' when calling listCustomerLicenses(Async)");
         }
 
-        return listCustomerLicensesCall(customerId, page, pageSize, sort, search, key, policyId, machineVersion, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
+        return listCustomerLicensesCall(customerId, page, pageSize, sort, search, key, policyId, machineVersion, machinePlatform, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
 
     }
 
 
-    private ApiResponse<LicenseList> listCustomerLicensesWithHttpInfo(@javax.annotation.Nonnull String customerId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice) throws ApiException {
-        okhttp3.Call localVarCall = listCustomerLicensesValidateBeforeCall(customerId, page, pageSize, sort, search, key, policyId, machineVersion, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, null);
+    private ApiResponse<LicenseList> listCustomerLicensesWithHttpInfo(@javax.annotation.Nonnull String customerId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable String machinePlatform, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice) throws ApiException {
+        okhttp3.Call localVarCall = listCustomerLicensesValidateBeforeCall(customerId, page, pageSize, sort, search, key, policyId, machineVersion, machinePlatform, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, null);
         Type localVarReturnType = new TypeToken<LicenseList>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
     }
 
-    private okhttp3.Call listCustomerLicensesAsync(@javax.annotation.Nonnull String customerId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice, final ApiCallback<LicenseList> _callback) throws ApiException {
+    private okhttp3.Call listCustomerLicensesAsync(@javax.annotation.Nonnull String customerId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable String machinePlatform, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice, final ApiCallback<LicenseList> _callback) throws ApiException {
 
-        okhttp3.Call localVarCall = listCustomerLicensesValidateBeforeCall(customerId, page, pageSize, sort, search, key, policyId, machineVersion, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
+        okhttp3.Call localVarCall = listCustomerLicensesValidateBeforeCall(customerId, page, pageSize, sort, search, key, policyId, machineVersion, machinePlatform, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
         Type localVarReturnType = new TypeToken<LicenseList>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;
@@ -1402,6 +1406,8 @@ public class LicensesApi {
         private String policyId;
         @javax.annotation.Nullable
         private String machineVersion;
+        @javax.annotation.Nullable
+        private String machinePlatform;
         @javax.annotation.Nullable
         private LicenseStatus status;
         @javax.annotation.Nullable
@@ -1502,6 +1508,16 @@ public class LicensesApi {
          */
         public APIlistCustomerLicensesRequest machineVersion(@javax.annotation.Nullable String machineVersion) {
             this.machineVersion = machineVersion;
+            return this;
+        }
+
+        /**
+         * Set machinePlatform
+         * @param machinePlatform Only returns the licenses with at least one active machine on this platform. (optional)
+         * @return APIlistCustomerLicensesRequest
+         */
+        public APIlistCustomerLicensesRequest machinePlatform(@javax.annotation.Nullable String machinePlatform) {
+            this.machinePlatform = machinePlatform;
             return this;
         }
 
@@ -1664,7 +1680,7 @@ public class LicensesApi {
          </table>
          */
         public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
-            return listCustomerLicensesCall(customerId, page, pageSize, sort, search, key, policyId, machineVersion, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
+            return listCustomerLicensesCall(customerId, page, pageSize, sort, search, key, policyId, machineVersion, machinePlatform, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
         }
 
         /**
@@ -1685,7 +1701,7 @@ public class LicensesApi {
          </table>
          */
         public LicenseList execute() throws ApiException {
-            ApiResponse<LicenseList> localVarResp = listCustomerLicensesWithHttpInfo(customerId, page, pageSize, sort, search, key, policyId, machineVersion, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice);
+            ApiResponse<LicenseList> localVarResp = listCustomerLicensesWithHttpInfo(customerId, page, pageSize, sort, search, key, policyId, machineVersion, machinePlatform, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice);
             return localVarResp.getData();
         }
 
@@ -1707,7 +1723,7 @@ public class LicensesApi {
          </table>
          */
         public ApiResponse<LicenseList> executeWithHttpInfo() throws ApiException {
-            return listCustomerLicensesWithHttpInfo(customerId, page, pageSize, sort, search, key, policyId, machineVersion, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice);
+            return listCustomerLicensesWithHttpInfo(customerId, page, pageSize, sort, search, key, policyId, machineVersion, machinePlatform, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice);
         }
 
         /**
@@ -1729,7 +1745,7 @@ public class LicensesApi {
          </table>
          */
         public okhttp3.Call executeAsync(final ApiCallback<LicenseList> _callback) throws ApiException {
-            return listCustomerLicensesAsync(customerId, page, pageSize, sort, search, key, policyId, machineVersion, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
+            return listCustomerLicensesAsync(customerId, page, pageSize, sort, search, key, policyId, machineVersion, machinePlatform, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
         }
     }
 
@@ -1754,7 +1770,7 @@ public class LicensesApi {
     public APIlistCustomerLicensesRequest listCustomerLicenses(@javax.annotation.Nonnull String customerId) {
         return new APIlistCustomerLicensesRequest(customerId);
     }
-    private okhttp3.Call listLicensesCall(@javax.annotation.Nonnull String productId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String customerId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call listLicensesCall(@javax.annotation.Nonnull String productId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String customerId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable String machinePlatform, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice, final ApiCallback _callback) throws ApiException {
         String basePath = null;
         // Operation Servers
         String[] localBasePaths = new String[] {  };
@@ -1810,6 +1826,10 @@ public class LicensesApi {
 
         if (machineVersion != null) {
             localVarQueryParams.addAll(localVarApiClient.parameterToPair("machineVersion", machineVersion));
+        }
+
+        if (machinePlatform != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("machinePlatform", machinePlatform));
         }
 
         if (status != null) {
@@ -1888,26 +1908,26 @@ public class LicensesApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private okhttp3.Call listLicensesValidateBeforeCall(@javax.annotation.Nonnull String productId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String customerId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice, final ApiCallback _callback) throws ApiException {
+    private okhttp3.Call listLicensesValidateBeforeCall(@javax.annotation.Nonnull String productId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String customerId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable String machinePlatform, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice, final ApiCallback _callback) throws ApiException {
         // verify the required parameter 'productId' is set
         if (productId == null) {
             throw new ApiException("Missing the required parameter 'productId' when calling listLicenses(Async)");
         }
 
-        return listLicensesCall(productId, page, pageSize, sort, search, key, policyId, customerId, machineVersion, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
+        return listLicensesCall(productId, page, pageSize, sort, search, key, policyId, customerId, machineVersion, machinePlatform, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
 
     }
 
 
-    private ApiResponse<LicenseList> listLicensesWithHttpInfo(@javax.annotation.Nonnull String productId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String customerId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice) throws ApiException {
-        okhttp3.Call localVarCall = listLicensesValidateBeforeCall(productId, page, pageSize, sort, search, key, policyId, customerId, machineVersion, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, null);
+    private ApiResponse<LicenseList> listLicensesWithHttpInfo(@javax.annotation.Nonnull String productId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String customerId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable String machinePlatform, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice) throws ApiException {
+        okhttp3.Call localVarCall = listLicensesValidateBeforeCall(productId, page, pageSize, sort, search, key, policyId, customerId, machineVersion, machinePlatform, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, null);
         Type localVarReturnType = new TypeToken<LicenseList>(){}.getType();
         return localVarApiClient.execute(localVarCall, localVarReturnType);
     }
 
-    private okhttp3.Call listLicensesAsync(@javax.annotation.Nonnull String productId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String customerId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice, final ApiCallback<LicenseList> _callback) throws ApiException {
+    private okhttp3.Call listLicensesAsync(@javax.annotation.Nonnull String productId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String customerId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable String machinePlatform, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice, final ApiCallback<LicenseList> _callback) throws ApiException {
 
-        okhttp3.Call localVarCall = listLicensesValidateBeforeCall(productId, page, pageSize, sort, search, key, policyId, customerId, machineVersion, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
+        okhttp3.Call localVarCall = listLicensesValidateBeforeCall(productId, page, pageSize, sort, search, key, policyId, customerId, machineVersion, machinePlatform, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
         Type localVarReturnType = new TypeToken<LicenseList>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;
@@ -1932,6 +1952,8 @@ public class LicensesApi {
         private String customerId;
         @javax.annotation.Nullable
         private String machineVersion;
+        @javax.annotation.Nullable
+        private String machinePlatform;
         @javax.annotation.Nullable
         private LicenseStatus status;
         @javax.annotation.Nullable
@@ -2042,6 +2064,16 @@ public class LicensesApi {
          */
         public APIlistLicensesRequest machineVersion(@javax.annotation.Nullable String machineVersion) {
             this.machineVersion = machineVersion;
+            return this;
+        }
+
+        /**
+         * Set machinePlatform
+         * @param machinePlatform Only returns the licenses with at least one active machine on this platform. (optional)
+         * @return APIlistLicensesRequest
+         */
+        public APIlistLicensesRequest machinePlatform(@javax.annotation.Nullable String machinePlatform) {
+            this.machinePlatform = machinePlatform;
             return this;
         }
 
@@ -2204,7 +2236,7 @@ public class LicensesApi {
          </table>
          */
         public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
-            return listLicensesCall(productId, page, pageSize, sort, search, key, policyId, customerId, machineVersion, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
+            return listLicensesCall(productId, page, pageSize, sort, search, key, policyId, customerId, machineVersion, machinePlatform, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
         }
 
         /**
@@ -2225,7 +2257,7 @@ public class LicensesApi {
          </table>
          */
         public LicenseList execute() throws ApiException {
-            ApiResponse<LicenseList> localVarResp = listLicensesWithHttpInfo(productId, page, pageSize, sort, search, key, policyId, customerId, machineVersion, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice);
+            ApiResponse<LicenseList> localVarResp = listLicensesWithHttpInfo(productId, page, pageSize, sort, search, key, policyId, customerId, machineVersion, machinePlatform, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice);
             return localVarResp.getData();
         }
 
@@ -2247,7 +2279,7 @@ public class LicensesApi {
          </table>
          */
         public ApiResponse<LicenseList> executeWithHttpInfo() throws ApiException {
-            return listLicensesWithHttpInfo(productId, page, pageSize, sort, search, key, policyId, customerId, machineVersion, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice);
+            return listLicensesWithHttpInfo(productId, page, pageSize, sort, search, key, policyId, customerId, machineVersion, machinePlatform, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice);
         }
 
         /**
@@ -2269,7 +2301,7 @@ public class LicensesApi {
          </table>
          */
         public okhttp3.Call executeAsync(final ApiCallback<LicenseList> _callback) throws ApiException {
-            return listLicensesAsync(productId, page, pageSize, sort, search, key, policyId, customerId, machineVersion, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
+            return listLicensesAsync(productId, page, pageSize, sort, search, key, policyId, customerId, machineVersion, machinePlatform, status, createdFrom, createdTo, lastActivatedFrom, lastActivatedTo, neverActivated, expiresFrom, expiresTo, neverExpires, currency, price, priceMin, priceMax, hasPrice, _callback);
         }
     }
 
