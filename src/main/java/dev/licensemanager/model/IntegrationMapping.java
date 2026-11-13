@@ -64,6 +64,65 @@ public class IntegrationMapping {
   @javax.annotation.Nonnull
   private String integrationId;
 
+  /**
+   * Gets or Sets provider
+   */
+  @JsonAdapter(ProviderEnum.Adapter.class)
+  public enum ProviderEnum {
+    STRIPE("stripe"),
+    
+    PADDLE("paddle"),
+    
+    UNKNOWN_DEFAULT_OPEN_API("unknown_default_open_api");
+
+    private String value;
+
+    ProviderEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static ProviderEnum fromValue(String value) {
+      for (ProviderEnum b : ProviderEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      return UNKNOWN_DEFAULT_OPEN_API;
+    }
+
+    public static class Adapter extends TypeAdapter<ProviderEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final ProviderEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public ProviderEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return ProviderEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      ProviderEnum.fromValue(value);
+    }
+  }
+
+  public static final String SERIALIZED_NAME_PROVIDER = "provider";
+  @SerializedName(SERIALIZED_NAME_PROVIDER)
+  @javax.annotation.Nonnull
+  private ProviderEnum provider;
+
   public static final String SERIALIZED_NAME_PRODUCT_ID = "productId";
   @SerializedName(SERIALIZED_NAME_PRODUCT_ID)
   @javax.annotation.Nonnull
@@ -74,12 +133,24 @@ public class IntegrationMapping {
   @javax.annotation.Nonnull
   private String policyId;
 
+  public static final String SERIALIZED_NAME_EXTERNAL_PRODUCT_ID = "externalProductId";
+  @SerializedName(SERIALIZED_NAME_EXTERNAL_PRODUCT_ID)
+  @javax.annotation.Nonnull
+  private String externalProductId;
+
+  public static final String SERIALIZED_NAME_EXTERNAL_PRICE_ID = "externalPriceId";
+  @SerializedName(SERIALIZED_NAME_EXTERNAL_PRICE_ID)
+  @javax.annotation.Nonnull
+  private String externalPriceId;
+
   public static final String SERIALIZED_NAME_STRIPE_PRODUCT_ID = "stripeProductId";
+  @Deprecated
   @SerializedName(SERIALIZED_NAME_STRIPE_PRODUCT_ID)
   @javax.annotation.Nonnull
   private String stripeProductId;
 
   public static final String SERIALIZED_NAME_STRIPE_PRICE_ID = "stripePriceId";
+  @Deprecated
   @SerializedName(SERIALIZED_NAME_STRIPE_PRICE_ID)
   @javax.annotation.Nonnull
   private String stripePriceId;
@@ -209,6 +280,25 @@ public class IntegrationMapping {
   }
 
 
+  public IntegrationMapping provider(@javax.annotation.Nonnull ProviderEnum provider) {
+    this.provider = provider;
+    return this;
+  }
+
+  /**
+   * Get provider
+   * @return provider
+   */
+  @javax.annotation.Nonnull
+  public ProviderEnum getProvider() {
+    return provider;
+  }
+
+  public void setProvider(@javax.annotation.Nonnull ProviderEnum provider) {
+    this.provider = provider;
+  }
+
+
   public IntegrationMapping productId(@javax.annotation.Nonnull String productId) {
     this.productId = productId;
     return this;
@@ -247,39 +337,85 @@ public class IntegrationMapping {
   }
 
 
+  public IntegrationMapping externalProductId(@javax.annotation.Nonnull String externalProductId) {
+    this.externalProductId = externalProductId;
+    return this;
+  }
+
+  /**
+   * Id of the product in the provider: &#x60;prod_…&#x60; in Stripe, &#x60;pro_…&#x60; in Paddle.
+   * @return externalProductId
+   */
+  @javax.annotation.Nonnull
+  public String getExternalProductId() {
+    return externalProductId;
+  }
+
+  public void setExternalProductId(@javax.annotation.Nonnull String externalProductId) {
+    this.externalProductId = externalProductId;
+  }
+
+
+  public IntegrationMapping externalPriceId(@javax.annotation.Nonnull String externalPriceId) {
+    this.externalPriceId = externalPriceId;
+    return this;
+  }
+
+  /**
+   * Id of the price in the provider: &#x60;price_…&#x60; in Stripe, &#x60;pri_…&#x60; in Paddle.
+   * @return externalPriceId
+   */
+  @javax.annotation.Nonnull
+  public String getExternalPriceId() {
+    return externalPriceId;
+  }
+
+  public void setExternalPriceId(@javax.annotation.Nonnull String externalPriceId) {
+    this.externalPriceId = externalPriceId;
+  }
+
+
+  @Deprecated
   public IntegrationMapping stripeProductId(@javax.annotation.Nonnull String stripeProductId) {
     this.stripeProductId = stripeProductId;
     return this;
   }
 
   /**
-   * Get stripeProductId
+   * Deprecated: use &#x60;externalProductId&#x60;, which it equals.
    * @return stripeProductId
+   * @deprecated
    */
+  @Deprecated
   @javax.annotation.Nonnull
   public String getStripeProductId() {
     return stripeProductId;
   }
 
+  @Deprecated
   public void setStripeProductId(@javax.annotation.Nonnull String stripeProductId) {
     this.stripeProductId = stripeProductId;
   }
 
 
+  @Deprecated
   public IntegrationMapping stripePriceId(@javax.annotation.Nonnull String stripePriceId) {
     this.stripePriceId = stripePriceId;
     return this;
   }
 
   /**
-   * Get stripePriceId
+   * Deprecated: use &#x60;externalPriceId&#x60;, which it equals.
    * @return stripePriceId
+   * @deprecated
    */
+  @Deprecated
   @javax.annotation.Nonnull
   public String getStripePriceId() {
     return stripePriceId;
   }
 
+  @Deprecated
   public void setStripePriceId(@javax.annotation.Nonnull String stripePriceId) {
     this.stripePriceId = stripePriceId;
   }
@@ -291,7 +427,7 @@ public class IntegrationMapping {
   }
 
   /**
-   * Name of the Stripe product when it was mapped.
+   * Name of the provider&#39;s product when it was mapped.
    * @return productName
    */
   @javax.annotation.Nonnull
@@ -455,8 +591,11 @@ public class IntegrationMapping {
     IntegrationMapping integrationMapping = (IntegrationMapping) o;
     return Objects.equals(this.id, integrationMapping.id) &&
         Objects.equals(this.integrationId, integrationMapping.integrationId) &&
+        Objects.equals(this.provider, integrationMapping.provider) &&
         Objects.equals(this.productId, integrationMapping.productId) &&
         Objects.equals(this.policyId, integrationMapping.policyId) &&
+        Objects.equals(this.externalProductId, integrationMapping.externalProductId) &&
+        Objects.equals(this.externalPriceId, integrationMapping.externalPriceId) &&
         Objects.equals(this.stripeProductId, integrationMapping.stripeProductId) &&
         Objects.equals(this.stripePriceId, integrationMapping.stripePriceId) &&
         Objects.equals(this.productName, integrationMapping.productName) &&
@@ -470,7 +609,7 @@ public class IntegrationMapping {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, integrationId, productId, policyId, stripeProductId, stripePriceId, productName, price, recurring, status, statusReason, createdAt, additionalProperties);
+    return Objects.hash(id, integrationId, provider, productId, policyId, externalProductId, externalPriceId, stripeProductId, stripePriceId, productName, price, recurring, status, statusReason, createdAt, additionalProperties);
   }
 
   @Override
@@ -479,8 +618,11 @@ public class IntegrationMapping {
     sb.append("class IntegrationMapping {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    integrationId: ").append(toIndentedString(integrationId)).append("\n");
+    sb.append("    provider: ").append(toIndentedString(provider)).append("\n");
     sb.append("    productId: ").append(toIndentedString(productId)).append("\n");
     sb.append("    policyId: ").append(toIndentedString(policyId)).append("\n");
+    sb.append("    externalProductId: ").append(toIndentedString(externalProductId)).append("\n");
+    sb.append("    externalPriceId: ").append(toIndentedString(externalPriceId)).append("\n");
     sb.append("    stripeProductId: ").append(toIndentedString(stripeProductId)).append("\n");
     sb.append("    stripePriceId: ").append(toIndentedString(stripePriceId)).append("\n");
     sb.append("    productName: ").append(toIndentedString(productName)).append("\n");
@@ -508,10 +650,10 @@ public class IntegrationMapping {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("id", "integrationId", "productId", "policyId", "stripeProductId", "stripePriceId", "productName", "price", "recurring", "status", "statusReason", "createdAt"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "integrationId", "provider", "productId", "policyId", "externalProductId", "externalPriceId", "stripeProductId", "stripePriceId", "productName", "price", "recurring", "status", "statusReason", "createdAt"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "integrationId", "productId", "policyId", "stripeProductId", "stripePriceId", "productName", "price", "recurring", "status", "statusReason", "createdAt"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "integrationId", "provider", "productId", "policyId", "externalProductId", "externalPriceId", "stripeProductId", "stripePriceId", "productName", "price", "recurring", "status", "statusReason", "createdAt"));
   }
 
   /**
@@ -540,11 +682,22 @@ public class IntegrationMapping {
       if (!jsonObj.get("integrationId").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `integrationId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("integrationId").toString()));
       }
+      if (!jsonObj.get("provider").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `provider` to be a primitive type in the JSON string but got `%s`", jsonObj.get("provider").toString()));
+      }
+      // validate the required field `provider`
+      ProviderEnum.validateJsonElement(jsonObj.get("provider"));
       if (!jsonObj.get("productId").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `productId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("productId").toString()));
       }
       if (!jsonObj.get("policyId").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `policyId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("policyId").toString()));
+      }
+      if (!jsonObj.get("externalProductId").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `externalProductId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("externalProductId").toString()));
+      }
+      if (!jsonObj.get("externalPriceId").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `externalPriceId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("externalPriceId").toString()));
       }
       if (!jsonObj.get("stripeProductId").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `stripeProductId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("stripeProductId").toString()));

@@ -127,6 +127,14 @@ public class LicenseTest {
     }
 
     /**
+     * Test the property 'paddleTransactionId'
+     */
+    @Test
+    public void paddleTransactionIdTest() {
+        // TODO: test paddleTransactionId
+    }
+
+    /**
      * Test the property 'maxMachines'
      */
     @Test
@@ -228,6 +236,22 @@ public class LicenseTest {
     @Test
     public void stripeRefundIdTest() {
         // TODO: test stripeRefundId
+    }
+
+    /**
+     * Test the property 'paddleAdjustmentId'
+     */
+    @Test
+    public void paddleAdjustmentIdTest() {
+        // TODO: test paddleAdjustmentId
+    }
+
+    /**
+     * Test the property 'paddleRefundStatus'
+     */
+    @Test
+    public void paddleRefundStatusTest() {
+        // TODO: test paddleRefundStatus
     }
 
     /**

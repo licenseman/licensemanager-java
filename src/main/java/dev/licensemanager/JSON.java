@@ -104,11 +104,13 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.CancelLicense.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.CancellationStats.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.CancellationStatsByReasonInner.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ConnectPaddle.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ConnectStripe.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.CreateBillingPortalSession.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.CreateCustomer.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.CreateIntegrationMapping.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.CreateLicense.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.CreatePaddleMapping.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.CreatePolicy.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.CreatePortalLink.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.CreateProduct.CustomTypeAdapterFactory());
@@ -144,6 +146,7 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.LicenseStatsActivationsByVersionInner.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.LicenseSubscription.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.LicenseToken.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ListPaddlePrices200Response.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ListPolicyEventsTypeParameter.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ListStripePrices200Response.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.LockMaxVersion.CustomTypeAdapterFactory());
@@ -156,6 +159,9 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.Mrr.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.MrrByIntervalInner.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.MrrByPolicyInner.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.PaddleIntegration.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.PaddlePermission.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.PaddlePrice.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.Pagination.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.Policy.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.PolicyDuration.CustomTypeAdapterFactory());

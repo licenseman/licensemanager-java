@@ -3148,7 +3148,7 @@ paths:
                 $ref: "#/components/schemas/Error"
           description: "`subscription_managed`: the license is a subscription license,\
             \ whose `expiresAt`, `price`, `maxVersion` and `cancellableUntil` follow\
-            \ its Stripe subscription"
+            \ its Stripe or Paddle subscription"
         "422":
           content:
             application/json:
@@ -3252,9 +3252,9 @@ paths:
 
         Customers can cancel their licenses until their `cancellableUntil`, the end of their money back guarantee: tokens can't cancel a license past it, or without one. API keys and sessions can cancel any license.
 
-        When the license was bought through the Stripe integration, its payment is refunded in the background, unless the integration disables `autoRefund`, its API key lacks the optional Refunds: Write permission (`canRefund`), or `refund` is `false`: the refund is its price paid, taxes included, and its id is set as `stripeRefundId`. The customer is emailed a confirmation, and the owners and admins of the organization are told about the cancellation and its refund. In test products, the customer is only emailed when their email is a member's of the organization.
+        When the license was bought through the Stripe or Paddle integration, its payment is refunded in the background, unless the integration disables `autoRefund`, its API key lacks the optional refund permission (`canRefund`), or `refund` is `false`: the refund is its price paid, taxes included, and its id is set as `stripeRefundId` (Stripe) or `paddleAdjustmentId` (Paddle, which reviews it: see `paddleRefundStatus`). The customer is emailed a confirmation, and the owners and admins of the organization are told about the cancellation and its refund. In test products, the customer is only emailed when their email is a member's of the organization.
 
-        A subscription license isn't refunded: its Stripe subscription is canceled at once, without proration, which needs the integration's `canManageSubscriptions`.
+        A subscription license isn't refunded: its Stripe or Paddle subscription is canceled at once, without proration, which needs the integration's `canManageSubscriptions`.
 
         Records a `license.canceled` event, then a `license.refunded` or `license.refund_failed` one once the refund is done.
 
@@ -3325,8 +3325,8 @@ paths:
           description: "`already_canceled`: the license is already canceled. `not_cancellable`:\
             \ for tokens, the license has no money back guarantee, or it has ended,\
             \ as subscription licenses have none. `subscription_managed`: the license\
-            \ is a subscription license, and the Stripe API key lacks the Subscriptions:\
-            \ Write permission to cancel its subscription"
+            \ is a subscription license, and the Stripe or Paddle API key lacks the\
+            \ Subscriptions: Write permission to cancel its subscription"
         "422":
           content:
             application/json:
@@ -3854,7 +3854,7 @@ paths:
   /v1/customers/{id}/billing-portal-sessions:
     post:
       description: |-
-        Link to the Stripe customer portal of the customer's Stripe customer, where they manage their subscriptions: change their plan or payment method, see their invoices, cancel. Needs the Stripe integration's `canBillingPortal`, and the customer portal configured in the Stripe account's settings. The changes come back through the integration's webhook, keeping the subscription licenses in line.
+        Link to the customer portal of the customer's Stripe or Paddle customer, where they manage their subscriptions: change their plan or payment method, see their invoices, cancel. Needs the integration's `canBillingPortal`, and for Stripe, the customer portal configured in the Stripe account's settings. The changes come back through the integration's webhook, keeping the subscription licenses in line.
 
         **Token access**: customer tokens with the `customer:billing` permission (or the matching write one). A customer token reaches its own customer.
 
@@ -3921,8 +3921,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "`no_stripe_customer`: the customer didn't pay through the\
-            \ Stripe integration. `billing_portal_unavailable`: the Stripe integration\
-            \ isn't connected, or its API key lacks the Customer portal: Write permission"
+            \ Stripe or Paddle integration. `billing_portal_unavailable`: the integration\
+            \ isn't connected, or its API key lacks the customer portal permission\
+            \ (Stripe: Customer portal: Write, Paddle: Customer portal sessions: Write)"
         "422":
           content:
             application/json:
@@ -3942,8 +3943,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-          description: "`provider_unavailable`: Stripe refused or couldn't be reached,\
-            \ like when its customer portal isn't configured"
+          description: "`provider_unavailable`: Stripe or Paddle refused or couldn't\
+            \ be reached, like when the Stripe customer portal isn't configured"
       security:
       - apiKey: []
       - token:
@@ -5326,7 +5327,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-          description: "`provider_unavailable`: Stripe couldn't be reached"
+          description: "`provider_unavailable`: the provider (Stripe or Paddle) couldn't\
+            \ be reached"
       summary: Connect Stripe
       tags:
       - Integrations
@@ -5405,7 +5407,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-          description: "`provider_unavailable`: Stripe couldn't be reached"
+          description: "`provider_unavailable`: the provider (Stripe or Paddle) couldn't\
+            \ be reached"
       summary: Disconnect an integration
       tags:
       - Integrations
@@ -5578,7 +5581,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-          description: "`provider_unavailable`: Stripe couldn't be reached"
+          description: "`provider_unavailable`: the provider (Stripe or Paddle) couldn't\
+            \ be reached"
       summary: Check an integration
       tags:
       - Integrations
@@ -5757,7 +5761,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-          description: "`provider_unavailable`: Stripe couldn't be reached"
+          description: "`provider_unavailable`: the provider (Stripe or Paddle) couldn't\
+            \ be reached"
       summary: Map a Stripe price to a policy
       tags:
       - Integrations
@@ -5916,6 +5921,364 @@ paths:
           description: "`rate_limited`: the API key made more than 10 requests in\
             \ the last second. Wait for the `Retry-After` seconds"
       summary: Change the policy of a mapping
+      tags:
+      - Integrations
+      x-required-permissions:
+      - integration:update
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/products/{productId}/integrations/paddle:
+    get:
+      description: "The organization connects one Paddle Billing account for its live\
+        \ products, and one sandbox account for its test products. Its mappings tell\
+        \ which Paddle prices create licenses of the product. Doesn't accept tokens:\
+        \ only API keys and sessions."
+      operationId: getPaddleIntegration
+      parameters:
+      - explode: false
+        in: path
+        name: productId
+        required: true
+        schema:
+          example: x7Kp2QaZ
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaddleIntegration"
+          description: Paddle integration
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`unauthorized`: no credentials. `invalid_api_key`: the API\
+            \ key doesn't exist, was revoked or has expired. `invalid_token`: the\
+            \ token's signature is invalid, it has expired, or the resource it's scoped\
+            \ to was deleted"
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`plan_limit_exceeded`: the organization stayed over its plan's\
+            \ limits after the grace period, its API is blocked until it upgrades.\
+            \ `plan_limit_reached`: creating the resource would go over the plan's\
+            \ limit"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`token_not_allowed`: the endpoint doesn't accept tokens, or\
+            \ not of this type. `insufficient_scope`: the token lacks the permission.\
+            \ `no_active_organization` or `forbidden`: the session has no organization,\
+            \ or isn't a member of the one requested"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Product not found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`validation_error`: invalid path, query or body, with the\
+            \ `issues`"
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`rate_limited`: the API key made more than 10 requests in\
+            \ the last second. Wait for the `Retry-After` seconds"
+      summary: Get the Paddle integration of a product
+      tags:
+      - Integrations
+      x-accepts:
+      - application/json
+    put:
+      description: |-
+        Connects the Paddle Billing account of the API key for the organization's products of the product's mode, or replaces the key of the existing connection. Checks the key works and has the required permissions, then creates a notification destination on the account, telling the app about payments. Doesn't accept tokens: only API keys and sessions.
+
+        **Required role permission**: `integration:create` when called with a session, granted by the member's role. API keys aren't limited by roles.
+      operationId: connectPaddle
+      parameters:
+      - explode: false
+        in: path
+        name: productId
+        required: true
+        schema:
+          example: x7Kp2QaZ
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConnectPaddle"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaddleIntegration"
+          description: Paddle integration
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`unauthorized`: no credentials. `invalid_api_key`: the API\
+            \ key doesn't exist, was revoked or has expired. `invalid_token`: the\
+            \ token's signature is invalid, it has expired, or the resource it's scoped\
+            \ to was deleted"
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`plan_limit_exceeded`: the organization stayed over its plan's\
+            \ limits after the grace period, its API is blocked until it upgrades.\
+            \ `plan_limit_reached`: creating the resource would go over the plan's\
+            \ limit"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`token_not_allowed`: the endpoint doesn't accept tokens, or\
+            \ not of this type. `insufficient_scope`: the token lacks the permission.\
+            \ `no_active_organization` or `forbidden`: the session has no organization,\
+            \ or isn't a member of the one requested"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Product not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`webhook_url_unreachable`: Paddle can't reach the server's\
+            \ webhook URL"
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`validation_error`: invalid body. `invalid_api_key`: not a\
+            \ Paddle Billing API key, or Paddle rejected it. `key_mode_mismatch`:\
+            \ a sandbox key for a live product, or the opposite. `missing_permission`:\
+            \ the key lacks required permissions, listed in the message. `too_many_destinations`:\
+            \ the account already has the 10 active notification destinations Paddle\
+            \ allows"
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`rate_limited`: the API key made more than 10 requests in\
+            \ the last second. Wait for the `Retry-After` seconds"
+        "502":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`provider_unavailable`: the provider (Stripe or Paddle) couldn't\
+            \ be reached"
+      summary: Connect Paddle
+      tags:
+      - Integrations
+      x-required-permissions:
+      - integration:create
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v1/integrations/{id}/paddle/prices:
+    get:
+      description: "Active catalog prices of active products of the Paddle account,\
+        \ the ones that can be mapped, up to 500. Doesn't accept tokens: only API\
+        \ keys and sessions."
+      operationId: listPaddlePrices
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          example: i8Fz4QnRt
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listPaddlePrices_200_response"
+          description: Prices
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`unauthorized`: no credentials. `invalid_api_key`: the API\
+            \ key doesn't exist, was revoked or has expired. `invalid_token`: the\
+            \ token's signature is invalid, it has expired, or the resource it's scoped\
+            \ to was deleted"
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`plan_limit_exceeded`: the organization stayed over its plan's\
+            \ limits after the grace period, its API is blocked until it upgrades.\
+            \ `plan_limit_reached`: creating the resource would go over the plan's\
+            \ limit"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`token_not_allowed`: the endpoint doesn't accept tokens, or\
+            \ not of this type. `insufficient_scope`: the token lacks the permission.\
+            \ `no_active_organization` or `forbidden`: the session has no organization,\
+            \ or isn't a member of the one requested"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Integration not found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`validation_error`: invalid path, query or body, with the\
+            \ `issues`"
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`rate_limited`: the API key made more than 10 requests in\
+            \ the last second. Wait for the `Retry-After` seconds"
+        "502":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`provider_unavailable`: Paddle couldn't be reached, or refused\
+            \ the request"
+      summary: List the Paddle prices of an integration
+      tags:
+      - Integrations
+      x-accepts:
+      - application/json
+  /v1/products/{productId}/integrations/paddle/mappings:
+    post:
+      description: |-
+        Paying the price then creates licenses of the product with the policy: one per unit bought, or one per subscription for a recurring price. Doesn't accept tokens: only API keys and sessions.
+
+        **Required role permission**: `integration:update` when called with a session, granted by the member's role. API keys aren't limited by roles.
+      operationId: createPaddleMapping
+      parameters:
+      - explode: false
+        in: path
+        name: productId
+        required: true
+        schema:
+          example: x7Kp2QaZ
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaddleMapping"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntegrationMapping"
+          description: Created mapping
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`unauthorized`: no credentials. `invalid_api_key`: the API\
+            \ key doesn't exist, was revoked or has expired. `invalid_token`: the\
+            \ token's signature is invalid, it has expired, or the resource it's scoped\
+            \ to was deleted"
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`plan_limit_exceeded`: the organization stayed over its plan's\
+            \ limits after the grace period, its API is blocked until it upgrades.\
+            \ `plan_limit_reached`: creating the resource would go over the plan's\
+            \ limit"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`token_not_allowed`: the endpoint doesn't accept tokens, or\
+            \ not of this type. `insufficient_scope`: the token lacks the permission.\
+            \ `no_active_organization` or `forbidden`: the session has no organization,\
+            \ or isn't a member of the one requested"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`not_found`: product not found. `policy_not_found`: the product\
+            \ has no policy with this `policyId`. `price_not_found`: the Paddle account\
+            \ has no price with this `paddlePriceId`"
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`not_connected`: Paddle isn't connected in the product's mode.\
+            \ `price_mapped`: the price already creates licenses of a product"
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`validation_error`: invalid body. `price_unusable`: the price\
+            \ or its product is archived, or it's a custom (non-catalog) price. `missing_permission`:\
+            \ a recurring price, while the API key lacks the Subscriptions: Read permission"
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`rate_limited`: the API key made more than 10 requests in\
+            \ the last second. Wait for the `Retry-After` seconds"
+        "502":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`provider_unavailable`: the provider (Stripe or Paddle) couldn't\
+            \ be reached"
+      summary: Map a Paddle price to a policy
       tags:
       - Integrations
       x-required-permissions:
@@ -7824,6 +8187,7 @@ components:
           name: Jane Doe
           licenseCount: 3
           stripeCustomerId: cus_NffrFeUfNV2Hib
+          paddleCustomerId: ctm_01h04vsc0qhwtsbsxh3422wjs4
           createdAt: 2026-01-15T09:30:00.000Z
         - id: c9Wd3RtE
           productId: x7Kp2QaZ
@@ -7831,6 +8195,7 @@ components:
           name: Jane Doe
           licenseCount: 3
           stripeCustomerId: cus_NffrFeUfNV2Hib
+          paddleCustomerId: ctm_01h04vsc0qhwtsbsxh3422wjs4
           createdAt: 2026-01-15T09:30:00.000Z
         pagination:
           page: 1
@@ -7858,6 +8223,7 @@ components:
         name: Jane Doe
         licenseCount: 3
         stripeCustomerId: cus_NffrFeUfNV2Hib
+        paddleCustomerId: ctm_01h04vsc0qhwtsbsxh3422wjs4
         createdAt: 2026-01-15T09:30:00.000Z
       properties:
         id:
@@ -7886,6 +8252,12 @@ components:
           example: cus_NffrFeUfNV2Hib
           nullable: true
           type: string
+        paddleCustomerId:
+          description: "Id of the Paddle customer, when the customer bought licenses\
+            \ through the Paddle integration. `null` otherwise."
+          example: ctm_01h04vsc0qhwtsbsxh3422wjs4
+          nullable: true
+          type: string
         createdAt:
           example: 2026-01-15T09:30:00.000Z
           format: date-time
@@ -7896,6 +8268,7 @@ components:
       - id
       - licenseCount
       - name
+      - paddleCustomerId
       - productId
       - stripeCustomerId
     CreateCustomer:
@@ -7957,6 +8330,7 @@ components:
           meta:
             seats: 5
           stripePaymentIntentId: pi_3MtwBwLkdIwHu7ix28a3tqPa
+          paddleTransactionId: txn_01h04vsc0qhwtsbsxh3422wjs4
           maxMachines: 3
           maxOfflineDurationSeconds: 604800
           activeMachineCount: 2
@@ -7973,6 +8347,8 @@ components:
           canceledAt: 2026-01-20T16:12:00.000Z
           cancellationReason: ""
           subscription:
+            provider: stripe
+            externalId: sub_1MowQVLkdIwHu7ix
             stripeSubscriptionId: sub_1MowQVLkdIwHu7ix
             status: active
             interval: day
@@ -7984,6 +8360,8 @@ components:
             endedAt: 2000-01-23T04:56:07.000+00:00
           cancellationComment: I only needed it for one project.
           stripeRefundId: re_3MtwBwLkdIwHu7ix0Bs5rA2b
+          paddleAdjustmentId: adj_01h04vsc0qhwtsbsxh3422wjs4
+          paddleRefundStatus: approved
           updatedAt: 2026-01-15T09:30:00.000Z
         - id: l3Nv8KwB
           productId: x7Kp2QaZ
@@ -7999,6 +8377,7 @@ components:
           meta:
             seats: 5
           stripePaymentIntentId: pi_3MtwBwLkdIwHu7ix28a3tqPa
+          paddleTransactionId: txn_01h04vsc0qhwtsbsxh3422wjs4
           maxMachines: 3
           maxOfflineDurationSeconds: 604800
           activeMachineCount: 2
@@ -8015,6 +8394,8 @@ components:
           canceledAt: 2026-01-20T16:12:00.000Z
           cancellationReason: ""
           subscription:
+            provider: stripe
+            externalId: sub_1MowQVLkdIwHu7ix
             stripeSubscriptionId: sub_1MowQVLkdIwHu7ix
             status: active
             interval: day
@@ -8026,6 +8407,8 @@ components:
             endedAt: 2000-01-23T04:56:07.000+00:00
           cancellationComment: I only needed it for one project.
           stripeRefundId: re_3MtwBwLkdIwHu7ix0Bs5rA2b
+          paddleAdjustmentId: adj_01h04vsc0qhwtsbsxh3422wjs4
+          paddleRefundStatus: approved
           updatedAt: 2026-01-15T09:30:00.000Z
         pagination:
           page: 1
@@ -8061,6 +8444,7 @@ components:
         meta:
           seats: 5
         stripePaymentIntentId: pi_3MtwBwLkdIwHu7ix28a3tqPa
+        paddleTransactionId: txn_01h04vsc0qhwtsbsxh3422wjs4
         maxMachines: 3
         maxOfflineDurationSeconds: 604800
         activeMachineCount: 2
@@ -8077,6 +8461,8 @@ components:
         canceledAt: 2026-01-20T16:12:00.000Z
         cancellationReason: ""
         subscription:
+          provider: stripe
+          externalId: sub_1MowQVLkdIwHu7ix
           stripeSubscriptionId: sub_1MowQVLkdIwHu7ix
           status: active
           interval: day
@@ -8088,6 +8474,8 @@ components:
           endedAt: 2000-01-23T04:56:07.000+00:00
         cancellationComment: I only needed it for one project.
         stripeRefundId: re_3MtwBwLkdIwHu7ix0Bs5rA2b
+        paddleAdjustmentId: adj_01h04vsc0qhwtsbsxh3422wjs4
+        paddleRefundStatus: approved
         updatedAt: 2026-01-15T09:30:00.000Z
       properties:
         id:
@@ -8132,6 +8520,12 @@ components:
             \ it was bought through the Stripe integration. `null` otherwise, or when\
             \ nothing was paid."
           example: pi_3MtwBwLkdIwHu7ix28a3tqPa
+          nullable: true
+          type: string
+        paddleTransactionId:
+          description: "Id of the Paddle transaction that paid the license, when it\
+            \ was bought through the Paddle integration. `null` otherwise."
+          example: txn_01h04vsc0qhwtsbsxh3422wjs4
           nullable: true
           type: string
         maxMachines:
@@ -8199,6 +8593,23 @@ components:
           example: re_3MtwBwLkdIwHu7ix0Bs5rA2b
           nullable: true
           type: string
+        paddleAdjustmentId:
+          description: "Id of the Paddle refund adjustment of the license's transaction\
+            \ once it was canceled, through the Paddle integration. `null` otherwise."
+          example: adj_01h04vsc0qhwtsbsxh3422wjs4
+          nullable: true
+          type: string
+        paddleRefundStatus:
+          description: "Outcome of the Paddle refund: `pending_approval` while Paddle\
+            \ reviews it, then `approved` or `rejected`. `null` without a Paddle refund."
+          enum:
+          - pending_approval
+          - approved
+          - rejected
+          - null
+          example: approved
+          nullable: true
+          type: string
         updatedAt:
           description: "Last time the license's settings were edited, not when its\
             \ key was validated."
@@ -8222,6 +8633,9 @@ components:
       - maxOfflineDurationSeconds
       - maxVersion
       - meta
+      - paddleAdjustmentId
+      - paddleRefundStatus
+      - paddleTransactionId
       - policyId
       - price
       - productId
@@ -8334,10 +8748,13 @@ components:
       example: active
       type: string
     LicenseSubscription:
-      description: "The Stripe subscription keeping the license valid, `null` when\
-        \ it isn't a subscription license. The license expires when it stops being\
-        \ paid, includes every update, and can't be canceled during a money back guarantee."
+      description: "The Stripe or Paddle subscription keeping the license valid, `null`\
+        \ when it isn't a subscription license. The license expires when it stops\
+        \ being paid, includes every update, and can't be canceled during a money\
+        \ back guarantee."
       example:
+        provider: stripe
+        externalId: sub_1MowQVLkdIwHu7ix
         stripeSubscriptionId: sub_1MowQVLkdIwHu7ix
         status: active
         interval: day
@@ -8349,13 +8766,27 @@ components:
         endedAt: 2000-01-23T04:56:07.000+00:00
       nullable: true
       properties:
+        provider:
+          description: Provider of the subscription.
+          enum:
+          - stripe
+          - paddle
+          type: string
+        externalId:
+          description: "Id of the subscription in the provider: `sub_…` in Stripe\
+            \ and in Paddle."
+          example: sub_1MowQVLkdIwHu7ix
+          type: string
         stripeSubscriptionId:
+          deprecated: true
+          description: "Deprecated: use `externalId`, which it equals."
           example: sub_1MowQVLkdIwHu7ix
           type: string
         status:
-          description: "Status of the subscription in Stripe: `active`, `trialing`,\
-            \ `past_due` while a failed payment is retried, `canceled`, `unpaid`,\
-            \ `paused`, `incomplete` or `incomplete_expired`."
+          description: "Status of the subscription in the provider. Stripe: `active`,\
+            \ `trialing`, `past_due` while a failed payment is retried, `canceled`,\
+            \ `unpaid`, `paused`, `incomplete` or `incomplete_expired`. Paddle: `active`,\
+            \ `trialing`, `past_due`, `paused` or `canceled`."
           example: active
           type: string
         interval:
@@ -8392,9 +8823,11 @@ components:
       - cancelAtPeriodEnd
       - currentPeriodEnd
       - endedAt
+      - externalId
       - interval
       - intervalCount
       - price
+      - provider
       - quantity
       - status
       - stripeSubscriptionId
@@ -8902,8 +9335,8 @@ components:
         url: https://billing.stripe.com/p/session/test_YWNjdF8x
       properties:
         url:
-          description: "Link to the Stripe customer portal, to open right away: it\
-            \ expires shortly."
+          description: "Link to the Stripe or Paddle customer portal, to open right\
+            \ away: it expires shortly."
           example: https://billing.stripe.com/p/session/test_YWNjdF8x
           type: string
       required:
@@ -8915,7 +9348,8 @@ components:
         returnUrl:
           description: "Where the Stripe customer portal links back to: a page of\
             \ the customer portal, or of one of the product's `returnDomains`. The\
-            \ customer portal of the product by default."
+            \ customer portal of the product by default. Paddle's customer portal\
+            \ has no link back: ignored for Paddle customers."
           example: https://example.com/account
           format: uri
           type: string
@@ -9383,8 +9817,11 @@ components:
         mappings:
         - id: g2Lk7RwPa
           integrationId: i8Fz4QnRt
+          provider: stripe
           productId: x7Kp2QaZ
           policyId: p4Rt8LmQ
+          externalProductId: prod_NWjs8kKbJWmuuc
+          externalPriceId: price_1MoBy5LkdIwHu7ix
           stripeProductId: prod_NWjs8kKbJWmuuc
           stripePriceId: price_1MoBy5LkdIwHu7ix
           productName: Acme Pro
@@ -9399,8 +9836,11 @@ components:
           createdAt: 2000-01-23T04:56:07.000+00:00
         - id: g2Lk7RwPa
           integrationId: i8Fz4QnRt
+          provider: stripe
           productId: x7Kp2QaZ
           policyId: p4Rt8LmQ
+          externalProductId: prod_NWjs8kKbJWmuuc
+          externalPriceId: price_1MoBy5LkdIwHu7ix
           stripeProductId: prod_NWjs8kKbJWmuuc
           stripePriceId: price_1MoBy5LkdIwHu7ix
           productName: Acme Pro
@@ -9510,6 +9950,7 @@ components:
         provider:
           enum:
           - stripe
+          - paddle
           type: string
         livemode:
           description: "Whether it's connected in live mode, for the live products,\
@@ -9517,7 +9958,7 @@ components:
           type: boolean
         accountName:
           description: "Name of the Stripe account, `null` when the API key can't\
-            \ read it."
+            \ read it, and for Paddle, whose API doesn't give it."
           example: Acme Inc.
           nullable: true
           type: string
@@ -9526,7 +9967,8 @@ components:
           example: rk_live_…Ab3d
           type: string
         webhookUrl:
-          description: URL of the webhook endpoint created on the Stripe account.
+          description: "URL of the webhook endpoint created on the Stripe account,\
+            \ or of the notification destination created on the Paddle account."
           example: https://api.licensemanager.dev/v1/webhooks/stripe/i8Fz4QnRt
           type: string
         status:
@@ -9548,32 +9990,35 @@ components:
           nullable: true
           type: string
         autoRefund:
-          description: "Whether canceling a license bought through Stripe refunds\
-            \ its payment. On by default, always off when `canRefund` is false."
+          description: "Whether canceling a license bought through the integration\
+            \ refunds its payment. On by default, always off when `canRefund` is false."
           example: true
           type: boolean
         canRefund:
-          description: "Whether the API key has the optional Refunds: Write permission,\
-            \ checked when connecting and every day. Without it, canceled licenses\
-            \ aren't refunded: refund their payments from Stripe."
+          description: "Whether the API key has the optional refund permission (Stripe:\
+            \ Refunds: Write, Paddle: Adjustments: Write), checked when connecting\
+            \ and every day. Without it, canceled licenses aren't refunded: refund\
+            \ their payments from the provider."
           example: true
           type: boolean
         canManageSubscriptions:
           description: "Whether the API key has the optional Subscriptions: Write\
             \ permission, checked when connecting and every day. Without it, subscription\
             \ licenses can't be canceled from the app: cancel their subscriptions\
-            \ from Stripe."
+            \ from the provider."
           example: true
           type: boolean
         canBillingPortal:
-          description: "Whether the API key has the optional Customer portal: Write\
-            \ permission, checked when connecting and every day. Without it, the license\
-            \ portal doesn't link to the Stripe customer portal."
+          description: "Whether the API key has the optional customer portal permission\
+            \ (Stripe: Customer portal: Write, Paddle: Customer portal sessions: Write),\
+            \ checked when connecting and every day. Without it, the license portal\
+            \ doesn't link to the provider's customer portal."
           example: true
           type: boolean
         subscriptionGraceDays:
           description: "Days a subscription license stays valid after its period ends\
-            \ while its renewal is unpaid, as Stripe retries the payment. 7 by default."
+            \ while its renewal is unpaid, as the provider retries the payment. 7\
+            \ by default."
           example: 7
           type: integer
         createdAt:
@@ -9610,8 +10055,11 @@ components:
       example:
         id: g2Lk7RwPa
         integrationId: i8Fz4QnRt
+        provider: stripe
         productId: x7Kp2QaZ
         policyId: p4Rt8LmQ
+        externalProductId: prod_NWjs8kKbJWmuuc
+        externalPriceId: price_1MoBy5LkdIwHu7ix
         stripeProductId: prod_NWjs8kKbJWmuuc
         stripePriceId: price_1MoBy5LkdIwHu7ix
         productName: Acme Pro
@@ -9631,20 +10079,39 @@ components:
         integrationId:
           example: i8Fz4QnRt
           type: string
+        provider:
+          enum:
+          - stripe
+          - paddle
+          type: string
         productId:
           example: x7Kp2QaZ
           type: string
         policyId:
           example: p4Rt8LmQ
           type: string
+        externalProductId:
+          description: "Id of the product in the provider: `prod_…` in Stripe, `pro_…\
+            ` in Paddle."
+          example: prod_NWjs8kKbJWmuuc
+          type: string
+        externalPriceId:
+          description: "Id of the price in the provider: `price_…` in Stripe, `pri_…\
+            ` in Paddle."
+          example: price_1MoBy5LkdIwHu7ix
+          type: string
         stripeProductId:
+          deprecated: true
+          description: "Deprecated: use `externalProductId`, which it equals."
           example: prod_NWjs8kKbJWmuuc
           type: string
         stripePriceId:
+          deprecated: true
+          description: "Deprecated: use `externalPriceId`, which it equals."
           example: price_1MoBy5LkdIwHu7ix
           type: string
         productName:
-          description: Name of the Stripe product when it was mapped.
+          description: Name of the provider's product when it was mapped.
           example: Acme Pro
           type: string
         price:
@@ -9667,12 +10134,15 @@ components:
           type: string
       required:
       - createdAt
+      - externalPriceId
+      - externalProductId
       - id
       - integrationId
       - policyId
       - price
       - productId
       - productName
+      - provider
       - recurring
       - status
       - statusReason
@@ -9780,6 +10250,217 @@ components:
           type: string
       required:
       - policyId
+    PaddleIntegration:
+      example:
+        livemode: true
+        webhookUrlReachable: true
+        requiredPermissions:
+        - resource: Prices
+          access: Read
+          scope: price.read
+          reason: "Lists your prices so you can choose which ones create licenses,\
+            \ and checks they can still be paid."
+          optional: false
+          subscriptions: false
+        - resource: Prices
+          access: Read
+          scope: price.read
+          reason: "Lists your prices so you can choose which ones create licenses,\
+            \ and checks they can still be paid."
+          optional: false
+          subscriptions: false
+        integration: ""
+        mappings:
+        - id: g2Lk7RwPa
+          integrationId: i8Fz4QnRt
+          provider: stripe
+          productId: x7Kp2QaZ
+          policyId: p4Rt8LmQ
+          externalProductId: prod_NWjs8kKbJWmuuc
+          externalPriceId: price_1MoBy5LkdIwHu7ix
+          stripeProductId: prod_NWjs8kKbJWmuuc
+          stripePriceId: price_1MoBy5LkdIwHu7ix
+          productName: Acme Pro
+          price:
+            amount: 49.99
+            currency: USD
+          recurring:
+            interval: day
+            intervalCount: 1
+          status: active
+          statusReason: The price is archived in Stripe
+          createdAt: 2000-01-23T04:56:07.000+00:00
+        - id: g2Lk7RwPa
+          integrationId: i8Fz4QnRt
+          provider: stripe
+          productId: x7Kp2QaZ
+          policyId: p4Rt8LmQ
+          externalProductId: prod_NWjs8kKbJWmuuc
+          externalPriceId: price_1MoBy5LkdIwHu7ix
+          stripeProductId: prod_NWjs8kKbJWmuuc
+          stripePriceId: price_1MoBy5LkdIwHu7ix
+          productName: Acme Pro
+          price:
+            amount: 49.99
+            currency: USD
+          recurring:
+            interval: day
+            intervalCount: 1
+          status: active
+          statusReason: The price is archived in Stripe
+          createdAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        livemode:
+          description: "Environment of the Paddle connection the product uses: live\
+            \ for live products, sandbox for test products."
+          type: boolean
+        webhookUrlReachable:
+          description: "Whether Paddle can reach the API's webhook URL. A local URL\
+            \ can't be: set `WEBHOOK_URL` on the server, like to a tunnel in development."
+          type: boolean
+        requiredPermissions:
+          description: "Permissions the API key needs, and why, the `optional` ones\
+            \ included. Every other permission can stay off."
+          items:
+            $ref: "#/components/schemas/PaddlePermission"
+          type: array
+          default: null
+        integration:
+          allOf:
+          - $ref: "#/components/schemas/Integration"
+          description: "The organization's Paddle connection in this environment,\
+            \ `null` when there's none."
+          nullable: true
+        mappings:
+          description: Paddle prices creating licenses of the product.
+          items:
+            $ref: "#/components/schemas/IntegrationMapping"
+          type: array
+          default: null
+      required:
+      - integration
+      - livemode
+      - mappings
+      - requiredPermissions
+      - webhookUrlReachable
+    PaddlePermission:
+      example:
+        resource: Prices
+        access: Read
+        scope: price.read
+        reason: "Lists your prices so you can choose which ones create licenses, and\
+          \ checks they can still be paid."
+        optional: false
+        subscriptions: false
+      properties:
+        resource:
+          example: Prices
+          type: string
+        access:
+          enum:
+          - Read
+          - Write
+          type: string
+        scope:
+          description: Permission of the Paddle API.
+          example: price.read
+          type: string
+        reason:
+          example: "Lists your prices so you can choose which ones create licenses,\
+            \ and checks they can still be paid."
+          type: string
+        optional:
+          description: "Whether the key can connect without it, losing what it's for,\
+            \ explained by `reason`."
+          example: false
+          type: boolean
+        subscriptions:
+          description: "Whether it's only needed to sell subscriptions: checked once\
+            \ a recurring price is mapped."
+          example: false
+          type: boolean
+      required:
+      - access
+      - optional
+      - reason
+      - resource
+      - scope
+      - subscriptions
+    ConnectPaddle:
+      example:
+        apiKey: pdl_live_apikey_01gtgztp8f…
+      properties:
+        apiKey:
+          description: "API key of the Paddle Billing account (`pdl_live_apikey_…\
+            ` for live products, `pdl_sdbx_apikey_…` from a sandbox account for test\
+            \ products), with the `requiredPermissions` of `getPaddleIntegration`.\
+            \ Without the optional ones, it connects with what they're for turned\
+            \ off."
+          example: pdl_live_apikey_01gtgztp8f…
+          minLength: 1
+          type: string
+      required:
+      - apiKey
+    PaddlePrice:
+      example:
+        id: pri_01gsz8x8sawmvhz1pv30nge1ke
+        productId: pro_01gsz4t5hdjse780zja8vvr7jg
+        productName: Acme Pro
+        description: Launch price
+        price:
+          amount: 49.99
+          currency: USD
+        recurring:
+          interval: day
+          intervalCount: 1
+        mapped: true
+      properties:
+        id:
+          example: pri_01gsz8x8sawmvhz1pv30nge1ke
+          type: string
+        productId:
+          example: pro_01gsz4t5hdjse780zja8vvr7jg
+          type: string
+        productName:
+          example: Acme Pro
+          type: string
+        description:
+          description: Name or internal description of the price in Paddle.
+          example: Launch price
+          nullable: true
+          type: string
+        price:
+          $ref: "#/components/schemas/Price"
+        recurring:
+          $ref: "#/components/schemas/StripePrice_recurring"
+        mapped:
+          description: Whether the price already creates licenses of a product.
+          type: boolean
+      required:
+      - description
+      - id
+      - mapped
+      - price
+      - productId
+      - productName
+      - recurring
+    CreatePaddleMapping:
+      example:
+        paddlePriceId: pri_01gsz8x8sawmvhz1pv30nge1ke
+        policyId: p4Rt8LmQ
+      properties:
+        paddlePriceId:
+          description: Active one-time or recurring catalog price of the Paddle account.
+          example: pri_01gsz8x8sawmvhz1pv30nge1ke
+          minLength: 1
+          type: string
+        policyId:
+          example: p4Rt8LmQ
+          minLength: 1
+          type: string
+      required:
+      - paddlePriceId
+      - policyId
     SlackIntegration:
       example:
         configured: true
@@ -9864,9 +10545,9 @@ components:
           type: string
         events:
           description: "Notifications the channel gets: `purchased` (a license bought\
-            \ through Stripe), `renewed` (a subscription renewal paid), `payment_failed`\
-            \ (a subscription payment failed) and `canceled` (a license canceled,\
-            \ or its subscription ended)."
+            \ through Stripe or Paddle), `renewed` (a subscription renewal paid),\
+            \ `payment_failed` (a subscription payment failed) and `canceled` (a license\
+            \ canceled, or its subscription ended)."
           items:
             enum:
             - purchased
@@ -9978,6 +10659,39 @@ components:
         data:
           items:
             $ref: "#/components/schemas/StripePrice"
+          type: array
+          default: null
+      required:
+      - data
+    listPaddlePrices_200_response:
+      example:
+        data:
+        - id: pri_01gsz8x8sawmvhz1pv30nge1ke
+          productId: pro_01gsz4t5hdjse780zja8vvr7jg
+          productName: Acme Pro
+          description: Launch price
+          price:
+            amount: 49.99
+            currency: USD
+          recurring:
+            interval: day
+            intervalCount: 1
+          mapped: true
+        - id: pri_01gsz8x8sawmvhz1pv30nge1ke
+          productId: pro_01gsz4t5hdjse780zja8vvr7jg
+          productName: Acme Pro
+          description: Launch price
+          price:
+            amount: 49.99
+            currency: USD
+          recurring:
+            interval: day
+            intervalCount: 1
+          mapped: true
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/PaddlePrice"
           type: array
           default: null
       required:
@@ -10544,6 +11258,7 @@ components:
           description: Service the integration connects to.
           enum:
           - stripe
+          - paddle
           type: string
       required:
       - id

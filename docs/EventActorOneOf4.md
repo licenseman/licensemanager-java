@@ -27,6 +27,7 @@
 | Name | Value |
 |---- | -----|
 | STRIPE | &quot;stripe&quot; |
+| PADDLE | &quot;paddle&quot; |
 | UNKNOWN_DEFAULT_OPEN_API | &quot;unknown_default_open_api&quot; |
 
 

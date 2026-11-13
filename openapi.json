@@ -2002,6 +2002,14 @@
             "description": "Id of the Stripe customer, when the customer bought licenses through the Stripe integration as a Stripe customer. `null` otherwise, e.g. for a guest checkout.",
             "example": "cus_NffrFeUfNV2Hib"
           },
+          "paddleCustomerId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Id of the Paddle customer, when the customer bought licenses through the Paddle integration. `null` otherwise.",
+            "example": "ctm_01h04vsc0qhwtsbsxh3422wjs4"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time",
@@ -2015,6 +2023,7 @@
           "name",
           "licenseCount",
           "stripeCustomerId",
+          "paddleCustomerId",
           "createdAt"
         ]
       },
@@ -2144,6 +2153,14 @@
             "description": "Id of the Stripe payment intent that paid the license, when it was bought through the Stripe integration. `null` otherwise, or when nothing was paid.",
             "example": "pi_3MtwBwLkdIwHu7ix28a3tqPa"
           },
+          "paddleTransactionId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Id of the Paddle transaction that paid the license, when it was bought through the Paddle integration. `null` otherwise.",
+            "example": "txn_01h04vsc0qhwtsbsxh3422wjs4"
+          },
           "maxMachines": {
             "type": [
               "integer",
@@ -2228,6 +2245,28 @@
             "description": "Id of the Stripe refund of the license's payment once it was canceled, through the Stripe integration. `null` otherwise.",
             "example": "re_3MtwBwLkdIwHu7ix0Bs5rA2b"
           },
+          "paddleAdjustmentId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Id of the Paddle refund adjustment of the license's transaction once it was canceled, through the Paddle integration. `null` otherwise.",
+            "example": "adj_01h04vsc0qhwtsbsxh3422wjs4"
+          },
+          "paddleRefundStatus": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "pending_approval",
+              "approved",
+              "rejected",
+              null
+            ],
+            "description": "Outcome of the Paddle refund: `pending_approval` while Paddle reviews it, then `approved` or `rejected`. `null` without a Paddle refund.",
+            "example": "approved"
+          },
           "updatedAt": {
             "type": "string",
             "format": "date-time",
@@ -2246,6 +2285,7 @@
           "expiresAt",
           "meta",
           "stripePaymentIntentId",
+          "paddleTransactionId",
           "maxMachines",
           "maxOfflineDurationSeconds",
           "activeMachineCount",
@@ -2259,6 +2299,8 @@
           "subscription",
           "cancellationComment",
           "stripeRefundId",
+          "paddleAdjustmentId",
+          "paddleRefundStatus",
           "updatedAt"
         ]
       },
@@ -2368,13 +2410,28 @@
           "null"
         ],
         "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "stripe",
+              "paddle"
+            ],
+            "description": "Provider of the subscription."
+          },
+          "externalId": {
+            "type": "string",
+            "description": "Id of the subscription in the provider: `sub_…` in Stripe and in Paddle.",
+            "example": "sub_1MowQVLkdIwHu7ix"
+          },
           "stripeSubscriptionId": {
             "type": "string",
-            "example": "sub_1MowQVLkdIwHu7ix"
+            "description": "Deprecated: use `externalId`, which it equals.",
+            "example": "sub_1MowQVLkdIwHu7ix",
+            "deprecated": true
           },
           "status": {
             "type": "string",
-            "description": "Status of the subscription in Stripe: `active`, `trialing`, `past_due` while a failed payment is retried, `canceled`, `unpaid`, `paused`, `incomplete` or `incomplete_expired`.",
+            "description": "Status of the subscription in the provider. Stripe: `active`, `trialing`, `past_due` while a failed payment is retried, `canceled`, `unpaid`, `paused`, `incomplete` or `incomplete_expired`. Paddle: `active`, `trialing`, `past_due`, `paused` or `canceled`.",
             "example": "active"
           },
           "interval": {
@@ -2424,6 +2481,8 @@
           }
         },
         "required": [
+          "provider",
+          "externalId",
           "stripeSubscriptionId",
           "status",
           "interval",
@@ -2434,7 +2493,7 @@
           "cancelAtPeriodEnd",
           "endedAt"
         ],
-        "description": "The Stripe subscription keeping the license valid, `null` when it isn't a subscription license. The license expires when it stops being paid, includes every update, and can't be canceled during a money back guarantee."
+        "description": "The Stripe or Paddle subscription keeping the license valid, `null` when it isn't a subscription license. The license expires when it stops being paid, includes every update, and can't be canceled during a money back guarantee."
       },
       "CreateLicense": {
         "type": "object",
@@ -2943,7 +3002,7 @@
         "properties": {
           "url": {
             "type": "string",
-            "description": "Link to the Stripe customer portal, to open right away: it expires shortly.",
+            "description": "Link to the Stripe or Paddle customer portal, to open right away: it expires shortly.",
             "example": "https://billing.stripe.com/p/session/test_YWNjdF8x"
           }
         },
@@ -2957,7 +3016,7 @@
           "returnUrl": {
             "type": "string",
             "format": "uri",
-            "description": "Where the Stripe customer portal links back to: a page of the customer portal, or of one of the product's `returnDomains`. The customer portal of the product by default.",
+            "description": "Where the Stripe customer portal links back to: a page of the customer portal, or of one of the product's `returnDomains`. The customer portal of the product by default. Paddle's customer portal has no link back: ignored for Paddle customers.",
             "example": "https://example.com/account"
           }
         }
@@ -3483,7 +3542,8 @@
               "provider": {
                 "type": "string",
                 "enum": [
-                  "stripe"
+                  "stripe",
+                  "paddle"
                 ],
                 "description": "Service the integration connects to."
               }
@@ -3592,7 +3652,8 @@
           "provider": {
             "type": "string",
             "enum": [
-              "stripe"
+              "stripe",
+              "paddle"
             ]
           },
           "livemode": {
@@ -3604,7 +3665,7 @@
               "string",
               "null"
             ],
-            "description": "Name of the Stripe account, `null` when the API key can't read it.",
+            "description": "Name of the Stripe account, `null` when the API key can't read it, and for Paddle, whose API doesn't give it.",
             "example": "Acme Inc."
           },
           "apiKeyHint": {
@@ -3614,7 +3675,7 @@
           },
           "webhookUrl": {
             "type": "string",
-            "description": "URL of the webhook endpoint created on the Stripe account.",
+            "description": "URL of the webhook endpoint created on the Stripe account, or of the notification destination created on the Paddle account.",
             "example": "https://api.licensemanager.dev/v1/webhooks/stripe/i8Fz4QnRt"
           },
           "status": {
@@ -3646,27 +3707,27 @@
           },
           "autoRefund": {
             "type": "boolean",
-            "description": "Whether canceling a license bought through Stripe refunds its payment. On by default, always off when `canRefund` is false.",
+            "description": "Whether canceling a license bought through the integration refunds its payment. On by default, always off when `canRefund` is false.",
             "example": true
           },
           "canRefund": {
             "type": "boolean",
-            "description": "Whether the API key has the optional Refunds: Write permission, checked when connecting and every day. Without it, canceled licenses aren't refunded: refund their payments from Stripe.",
+            "description": "Whether the API key has the optional refund permission (Stripe: Refunds: Write, Paddle: Adjustments: Write), checked when connecting and every day. Without it, canceled licenses aren't refunded: refund their payments from the provider.",
             "example": true
           },
           "canManageSubscriptions": {
             "type": "boolean",
-            "description": "Whether the API key has the optional Subscriptions: Write permission, checked when connecting and every day. Without it, subscription licenses can't be canceled from the app: cancel their subscriptions from Stripe.",
+            "description": "Whether the API key has the optional Subscriptions: Write permission, checked when connecting and every day. Without it, subscription licenses can't be canceled from the app: cancel their subscriptions from the provider.",
             "example": true
           },
           "canBillingPortal": {
             "type": "boolean",
-            "description": "Whether the API key has the optional Customer portal: Write permission, checked when connecting and every day. Without it, the license portal doesn't link to the Stripe customer portal.",
+            "description": "Whether the API key has the optional customer portal permission (Stripe: Customer portal: Write, Paddle: Customer portal sessions: Write), checked when connecting and every day. Without it, the license portal doesn't link to the provider's customer portal.",
             "example": true
           },
           "subscriptionGraceDays": {
             "type": "integer",
-            "description": "Days a subscription license stays valid after its period ends while its renewal is unpaid, as Stripe retries the payment. 7 by default.",
+            "description": "Days a subscription license stays valid after its period ends while its renewal is unpaid, as the provider retries the payment. 7 by default.",
             "example": 7
           },
           "createdAt": {
@@ -3713,6 +3774,13 @@
             "type": "string",
             "example": "i8Fz4QnRt"
           },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "stripe",
+              "paddle"
+            ]
+          },
           "productId": {
             "type": "string",
             "example": "x7Kp2QaZ"
@@ -3721,17 +3789,31 @@
             "type": "string",
             "example": "p4Rt8LmQ"
           },
+          "externalProductId": {
+            "type": "string",
+            "description": "Id of the product in the provider: `prod_…` in Stripe, `pro_…` in Paddle.",
+            "example": "prod_NWjs8kKbJWmuuc"
+          },
+          "externalPriceId": {
+            "type": "string",
+            "description": "Id of the price in the provider: `price_…` in Stripe, `pri_…` in Paddle.",
+            "example": "price_1MoBy5LkdIwHu7ix"
+          },
           "stripeProductId": {
             "type": "string",
-            "example": "prod_NWjs8kKbJWmuuc"
+            "description": "Deprecated: use `externalProductId`, which it equals.",
+            "example": "prod_NWjs8kKbJWmuuc",
+            "deprecated": true
           },
           "stripePriceId": {
             "type": "string",
-            "example": "price_1MoBy5LkdIwHu7ix"
+            "description": "Deprecated: use `externalPriceId`, which it equals.",
+            "example": "price_1MoBy5LkdIwHu7ix",
+            "deprecated": true
           },
           "productName": {
             "type": "string",
-            "description": "Name of the Stripe product when it was mapped.",
+            "description": "Name of the provider's product when it was mapped.",
             "example": "Acme Pro"
           },
           "price": {
@@ -3786,8 +3868,11 @@
         "required": [
           "id",
           "integrationId",
+          "provider",
           "productId",
           "policyId",
+          "externalProductId",
+          "externalPriceId",
           "stripeProductId",
           "stripePriceId",
           "productName",
@@ -3928,6 +4013,195 @@
           "policyId"
         ]
       },
+      "PaddleIntegration": {
+        "type": "object",
+        "properties": {
+          "livemode": {
+            "type": "boolean",
+            "description": "Environment of the Paddle connection the product uses: live for live products, sandbox for test products."
+          },
+          "webhookUrlReachable": {
+            "type": "boolean",
+            "description": "Whether Paddle can reach the API's webhook URL. A local URL can't be: set `WEBHOOK_URL` on the server, like to a tunnel in development."
+          },
+          "requiredPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaddlePermission"
+            },
+            "description": "Permissions the API key needs, and why, the `optional` ones included. Every other permission can stay off."
+          },
+          "integration": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Integration"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The organization's Paddle connection in this environment, `null` when there's none."
+          },
+          "mappings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IntegrationMapping"
+            },
+            "description": "Paddle prices creating licenses of the product."
+          }
+        },
+        "required": [
+          "livemode",
+          "webhookUrlReachable",
+          "requiredPermissions",
+          "integration",
+          "mappings"
+        ]
+      },
+      "PaddlePermission": {
+        "type": "object",
+        "properties": {
+          "resource": {
+            "type": "string",
+            "example": "Prices"
+          },
+          "access": {
+            "type": "string",
+            "enum": [
+              "Read",
+              "Write"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "description": "Permission of the Paddle API.",
+            "example": "price.read"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Lists your prices so you can choose which ones create licenses, and checks they can still be paid."
+          },
+          "optional": {
+            "type": "boolean",
+            "description": "Whether the key can connect without it, losing what it's for, explained by `reason`.",
+            "example": false
+          },
+          "subscriptions": {
+            "type": "boolean",
+            "description": "Whether it's only needed to sell subscriptions: checked once a recurring price is mapped.",
+            "example": false
+          }
+        },
+        "required": [
+          "resource",
+          "access",
+          "scope",
+          "reason",
+          "optional",
+          "subscriptions"
+        ]
+      },
+      "ConnectPaddle": {
+        "type": "object",
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "minLength": 1,
+            "description": "API key of the Paddle Billing account (`pdl_live_apikey_…` for live products, `pdl_sdbx_apikey_…` from a sandbox account for test products), with the `requiredPermissions` of `getPaddleIntegration`. Without the optional ones, it connects with what they're for turned off.",
+            "example": "pdl_live_apikey_01gtgztp8f…"
+          }
+        },
+        "required": [
+          "apiKey"
+        ]
+      },
+      "PaddlePrice": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "pri_01gsz8x8sawmvhz1pv30nge1ke"
+          },
+          "productId": {
+            "type": "string",
+            "example": "pro_01gsz4t5hdjse780zja8vvr7jg"
+          },
+          "productName": {
+            "type": "string",
+            "example": "Acme Pro"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Name or internal description of the price in Paddle.",
+            "example": "Launch price"
+          },
+          "price": {
+            "$ref": "#/components/schemas/Price"
+          },
+          "recurring": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "interval": {
+                "type": "string",
+                "enum": [
+                  "day",
+                  "week",
+                  "month",
+                  "year"
+                ]
+              },
+              "intervalCount": {
+                "type": "integer",
+                "example": 1
+              }
+            },
+            "required": [
+              "interval",
+              "intervalCount"
+            ],
+            "description": "Billing period of a recurring price, `null` for a one-time price."
+          },
+          "mapped": {
+            "type": "boolean",
+            "description": "Whether the price already creates licenses of a product."
+          }
+        },
+        "required": [
+          "id",
+          "productId",
+          "productName",
+          "description",
+          "price",
+          "recurring",
+          "mapped"
+        ]
+      },
+      "CreatePaddleMapping": {
+        "type": "object",
+        "properties": {
+          "paddlePriceId": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Active one-time or recurring catalog price of the Paddle account.",
+            "example": "pri_01gsz8x8sawmvhz1pv30nge1ke"
+          },
+          "policyId": {
+            "type": "string",
+            "minLength": 1,
+            "example": "p4Rt8LmQ"
+          }
+        },
+        "required": [
+          "paddlePriceId",
+          "policyId"
+        ]
+      },
       "SlackIntegration": {
         "type": "object",
         "properties": {
@@ -3996,7 +4270,7 @@
                 "canceled"
               ]
             },
-            "description": "Notifications the channel gets: `purchased` (a license bought through Stripe), `renewed` (a subscription renewal paid), `payment_failed` (a subscription payment failed) and `canceled` (a license canceled, or its subscription ended)."
+            "description": "Notifications the channel gets: `purchased` (a license bought through Stripe or Paddle), `renewed` (a subscription renewal paid), `payment_failed` (a subscription payment failed) and `canceled` (a license canceled, or its subscription ended)."
           },
           "status": {
             "type": "string",
@@ -7591,7 +7865,7 @@
             }
           },
           "409": {
-            "description": "`subscription_managed`: the license is a subscription license, whose `expiresAt`, `price`, `maxVersion` and `cancellableUntil` follow its Stripe subscription",
+            "description": "`subscription_managed`: the license is a subscription license, whose `expiresAt`, `price`, `maxVersion` and `cancellableUntil` follow its Stripe or Paddle subscription",
             "content": {
               "application/json": {
                 "schema": {
@@ -7820,7 +8094,7 @@
         ],
         "operationId": "cancelLicense",
         "summary": "Cancel a license",
-        "description": "Cancels the license right away: validating its key then fails with `license_expired`, like an expired license, and its status is `canceled`. A cancellation can't be undone.\n\nCustomers can cancel their licenses until their `cancellableUntil`, the end of their money back guarantee: tokens can't cancel a license past it, or without one. API keys and sessions can cancel any license.\n\nWhen the license was bought through the Stripe integration, its payment is refunded in the background, unless the integration disables `autoRefund`, its API key lacks the optional Refunds: Write permission (`canRefund`), or `refund` is `false`: the refund is its price paid, taxes included, and its id is set as `stripeRefundId`. The customer is emailed a confirmation, and the owners and admins of the organization are told about the cancellation and its refund. In test products, the customer is only emailed when their email is a member's of the organization.\n\nA subscription license isn't refunded: its Stripe subscription is canceled at once, without proration, which needs the integration's `canManageSubscriptions`.\n\nRecords a `license.canceled` event, then a `license.refunded` or `license.refund_failed` one once the refund is done.\n\n**Token access**: customer, license tokens with the `license:cancel` permission (or the matching write one). A token reaches the license it's scoped to, or the licenses of its customer.\n\n**Required role permission**: `license:cancel` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "description": "Cancels the license right away: validating its key then fails with `license_expired`, like an expired license, and its status is `canceled`. A cancellation can't be undone.\n\nCustomers can cancel their licenses until their `cancellableUntil`, the end of their money back guarantee: tokens can't cancel a license past it, or without one. API keys and sessions can cancel any license.\n\nWhen the license was bought through the Stripe or Paddle integration, its payment is refunded in the background, unless the integration disables `autoRefund`, its API key lacks the optional refund permission (`canRefund`), or `refund` is `false`: the refund is its price paid, taxes included, and its id is set as `stripeRefundId` (Stripe) or `paddleAdjustmentId` (Paddle, which reviews it: see `paddleRefundStatus`). The customer is emailed a confirmation, and the owners and admins of the organization are told about the cancellation and its refund. In test products, the customer is only emailed when their email is a member's of the organization.\n\nA subscription license isn't refunded: its Stripe or Paddle subscription is canceled at once, without proration, which needs the integration's `canManageSubscriptions`.\n\nRecords a `license.canceled` event, then a `license.refunded` or `license.refund_failed` one once the refund is done.\n\n**Token access**: customer, license tokens with the `license:cancel` permission (or the matching write one). A token reaches the license it's scoped to, or the licenses of its customer.\n\n**Required role permission**: `license:cancel` when called with a session, granted by the member's role. API keys aren't limited by roles.",
         "security": [
           {
             "apiKey": []
@@ -7907,7 +8181,7 @@
             }
           },
           "409": {
-            "description": "`already_canceled`: the license is already canceled. `not_cancellable`: for tokens, the license has no money back guarantee, or it has ended, as subscription licenses have none. `subscription_managed`: the license is a subscription license, and the Stripe API key lacks the Subscriptions: Write permission to cancel its subscription",
+            "description": "`already_canceled`: the license is already canceled. `not_cancellable`: for tokens, the license has no money back guarantee, or it has ended, as subscription licenses have none. `subscription_managed`: the license is a subscription license, and the Stripe or Paddle API key lacks the Subscriptions: Write permission to cancel its subscription",
             "content": {
               "application/json": {
                 "schema": {
@@ -8551,7 +8825,7 @@
         ],
         "operationId": "createBillingPortalSession",
         "summary": "Open the Stripe customer portal of a customer",
-        "description": "Link to the Stripe customer portal of the customer's Stripe customer, where they manage their subscriptions: change their plan or payment method, see their invoices, cancel. Needs the Stripe integration's `canBillingPortal`, and the customer portal configured in the Stripe account's settings. The changes come back through the integration's webhook, keeping the subscription licenses in line.\n\n**Token access**: customer tokens with the `customer:billing` permission (or the matching write one). A customer token reaches its own customer.\n\n**Required role permission**: `portalLink:create` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "description": "Link to the customer portal of the customer's Stripe or Paddle customer, where they manage their subscriptions: change their plan or payment method, see their invoices, cancel. Needs the integration's `canBillingPortal`, and for Stripe, the customer portal configured in the Stripe account's settings. The changes come back through the integration's webhook, keeping the subscription licenses in line.\n\n**Token access**: customer tokens with the `customer:billing` permission (or the matching write one). A customer token reaches its own customer.\n\n**Required role permission**: `portalLink:create` when called with a session, granted by the member's role. API keys aren't limited by roles.",
         "security": [
           {
             "apiKey": []
@@ -8638,7 +8912,7 @@
             }
           },
           "409": {
-            "description": "`no_stripe_customer`: the customer didn't pay through the Stripe integration. `billing_portal_unavailable`: the Stripe integration isn't connected, or its API key lacks the Customer portal: Write permission",
+            "description": "`no_stripe_customer`: the customer didn't pay through the Stripe or Paddle integration. `billing_portal_unavailable`: the integration isn't connected, or its API key lacks the customer portal permission (Stripe: Customer portal: Write, Paddle: Customer portal sessions: Write)",
             "content": {
               "application/json": {
                 "schema": {
@@ -8668,7 +8942,7 @@
             }
           },
           "502": {
-            "description": "`provider_unavailable`: Stripe refused or couldn't be reached, like when its customer portal isn't configured",
+            "description": "`provider_unavailable`: Stripe or Paddle refused or couldn't be reached, like when the Stripe customer portal isn't configured",
             "content": {
               "application/json": {
                 "schema": {
@@ -10342,7 +10616,7 @@
             }
           },
           "502": {
-            "description": "`provider_unavailable`: Stripe couldn't be reached",
+            "description": "`provider_unavailable`: the provider (Stripe or Paddle) couldn't be reached",
             "content": {
               "application/json": {
                 "schema": {
@@ -10441,7 +10715,7 @@
             }
           },
           "502": {
-            "description": "`provider_unavailable`: Stripe couldn't be reached",
+            "description": "`provider_unavailable`: the provider (Stripe or Paddle) couldn't be reached",
             "content": {
               "application/json": {
                 "schema": {
@@ -10661,7 +10935,7 @@
             }
           },
           "502": {
-            "description": "`provider_unavailable`: Stripe couldn't be reached",
+            "description": "`provider_unavailable`: the provider (Stripe or Paddle) couldn't be reached",
             "content": {
               "application/json": {
                 "schema": {
@@ -10901,7 +11175,7 @@
             }
           },
           "502": {
-            "description": "`provider_unavailable`: Stripe couldn't be reached",
+            "description": "`provider_unavailable`: the provider (Stripe or Paddle) couldn't be reached",
             "content": {
               "application/json": {
                 "schema": {
@@ -11095,6 +11369,463 @@
           },
           "429": {
             "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/{productId}/integrations/paddle": {
+      "get": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "getPaddleIntegration",
+        "summary": "Get the Paddle integration of a product",
+        "description": "The organization connects one Paddle Billing account for its live products, and one sandbox account for its test products. Its mappings tell which Paddle prices create licenses of the product. Doesn't accept tokens: only API keys and sessions.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "x7Kp2QaZ"
+            },
+            "required": true,
+            "name": "productId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paddle integration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaddleIntegration"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: no credentials. `invalid_api_key`: the API key doesn't exist, was revoked or has expired. `invalid_token`: the token's signature is invalid, it has expired, or the resource it's scoped to was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "`plan_limit_exceeded`: the organization stayed over its plan's limits after the grace period, its API is blocked until it upgrades. `plan_limit_reached`: creating the resource would go over the plan's limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`token_not_allowed`: the endpoint doesn't accept tokens, or not of this type. `insufficient_scope`: the token lacks the permission. `no_active_organization` or `forbidden`: the session has no organization, or isn't a member of the one requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation_error`: invalid path, query or body, with the `issues`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "connectPaddle",
+        "summary": "Connect Paddle",
+        "description": "Connects the Paddle Billing account of the API key for the organization's products of the product's mode, or replaces the key of the existing connection. Checks the key works and has the required permissions, then creates a notification destination on the account, telling the app about payments. Doesn't accept tokens: only API keys and sessions.\n\n**Required role permission**: `integration:create` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "x-required-permissions": [
+          "integration:create"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "x7Kp2QaZ"
+            },
+            "required": true,
+            "name": "productId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectPaddle"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Paddle integration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaddleIntegration"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: no credentials. `invalid_api_key`: the API key doesn't exist, was revoked or has expired. `invalid_token`: the token's signature is invalid, it has expired, or the resource it's scoped to was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "`plan_limit_exceeded`: the organization stayed over its plan's limits after the grace period, its API is blocked until it upgrades. `plan_limit_reached`: creating the resource would go over the plan's limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`token_not_allowed`: the endpoint doesn't accept tokens, or not of this type. `insufficient_scope`: the token lacks the permission. `no_active_organization` or `forbidden`: the session has no organization, or isn't a member of the one requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`webhook_url_unreachable`: Paddle can't reach the server's webhook URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation_error`: invalid body. `invalid_api_key`: not a Paddle Billing API key, or Paddle rejected it. `key_mode_mismatch`: a sandbox key for a live product, or the opposite. `missing_permission`: the key lacks required permissions, listed in the message. `too_many_destinations`: the account already has the 10 active notification destinations Paddle allows",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "`provider_unavailable`: the provider (Stripe or Paddle) couldn't be reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/integrations/{id}/paddle/prices": {
+      "get": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "listPaddlePrices",
+        "summary": "List the Paddle prices of an integration",
+        "description": "Active catalog prices of active products of the Paddle account, the ones that can be mapped, up to 500. Doesn't accept tokens: only API keys and sessions.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "i8Fz4QnRt"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Prices",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PaddlePrice"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: no credentials. `invalid_api_key`: the API key doesn't exist, was revoked or has expired. `invalid_token`: the token's signature is invalid, it has expired, or the resource it's scoped to was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "`plan_limit_exceeded`: the organization stayed over its plan's limits after the grace period, its API is blocked until it upgrades. `plan_limit_reached`: creating the resource would go over the plan's limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`token_not_allowed`: the endpoint doesn't accept tokens, or not of this type. `insufficient_scope`: the token lacks the permission. `no_active_organization` or `forbidden`: the session has no organization, or isn't a member of the one requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Integration not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation_error`: invalid path, query or body, with the `issues`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "`provider_unavailable`: Paddle couldn't be reached, or refused the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/{productId}/integrations/paddle/mappings": {
+      "post": {
+        "tags": [
+          "Integrations"
+        ],
+        "operationId": "createPaddleMapping",
+        "summary": "Map a Paddle price to a policy",
+        "description": "Paying the price then creates licenses of the product with the policy: one per unit bought, or one per subscription for a recurring price. Doesn't accept tokens: only API keys and sessions.\n\n**Required role permission**: `integration:update` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "x-required-permissions": [
+          "integration:update"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "x7Kp2QaZ"
+            },
+            "required": true,
+            "name": "productId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaddleMapping"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created mapping",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationMapping"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: no credentials. `invalid_api_key`: the API key doesn't exist, was revoked or has expired. `invalid_token`: the token's signature is invalid, it has expired, or the resource it's scoped to was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "`plan_limit_exceeded`: the organization stayed over its plan's limits after the grace period, its API is blocked until it upgrades. `plan_limit_reached`: creating the resource would go over the plan's limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`token_not_allowed`: the endpoint doesn't accept tokens, or not of this type. `insufficient_scope`: the token lacks the permission. `no_active_organization` or `forbidden`: the session has no organization, or isn't a member of the one requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`not_found`: product not found. `policy_not_found`: the product has no policy with this `policyId`. `price_not_found`: the Paddle account has no price with this `paddlePriceId`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`not_connected`: Paddle isn't connected in the product's mode. `price_mapped`: the price already creates licenses of a product",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation_error`: invalid body. `price_unusable`: the price or its product is archived, or it's a custom (non-catalog) price. `missing_permission`: a recurring price, while the API key lacks the Subscriptions: Read permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "`provider_unavailable`: the provider (Stripe or Paddle) couldn't be reached",
             "content": {
               "application/json": {
                 "schema": {

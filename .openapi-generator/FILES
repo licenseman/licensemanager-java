@@ -11,11 +11,13 @@ docs/CancelLicense.md
 docs/CancellationReason.md
 docs/CancellationStats.md
 docs/CancellationStatsByReasonInner.md
+docs/ConnectPaddle.md
 docs/ConnectStripe.md
 docs/CreateBillingPortalSession.md
 docs/CreateCustomer.md
 docs/CreateIntegrationMapping.md
 docs/CreateLicense.md
+docs/CreatePaddleMapping.md
 docs/CreatePolicy.md
 docs/CreatePortalLink.md
 docs/CreateProduct.md
@@ -58,6 +60,7 @@ docs/LicenseStatus.md
 docs/LicenseSubscription.md
 docs/LicenseToken.md
 docs/LicensesApi.md
+docs/ListPaddlePrices200Response.md
 docs/ListPolicyEventsTypeParameter.md
 docs/ListStripePrices200Response.md
 docs/LockMaxVersion.md
@@ -71,6 +74,9 @@ docs/MachinesApi.md
 docs/Mrr.md
 docs/MrrByIntervalInner.md
 docs/MrrByPolicyInner.md
+docs/PaddleIntegration.md
+docs/PaddlePermission.md
+docs/PaddlePrice.md
 docs/Pagination.md
 docs/PoliciesApi.md
 docs/Policy.md
@@ -169,11 +175,13 @@ src/main/java/dev/licensemanager/model/CancelLicense.java
 src/main/java/dev/licensemanager/model/CancellationReason.java
 src/main/java/dev/licensemanager/model/CancellationStats.java
 src/main/java/dev/licensemanager/model/CancellationStatsByReasonInner.java
+src/main/java/dev/licensemanager/model/ConnectPaddle.java
 src/main/java/dev/licensemanager/model/ConnectStripe.java
 src/main/java/dev/licensemanager/model/CreateBillingPortalSession.java
 src/main/java/dev/licensemanager/model/CreateCustomer.java
 src/main/java/dev/licensemanager/model/CreateIntegrationMapping.java
 src/main/java/dev/licensemanager/model/CreateLicense.java
+src/main/java/dev/licensemanager/model/CreatePaddleMapping.java
 src/main/java/dev/licensemanager/model/CreatePolicy.java
 src/main/java/dev/licensemanager/model/CreatePortalLink.java
 src/main/java/dev/licensemanager/model/CreateProduct.java
@@ -212,6 +220,7 @@ src/main/java/dev/licensemanager/model/LicenseStatsActivationsByVersionInner.jav
 src/main/java/dev/licensemanager/model/LicenseStatus.java
 src/main/java/dev/licensemanager/model/LicenseSubscription.java
 src/main/java/dev/licensemanager/model/LicenseToken.java
+src/main/java/dev/licensemanager/model/ListPaddlePrices200Response.java
 src/main/java/dev/licensemanager/model/ListPolicyEventsTypeParameter.java
 src/main/java/dev/licensemanager/model/ListStripePrices200Response.java
 src/main/java/dev/licensemanager/model/LockMaxVersion.java
@@ -224,6 +233,9 @@ src/main/java/dev/licensemanager/model/MachineList.java
 src/main/java/dev/licensemanager/model/Mrr.java
 src/main/java/dev/licensemanager/model/MrrByIntervalInner.java
 src/main/java/dev/licensemanager/model/MrrByPolicyInner.java
+src/main/java/dev/licensemanager/model/PaddleIntegration.java
+src/main/java/dev/licensemanager/model/PaddlePermission.java
+src/main/java/dev/licensemanager/model/PaddlePrice.java
 src/main/java/dev/licensemanager/model/Pagination.java
 src/main/java/dev/licensemanager/model/Policy.java
 src/main/java/dev/licensemanager/model/PolicyDuration.java
@@ -290,11 +302,13 @@ src/test/java/dev/licensemanager/model/CancelLicenseTest.java
 src/test/java/dev/licensemanager/model/CancellationReasonTest.java
 src/test/java/dev/licensemanager/model/CancellationStatsByReasonInnerTest.java
 src/test/java/dev/licensemanager/model/CancellationStatsTest.java
+src/test/java/dev/licensemanager/model/ConnectPaddleTest.java
 src/test/java/dev/licensemanager/model/ConnectStripeTest.java
 src/test/java/dev/licensemanager/model/CreateBillingPortalSessionTest.java
 src/test/java/dev/licensemanager/model/CreateCustomerTest.java
 src/test/java/dev/licensemanager/model/CreateIntegrationMappingTest.java
 src/test/java/dev/licensemanager/model/CreateLicenseTest.java
+src/test/java/dev/licensemanager/model/CreatePaddleMappingTest.java
 src/test/java/dev/licensemanager/model/CreatePolicyTest.java
 src/test/java/dev/licensemanager/model/CreatePortalLinkTest.java
 src/test/java/dev/licensemanager/model/CreateProductTest.java
@@ -333,6 +347,7 @@ src/test/java/dev/licensemanager/model/LicenseStatusTest.java
 src/test/java/dev/licensemanager/model/LicenseSubscriptionTest.java
 src/test/java/dev/licensemanager/model/LicenseTest.java
 src/test/java/dev/licensemanager/model/LicenseTokenTest.java
+src/test/java/dev/licensemanager/model/ListPaddlePrices200ResponseTest.java
 src/test/java/dev/licensemanager/model/ListPolicyEventsTypeParameterTest.java
 src/test/java/dev/licensemanager/model/ListStripePrices200ResponseTest.java
 src/test/java/dev/licensemanager/model/LockMaxVersionMajorAfterOneOf1Test.java
@@ -345,6 +360,9 @@ src/test/java/dev/licensemanager/model/MachineTest.java
 src/test/java/dev/licensemanager/model/MrrByIntervalInnerTest.java
 src/test/java/dev/licensemanager/model/MrrByPolicyInnerTest.java
 src/test/java/dev/licensemanager/model/MrrTest.java
+src/test/java/dev/licensemanager/model/PaddleIntegrationTest.java
+src/test/java/dev/licensemanager/model/PaddlePermissionTest.java
+src/test/java/dev/licensemanager/model/PaddlePriceTest.java
 src/test/java/dev/licensemanager/model/PaginationTest.java
 src/test/java/dev/licensemanager/model/PolicyDurationTest.java
 src/test/java/dev/licensemanager/model/PolicyListTest.java

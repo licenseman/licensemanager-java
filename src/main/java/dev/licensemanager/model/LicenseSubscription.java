@@ -49,11 +49,76 @@ import java.util.Set;
 import dev.licensemanager.JSON;
 
 /**
- * The Stripe subscription keeping the license valid, &#x60;null&#x60; when it isn&#39;t a subscription license. The license expires when it stops being paid, includes every update, and can&#39;t be canceled during a money back guarantee.
+ * The Stripe or Paddle subscription keeping the license valid, &#x60;null&#x60; when it isn&#39;t a subscription license. The license expires when it stops being paid, includes every update, and can&#39;t be canceled during a money back guarantee.
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class LicenseSubscription {
+  /**
+   * Provider of the subscription.
+   */
+  @JsonAdapter(ProviderEnum.Adapter.class)
+  public enum ProviderEnum {
+    STRIPE("stripe"),
+    
+    PADDLE("paddle"),
+    
+    UNKNOWN_DEFAULT_OPEN_API("unknown_default_open_api");
+
+    private String value;
+
+    ProviderEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static ProviderEnum fromValue(String value) {
+      for (ProviderEnum b : ProviderEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      return UNKNOWN_DEFAULT_OPEN_API;
+    }
+
+    public static class Adapter extends TypeAdapter<ProviderEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final ProviderEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public ProviderEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return ProviderEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      ProviderEnum.fromValue(value);
+    }
+  }
+
+  public static final String SERIALIZED_NAME_PROVIDER = "provider";
+  @SerializedName(SERIALIZED_NAME_PROVIDER)
+  @javax.annotation.Nonnull
+  private ProviderEnum provider;
+
+  public static final String SERIALIZED_NAME_EXTERNAL_ID = "externalId";
+  @SerializedName(SERIALIZED_NAME_EXTERNAL_ID)
+  @javax.annotation.Nonnull
+  private String externalId;
+
   public static final String SERIALIZED_NAME_STRIPE_SUBSCRIPTION_ID = "stripeSubscriptionId";
+  @Deprecated
   @SerializedName(SERIALIZED_NAME_STRIPE_SUBSCRIPTION_ID)
   @javax.annotation.Nonnull
   private String stripeSubscriptionId;
@@ -159,20 +224,62 @@ public class LicenseSubscription {
   public LicenseSubscription() {
   }
 
+  public LicenseSubscription provider(@javax.annotation.Nonnull ProviderEnum provider) {
+    this.provider = provider;
+    return this;
+  }
+
+  /**
+   * Provider of the subscription.
+   * @return provider
+   */
+  @javax.annotation.Nonnull
+  public ProviderEnum getProvider() {
+    return provider;
+  }
+
+  public void setProvider(@javax.annotation.Nonnull ProviderEnum provider) {
+    this.provider = provider;
+  }
+
+
+  public LicenseSubscription externalId(@javax.annotation.Nonnull String externalId) {
+    this.externalId = externalId;
+    return this;
+  }
+
+  /**
+   * Id of the subscription in the provider: &#x60;sub_…&#x60; in Stripe and in Paddle.
+   * @return externalId
+   */
+  @javax.annotation.Nonnull
+  public String getExternalId() {
+    return externalId;
+  }
+
+  public void setExternalId(@javax.annotation.Nonnull String externalId) {
+    this.externalId = externalId;
+  }
+
+
+  @Deprecated
   public LicenseSubscription stripeSubscriptionId(@javax.annotation.Nonnull String stripeSubscriptionId) {
     this.stripeSubscriptionId = stripeSubscriptionId;
     return this;
   }
 
   /**
-   * Get stripeSubscriptionId
+   * Deprecated: use &#x60;externalId&#x60;, which it equals.
    * @return stripeSubscriptionId
+   * @deprecated
    */
+  @Deprecated
   @javax.annotation.Nonnull
   public String getStripeSubscriptionId() {
     return stripeSubscriptionId;
   }
 
+  @Deprecated
   public void setStripeSubscriptionId(@javax.annotation.Nonnull String stripeSubscriptionId) {
     this.stripeSubscriptionId = stripeSubscriptionId;
   }
@@ -184,7 +291,7 @@ public class LicenseSubscription {
   }
 
   /**
-   * Status of the subscription in Stripe: &#x60;active&#x60;, &#x60;trialing&#x60;, &#x60;past_due&#x60; while a failed payment is retried, &#x60;canceled&#x60;, &#x60;unpaid&#x60;, &#x60;paused&#x60;, &#x60;incomplete&#x60; or &#x60;incomplete_expired&#x60;.
+   * Status of the subscription in the provider. Stripe: &#x60;active&#x60;, &#x60;trialing&#x60;, &#x60;past_due&#x60; while a failed payment is retried, &#x60;canceled&#x60;, &#x60;unpaid&#x60;, &#x60;paused&#x60;, &#x60;incomplete&#x60; or &#x60;incomplete_expired&#x60;. Paddle: &#x60;active&#x60;, &#x60;trialing&#x60;, &#x60;past_due&#x60;, &#x60;paused&#x60; or &#x60;canceled&#x60;.
    * @return status
    */
   @javax.annotation.Nonnull
@@ -384,7 +491,9 @@ public class LicenseSubscription {
       return false;
     }
     LicenseSubscription licenseSubscription = (LicenseSubscription) o;
-    return Objects.equals(this.stripeSubscriptionId, licenseSubscription.stripeSubscriptionId) &&
+    return Objects.equals(this.provider, licenseSubscription.provider) &&
+        Objects.equals(this.externalId, licenseSubscription.externalId) &&
+        Objects.equals(this.stripeSubscriptionId, licenseSubscription.stripeSubscriptionId) &&
         Objects.equals(this.status, licenseSubscription.status) &&
         Objects.equals(this.interval, licenseSubscription.interval) &&
         Objects.equals(this.intervalCount, licenseSubscription.intervalCount) &&
@@ -398,13 +507,15 @@ public class LicenseSubscription {
 
   @Override
   public int hashCode() {
-    return Objects.hash(stripeSubscriptionId, status, interval, intervalCount, quantity, price, currentPeriodEnd, cancelAtPeriodEnd, endedAt, additionalProperties);
+    return Objects.hash(provider, externalId, stripeSubscriptionId, status, interval, intervalCount, quantity, price, currentPeriodEnd, cancelAtPeriodEnd, endedAt, additionalProperties);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class LicenseSubscription {\n");
+    sb.append("    provider: ").append(toIndentedString(provider)).append("\n");
+    sb.append("    externalId: ").append(toIndentedString(externalId)).append("\n");
     sb.append("    stripeSubscriptionId: ").append(toIndentedString(stripeSubscriptionId)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    interval: ").append(toIndentedString(interval)).append("\n");
@@ -433,10 +544,10 @@ public class LicenseSubscription {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("stripeSubscriptionId", "status", "interval", "intervalCount", "quantity", "price", "currentPeriodEnd", "cancelAtPeriodEnd", "endedAt"));
+    openapiFields = new HashSet<String>(Arrays.asList("provider", "externalId", "stripeSubscriptionId", "status", "interval", "intervalCount", "quantity", "price", "currentPeriodEnd", "cancelAtPeriodEnd", "endedAt"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("stripeSubscriptionId", "status", "interval", "intervalCount", "quantity", "price", "currentPeriodEnd", "cancelAtPeriodEnd", "endedAt"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("provider", "externalId", "stripeSubscriptionId", "status", "interval", "intervalCount", "quantity", "price", "currentPeriodEnd", "cancelAtPeriodEnd", "endedAt"));
   }
 
   /**
@@ -459,6 +570,14 @@ public class LicenseSubscription {
         }
       }
         JsonObject jsonObj = jsonElement.getAsJsonObject();
+      if (!jsonObj.get("provider").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `provider` to be a primitive type in the JSON string but got `%s`", jsonObj.get("provider").toString()));
+      }
+      // validate the required field `provider`
+      ProviderEnum.validateJsonElement(jsonObj.get("provider"));
+      if (!jsonObj.get("externalId").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `externalId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("externalId").toString()));
+      }
       if (!jsonObj.get("stripeSubscriptionId").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `stripeSubscriptionId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("stripeSubscriptionId").toString()));
       }

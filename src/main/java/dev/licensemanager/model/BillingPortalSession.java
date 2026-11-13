@@ -65,7 +65,7 @@ public class BillingPortalSession {
   }
 
   /**
-   * Link to the Stripe customer portal, to open right away: it expires shortly.
+   * Link to the Stripe or Paddle customer portal, to open right away: it expires shortly.
    * @return url
    */
   @javax.annotation.Nonnull

@@ -1,5 +1,83 @@
 # Changelog
 
+## 0.4.0 (2026-11-13)
+
+### Breaking changes
+
+- `PATCH /v1/integrations/{id}`: added the new `paddle` enum value to the `provider` response property for the response status `200`
+- `POST /v1/integrations/{id}/check`: added the new `paddle` enum value to the `provider` response property for the response status `200`
+- `GET /v1/licenses/{id}/events`: added the new `paddle` enum value to the `data/items/actor/oneOf[subschema #5]/provider` response property for the response status `200`
+- `GET /v1/policies/{id}/events`: added the new `paddle` enum value to the `data/items/actor/oneOf[subschema #5]/provider` response property for the response status `200`
+- `GET /v1/products/{productId}/integrations/stripe`: added the new `paddle` enum value to the `integration/anyOf[#/components/schemas/Integration]/provider` response property for the response status `200`
+- `PUT /v1/products/{productId}/integrations/stripe`: added the new `paddle` enum value to the `integration/anyOf[#/components/schemas/Integration]/provider` response property for the response status `200`
+
+### Changes
+
+- `GET /v1/customers/{customerId}/licenses`: response property `data/items/subscription/stripeSubscriptionId` deprecated
+- `GET /v1/customers/{customerId}/licenses`: added the required property `data/items/paddleAdjustmentId` to the response with the `200` status
+- `GET /v1/customers/{customerId}/licenses`: added the required property `data/items/paddleRefundStatus` to the response with the `200` status
+- `GET /v1/customers/{customerId}/licenses`: added the required property `data/items/paddleTransactionId` to the response with the `200` status
+- `GET /v1/customers/{customerId}/licenses`: added the required property `data/items/subscription/externalId` to the response with the `200` status
+- `GET /v1/customers/{customerId}/licenses`: added the required property `data/items/subscription/provider` to the response with the `200` status
+- `GET /v1/customers/{id}`: added the required property `paddleCustomerId` to the response with the `200` status
+- `PATCH /v1/customers/{id}`: added the required property `paddleCustomerId` to the response with the `200` status
+- `PATCH /v1/integration-mappings/{id}`: response property `stripePriceId` deprecated
+- `PATCH /v1/integration-mappings/{id}`: response property `stripeProductId` deprecated
+- `PATCH /v1/integration-mappings/{id}`: added the required property `externalPriceId` to the response with the `200` status
+- `PATCH /v1/integration-mappings/{id}`: added the required property `externalProductId` to the response with the `200` status
+- `PATCH /v1/integration-mappings/{id}`: added the required property `provider` to the response with the `200` status
+- `GET /v1/integrations/{id}/paddle/prices`: endpoint added
+- `GET /v1/licenses/{id}`: response property `subscription/stripeSubscriptionId` deprecated
+- `GET /v1/licenses/{id}`: added the required property `paddleAdjustmentId` to the response with the `200` status
+- `GET /v1/licenses/{id}`: added the required property `paddleRefundStatus` to the response with the `200` status
+- `GET /v1/licenses/{id}`: added the required property `paddleTransactionId` to the response with the `200` status
+- `GET /v1/licenses/{id}`: added the required property `subscription/externalId` to the response with the `200` status
+- `GET /v1/licenses/{id}`: added the required property `subscription/provider` to the response with the `200` status
+- `PATCH /v1/licenses/{id}`: response property `subscription/stripeSubscriptionId` deprecated
+- `PATCH /v1/licenses/{id}`: added the required property `paddleAdjustmentId` to the response with the `200` status
+- `PATCH /v1/licenses/{id}`: added the required property `paddleRefundStatus` to the response with the `200` status
+- `PATCH /v1/licenses/{id}`: added the required property `paddleTransactionId` to the response with the `200` status
+- `PATCH /v1/licenses/{id}`: added the required property `subscription/externalId` to the response with the `200` status
+- `PATCH /v1/licenses/{id}`: added the required property `subscription/provider` to the response with the `200` status
+- `POST /v1/licenses/{id}/cancel`: response property `subscription/stripeSubscriptionId` deprecated
+- `POST /v1/licenses/{id}/cancel`: added the required property `paddleAdjustmentId` to the response with the `200` status
+- `POST /v1/licenses/{id}/cancel`: added the required property `paddleRefundStatus` to the response with the `200` status
+- `POST /v1/licenses/{id}/cancel`: added the required property `paddleTransactionId` to the response with the `200` status
+- `POST /v1/licenses/{id}/cancel`: added the required property `subscription/externalId` to the response with the `200` status
+- `POST /v1/licenses/{id}/cancel`: added the required property `subscription/provider` to the response with the `200` status
+- `GET /v1/products/{productId}/customers`: added the required property `data/items/paddleCustomerId` to the response with the `200` status
+- `POST /v1/products/{productId}/customers`: added the required property `paddleCustomerId` to the response with the `201` status
+- `GET /v1/products/{productId}/integrations/paddle`: endpoint added
+- `PUT /v1/products/{productId}/integrations/paddle`: endpoint added
+- `POST /v1/products/{productId}/integrations/paddle/mappings`: endpoint added
+- `GET /v1/products/{productId}/integrations/stripe`: response property `mappings/items/stripePriceId` deprecated
+- `GET /v1/products/{productId}/integrations/stripe`: response property `mappings/items/stripeProductId` deprecated
+- `GET /v1/products/{productId}/integrations/stripe`: added the required property `mappings/items/externalPriceId` to the response with the `200` status
+- `GET /v1/products/{productId}/integrations/stripe`: added the required property `mappings/items/externalProductId` to the response with the `200` status
+- `GET /v1/products/{productId}/integrations/stripe`: added the required property `mappings/items/provider` to the response with the `200` status
+- `PUT /v1/products/{productId}/integrations/stripe`: response property `mappings/items/stripePriceId` deprecated
+- `PUT /v1/products/{productId}/integrations/stripe`: response property `mappings/items/stripeProductId` deprecated
+- `PUT /v1/products/{productId}/integrations/stripe`: added the required property `mappings/items/externalPriceId` to the response with the `200` status
+- `PUT /v1/products/{productId}/integrations/stripe`: added the required property `mappings/items/externalProductId` to the response with the `200` status
+- `PUT /v1/products/{productId}/integrations/stripe`: added the required property `mappings/items/provider` to the response with the `200` status
+- `POST /v1/products/{productId}/integrations/stripe/mappings`: response property `stripePriceId` deprecated
+- `POST /v1/products/{productId}/integrations/stripe/mappings`: response property `stripeProductId` deprecated
+- `POST /v1/products/{productId}/integrations/stripe/mappings`: added the required property `externalPriceId` to the response with the `201` status
+- `POST /v1/products/{productId}/integrations/stripe/mappings`: added the required property `externalProductId` to the response with the `201` status
+- `POST /v1/products/{productId}/integrations/stripe/mappings`: added the required property `provider` to the response with the `201` status
+- `GET /v1/products/{productId}/licenses`: response property `data/items/subscription/stripeSubscriptionId` deprecated
+- `GET /v1/products/{productId}/licenses`: added the required property `data/items/paddleAdjustmentId` to the response with the `200` status
+- `GET /v1/products/{productId}/licenses`: added the required property `data/items/paddleRefundStatus` to the response with the `200` status
+- `GET /v1/products/{productId}/licenses`: added the required property `data/items/paddleTransactionId` to the response with the `200` status
+- `GET /v1/products/{productId}/licenses`: added the required property `data/items/subscription/externalId` to the response with the `200` status
+- `GET /v1/products/{productId}/licenses`: added the required property `data/items/subscription/provider` to the response with the `200` status
+- `POST /v1/products/{productId}/licenses`: response property `subscription/stripeSubscriptionId` deprecated
+- `POST /v1/products/{productId}/licenses`: added the required property `paddleAdjustmentId` to the response with the `201` status
+- `POST /v1/products/{productId}/licenses`: added the required property `paddleRefundStatus` to the response with the `201` status
+- `POST /v1/products/{productId}/licenses`: added the required property `paddleTransactionId` to the response with the `201` status
+- `POST /v1/products/{productId}/licenses`: added the required property `subscription/externalId` to the response with the `201` status
+- `POST /v1/products/{productId}/licenses`: added the required property `subscription/provider` to the response with the `201` status
+
 ## 0.3.1 (2026-11-11)
 
 ### Changes

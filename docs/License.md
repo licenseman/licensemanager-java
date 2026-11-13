@@ -17,6 +17,7 @@
 |**expiresAt** | **OffsetDateTime** | &#x60;null&#x60; when the license never expires. |  |
 |**meta** | **Map&lt;String, Object&gt;** | Free-form JSON object. |  |
 |**stripePaymentIntentId** | **String** | Id of the Stripe payment intent that paid the license, when it was bought through the Stripe integration. &#x60;null&#x60; otherwise, or when nothing was paid. |  |
+|**paddleTransactionId** | **String** | Id of the Paddle transaction that paid the license, when it was bought through the Paddle integration. &#x60;null&#x60; otherwise. |  |
 |**maxMachines** | **Integer** | Maximum number of active machines the license can be used on. &#x60;null&#x60; when there&#39;s no limit. Can be lower than &#x60;activeMachineCount&#x60; after it was lowered: machines aren&#39;t deactivated to match it. |  |
 |**maxOfflineDurationSeconds** | **Integer** | Longest the applications can run offline with the license: the license tokens returned by &#x60;validateKey&#x60; expire this long after they&#39;re issued, unless the license expires sooner. |  |
 |**activeMachineCount** | **Integer** | Number of active machines the license is used on. |  |
@@ -30,7 +31,20 @@
 |**subscription** | [**LicenseSubscription**](LicenseSubscription.md) |  |  |
 |**cancellationComment** | **String** | Comment given when the license was canceled. &#x60;null&#x60; when there&#39;s none. |  |
 |**stripeRefundId** | **String** | Id of the Stripe refund of the license&#39;s payment once it was canceled, through the Stripe integration. &#x60;null&#x60; otherwise. |  |
+|**paddleAdjustmentId** | **String** | Id of the Paddle refund adjustment of the license&#39;s transaction once it was canceled, through the Paddle integration. &#x60;null&#x60; otherwise. |  |
+|**paddleRefundStatus** | [**PaddleRefundStatusEnum**](#PaddleRefundStatusEnum) | Outcome of the Paddle refund: &#x60;pending_approval&#x60; while Paddle reviews it, then &#x60;approved&#x60; or &#x60;rejected&#x60;. &#x60;null&#x60; without a Paddle refund. |  |
 |**updatedAt** | **OffsetDateTime** | Last time the license&#39;s settings were edited, not when its key was validated. |  |
+
+
+
+## Enum: PaddleRefundStatusEnum
+
+| Name | Value |
+|---- | -----|
+| PENDING_APPROVAL | &quot;pending_approval&quot; |
+| APPROVED | &quot;approved&quot; |
+| REJECTED | &quot;rejected&quot; |
+| UNKNOWN_DEFAULT_OPEN_API | &quot;unknown_default_open_api&quot; |
 
 
 

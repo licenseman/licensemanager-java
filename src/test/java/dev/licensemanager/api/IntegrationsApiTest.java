@@ -14,12 +14,16 @@
 package dev.licensemanager.api;
 
 import dev.licensemanager.ApiException;
+import dev.licensemanager.model.ConnectPaddle;
 import dev.licensemanager.model.ConnectStripe;
 import dev.licensemanager.model.CreateIntegrationMapping;
+import dev.licensemanager.model.CreatePaddleMapping;
 import dev.licensemanager.model.Error;
 import dev.licensemanager.model.Integration;
 import dev.licensemanager.model.IntegrationMapping;
+import dev.licensemanager.model.ListPaddlePrices200Response;
 import dev.licensemanager.model.ListStripePrices200Response;
+import dev.licensemanager.model.PaddleIntegration;
 import dev.licensemanager.model.SlackAuthorize;
 import dev.licensemanager.model.SlackConnection;
 import dev.licensemanager.model.SlackIntegration;
@@ -74,6 +78,22 @@ public class IntegrationsApiTest {
     }
 
     /**
+     * Connect Paddle
+     *
+     * Connects the Paddle Billing account of the API key for the organization&#39;s products of the product&#39;s mode, or replaces the key of the existing connection. Checks the key works and has the required permissions, then creates a notification destination on the account, telling the app about payments. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:create&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     *
+     * @throws ApiException if the Api call fails
+     */
+    @Test
+    public void connectPaddleTest() throws ApiException {
+        String productId = null;
+        ConnectPaddle connectPaddle = null;
+        PaddleIntegration response = api.connectPaddle(productId, connectPaddle)
+                .execute();
+        // TODO: test validations
+    }
+
+    /**
      * Connect Stripe
      *
      * Connects the Stripe account of the API key for the organization&#39;s products of the product&#39;s mode, or replaces the key of the existing connection. Checks the key works and has the required permissions, then creates a webhook endpoint on the account, telling the app about payments. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:create&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
@@ -85,6 +105,22 @@ public class IntegrationsApiTest {
         String productId = null;
         ConnectStripe connectStripe = null;
         StripeIntegration response = api.connectStripe(productId, connectStripe)
+                .execute();
+        // TODO: test validations
+    }
+
+    /**
+     * Map a Paddle price to a policy
+     *
+     * Paying the price then creates licenses of the product with the policy: one per unit bought, or one per subscription for a recurring price. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:update&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     *
+     * @throws ApiException if the Api call fails
+     */
+    @Test
+    public void createPaddleMappingTest() throws ApiException {
+        String productId = null;
+        CreatePaddleMapping createPaddleMapping = null;
+        IntegrationMapping response = api.createPaddleMapping(productId, createPaddleMapping)
                 .execute();
         // TODO: test validations
     }
@@ -151,6 +187,21 @@ public class IntegrationsApiTest {
     }
 
     /**
+     * Get the Paddle integration of a product
+     *
+     * The organization connects one Paddle Billing account for its live products, and one sandbox account for its test products. Its mappings tell which Paddle prices create licenses of the product. Doesn&#39;t accept tokens: only API keys and sessions.
+     *
+     * @throws ApiException if the Api call fails
+     */
+    @Test
+    public void getPaddleIntegrationTest() throws ApiException {
+        String productId = null;
+        PaddleIntegration response = api.getPaddleIntegration(productId)
+                .execute();
+        // TODO: test validations
+    }
+
+    /**
      * Get the Slack integration of a product
      *
      * Slack channels getting notifications about the product&#39;s licenses: purchases, renewals, failed payments and cancellations. Doesn&#39;t accept tokens: only API keys and sessions.
@@ -176,6 +227,21 @@ public class IntegrationsApiTest {
     public void getStripeIntegrationTest() throws ApiException {
         String productId = null;
         StripeIntegration response = api.getStripeIntegration(productId)
+                .execute();
+        // TODO: test validations
+    }
+
+    /**
+     * List the Paddle prices of an integration
+     *
+     * Active catalog prices of active products of the Paddle account, the ones that can be mapped, up to 500. Doesn&#39;t accept tokens: only API keys and sessions.
+     *
+     * @throws ApiException if the Api call fails
+     */
+    @Test
+    public void listPaddlePricesTest() throws ApiException {
+        String id = null;
+        ListPaddlePrices200Response response = api.listPaddlePrices(id)
                 .execute();
         // TODO: test validations
     }

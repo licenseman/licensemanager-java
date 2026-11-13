@@ -87,6 +87,14 @@ public class CustomerTest {
     }
 
     /**
+     * Test the property 'paddleCustomerId'
+     */
+    @Test
+    public void paddleCustomerIdTest() {
+        // TODO: test paddleCustomerId
+    }
+
+    /**
      * Test the property 'createdAt'
      */
     @Test

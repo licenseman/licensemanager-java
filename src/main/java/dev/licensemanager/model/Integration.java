@@ -65,6 +65,8 @@ public class Integration {
   public enum ProviderEnum {
     STRIPE("stripe"),
     
+    PADDLE("paddle"),
+    
     UNKNOWN_DEFAULT_OPEN_API("unknown_default_open_api");
 
     private String value;
@@ -251,7 +253,7 @@ public class Integration {
   }
 
   /**
-   * Name of the Stripe account, &#x60;null&#x60; when the API key can&#39;t read it.
+   * Name of the Stripe account, &#x60;null&#x60; when the API key can&#39;t read it, and for Paddle, whose API doesn&#39;t give it.
    * @return accountName
    */
   @javax.annotation.Nullable
@@ -289,7 +291,7 @@ public class Integration {
   }
 
   /**
-   * URL of the webhook endpoint created on the Stripe account.
+   * URL of the webhook endpoint created on the Stripe account, or of the notification destination created on the Paddle account.
    * @return webhookUrl
    */
   @javax.annotation.Nonnull
@@ -384,7 +386,7 @@ public class Integration {
   }
 
   /**
-   * Whether canceling a license bought through Stripe refunds its payment. On by default, always off when &#x60;canRefund&#x60; is false.
+   * Whether canceling a license bought through the integration refunds its payment. On by default, always off when &#x60;canRefund&#x60; is false.
    * @return autoRefund
    */
   @javax.annotation.Nonnull
@@ -403,7 +405,7 @@ public class Integration {
   }
 
   /**
-   * Whether the API key has the optional Refunds: Write permission, checked when connecting and every day. Without it, canceled licenses aren&#39;t refunded: refund their payments from Stripe.
+   * Whether the API key has the optional refund permission (Stripe: Refunds: Write, Paddle: Adjustments: Write), checked when connecting and every day. Without it, canceled licenses aren&#39;t refunded: refund their payments from the provider.
    * @return canRefund
    */
   @javax.annotation.Nonnull
@@ -422,7 +424,7 @@ public class Integration {
   }
 
   /**
-   * Whether the API key has the optional Subscriptions: Write permission, checked when connecting and every day. Without it, subscription licenses can&#39;t be canceled from the app: cancel their subscriptions from Stripe.
+   * Whether the API key has the optional Subscriptions: Write permission, checked when connecting and every day. Without it, subscription licenses can&#39;t be canceled from the app: cancel their subscriptions from the provider.
    * @return canManageSubscriptions
    */
   @javax.annotation.Nonnull
@@ -441,7 +443,7 @@ public class Integration {
   }
 
   /**
-   * Whether the API key has the optional Customer portal: Write permission, checked when connecting and every day. Without it, the license portal doesn&#39;t link to the Stripe customer portal.
+   * Whether the API key has the optional customer portal permission (Stripe: Customer portal: Write, Paddle: Customer portal sessions: Write), checked when connecting and every day. Without it, the license portal doesn&#39;t link to the provider&#39;s customer portal.
    * @return canBillingPortal
    */
   @javax.annotation.Nonnull
@@ -460,7 +462,7 @@ public class Integration {
   }
 
   /**
-   * Days a subscription license stays valid after its period ends while its renewal is unpaid, as Stripe retries the payment. 7 by default.
+   * Days a subscription license stays valid after its period ends while its renewal is unpaid, as the provider retries the payment. 7 by default.
    * @return subscriptionGraceDays
    */
   @javax.annotation.Nonnull

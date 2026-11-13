@@ -57,6 +57,14 @@ public class IntegrationMappingTest {
     }
 
     /**
+     * Test the property 'provider'
+     */
+    @Test
+    public void providerTest() {
+        // TODO: test provider
+    }
+
+    /**
      * Test the property 'productId'
      */
     @Test
@@ -70,6 +78,22 @@ public class IntegrationMappingTest {
     @Test
     public void policyIdTest() {
         // TODO: test policyId
+    }
+
+    /**
+     * Test the property 'externalProductId'
+     */
+    @Test
+    public void externalProductIdTest() {
+        // TODO: test externalProductId
+    }
+
+    /**
+     * Test the property 'externalPriceId'
+     */
+    @Test
+    public void externalPriceIdTest() {
+        // TODO: test externalPriceId
     }
 
     /**

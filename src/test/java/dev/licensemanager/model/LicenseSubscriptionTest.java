@@ -40,6 +40,22 @@ public class LicenseSubscriptionTest {
     }
 
     /**
+     * Test the property 'provider'
+     */
+    @Test
+    public void providerTest() {
+        // TODO: test provider
+    }
+
+    /**
+     * Test the property 'externalId'
+     */
+    @Test
+    public void externalIdTest() {
+        // TODO: test externalId
+    }
+
+    /**
      * Test the property 'stripeSubscriptionId'
      */
     @Test

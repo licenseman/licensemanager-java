@@ -120,6 +120,8 @@ public class EventActorOneOf4 {
   public enum ProviderEnum {
     STRIPE("stripe"),
     
+    PADDLE("paddle"),
+    
     UNKNOWN_DEFAULT_OPEN_API("unknown_default_open_api");
 
     private String value;

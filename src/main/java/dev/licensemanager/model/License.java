@@ -110,6 +110,11 @@ public class License {
   @javax.annotation.Nullable
   private String stripePaymentIntentId;
 
+  public static final String SERIALIZED_NAME_PADDLE_TRANSACTION_ID = "paddleTransactionId";
+  @SerializedName(SERIALIZED_NAME_PADDLE_TRANSACTION_ID)
+  @javax.annotation.Nullable
+  private String paddleTransactionId;
+
   public static final String SERIALIZED_NAME_MAX_MACHINES = "maxMachines";
   @SerializedName(SERIALIZED_NAME_MAX_MACHINES)
   @javax.annotation.Nullable
@@ -174,6 +179,72 @@ public class License {
   @SerializedName(SERIALIZED_NAME_STRIPE_REFUND_ID)
   @javax.annotation.Nullable
   private String stripeRefundId;
+
+  public static final String SERIALIZED_NAME_PADDLE_ADJUSTMENT_ID = "paddleAdjustmentId";
+  @SerializedName(SERIALIZED_NAME_PADDLE_ADJUSTMENT_ID)
+  @javax.annotation.Nullable
+  private String paddleAdjustmentId;
+
+  /**
+   * Outcome of the Paddle refund: &#x60;pending_approval&#x60; while Paddle reviews it, then &#x60;approved&#x60; or &#x60;rejected&#x60;. &#x60;null&#x60; without a Paddle refund.
+   */
+  @JsonAdapter(PaddleRefundStatusEnum.Adapter.class)
+  public enum PaddleRefundStatusEnum {
+    PENDING_APPROVAL("pending_approval"),
+    
+    APPROVED("approved"),
+    
+    REJECTED("rejected"),
+    
+    UNKNOWN_DEFAULT_OPEN_API("unknown_default_open_api");
+
+    private String value;
+
+    PaddleRefundStatusEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static PaddleRefundStatusEnum fromValue(String value) {
+      for (PaddleRefundStatusEnum b : PaddleRefundStatusEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      return null;
+    }
+
+    public static class Adapter extends TypeAdapter<PaddleRefundStatusEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final PaddleRefundStatusEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public PaddleRefundStatusEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return PaddleRefundStatusEnum.fromValue(value);
+      }
+    }
+
+    public static void validateJsonElement(JsonElement jsonElement) throws IOException {
+      String value = jsonElement.getAsString();
+      PaddleRefundStatusEnum.fromValue(value);
+    }
+  }
+
+  public static final String SERIALIZED_NAME_PADDLE_REFUND_STATUS = "paddleRefundStatus";
+  @SerializedName(SERIALIZED_NAME_PADDLE_REFUND_STATUS)
+  @javax.annotation.Nullable
+  private PaddleRefundStatusEnum paddleRefundStatus;
 
   public static final String SERIALIZED_NAME_UPDATED_AT = "updatedAt";
   @SerializedName(SERIALIZED_NAME_UPDATED_AT)
@@ -378,6 +449,25 @@ public class License {
 
   public void setStripePaymentIntentId(@javax.annotation.Nullable String stripePaymentIntentId) {
     this.stripePaymentIntentId = stripePaymentIntentId;
+  }
+
+
+  public License paddleTransactionId(@javax.annotation.Nullable String paddleTransactionId) {
+    this.paddleTransactionId = paddleTransactionId;
+    return this;
+  }
+
+  /**
+   * Id of the Paddle transaction that paid the license, when it was bought through the Paddle integration. &#x60;null&#x60; otherwise.
+   * @return paddleTransactionId
+   */
+  @javax.annotation.Nullable
+  public String getPaddleTransactionId() {
+    return paddleTransactionId;
+  }
+
+  public void setPaddleTransactionId(@javax.annotation.Nullable String paddleTransactionId) {
+    this.paddleTransactionId = paddleTransactionId;
   }
 
 
@@ -628,6 +718,44 @@ public class License {
   }
 
 
+  public License paddleAdjustmentId(@javax.annotation.Nullable String paddleAdjustmentId) {
+    this.paddleAdjustmentId = paddleAdjustmentId;
+    return this;
+  }
+
+  /**
+   * Id of the Paddle refund adjustment of the license&#39;s transaction once it was canceled, through the Paddle integration. &#x60;null&#x60; otherwise.
+   * @return paddleAdjustmentId
+   */
+  @javax.annotation.Nullable
+  public String getPaddleAdjustmentId() {
+    return paddleAdjustmentId;
+  }
+
+  public void setPaddleAdjustmentId(@javax.annotation.Nullable String paddleAdjustmentId) {
+    this.paddleAdjustmentId = paddleAdjustmentId;
+  }
+
+
+  public License paddleRefundStatus(@javax.annotation.Nullable PaddleRefundStatusEnum paddleRefundStatus) {
+    this.paddleRefundStatus = paddleRefundStatus;
+    return this;
+  }
+
+  /**
+   * Outcome of the Paddle refund: &#x60;pending_approval&#x60; while Paddle reviews it, then &#x60;approved&#x60; or &#x60;rejected&#x60;. &#x60;null&#x60; without a Paddle refund.
+   * @return paddleRefundStatus
+   */
+  @javax.annotation.Nullable
+  public PaddleRefundStatusEnum getPaddleRefundStatus() {
+    return paddleRefundStatus;
+  }
+
+  public void setPaddleRefundStatus(@javax.annotation.Nullable PaddleRefundStatusEnum paddleRefundStatus) {
+    this.paddleRefundStatus = paddleRefundStatus;
+  }
+
+
   public License updatedAt(@javax.annotation.Nonnull OffsetDateTime updatedAt) {
     this.updatedAt = updatedAt;
     return this;
@@ -711,6 +839,7 @@ public class License {
         Objects.equals(this.expiresAt, license.expiresAt) &&
         Objects.equals(this.meta, license.meta) &&
         Objects.equals(this.stripePaymentIntentId, license.stripePaymentIntentId) &&
+        Objects.equals(this.paddleTransactionId, license.paddleTransactionId) &&
         Objects.equals(this.maxMachines, license.maxMachines) &&
         Objects.equals(this.maxOfflineDurationSeconds, license.maxOfflineDurationSeconds) &&
         Objects.equals(this.activeMachineCount, license.activeMachineCount) &&
@@ -724,13 +853,15 @@ public class License {
         Objects.equals(this.subscription, license.subscription) &&
         Objects.equals(this.cancellationComment, license.cancellationComment) &&
         Objects.equals(this.stripeRefundId, license.stripeRefundId) &&
+        Objects.equals(this.paddleAdjustmentId, license.paddleAdjustmentId) &&
+        Objects.equals(this.paddleRefundStatus, license.paddleRefundStatus) &&
         Objects.equals(this.updatedAt, license.updatedAt)&&
         Objects.equals(this.additionalProperties, license.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, productId, policyId, customerId, customer, key, createdAt, expiresAt, meta, stripePaymentIntentId, maxMachines, maxOfflineDurationSeconds, activeMachineCount, lastActivatedAt, maxVersion, price, status, cancellableUntil, canceledAt, cancellationReason, subscription, cancellationComment, stripeRefundId, updatedAt, additionalProperties);
+    return Objects.hash(id, productId, policyId, customerId, customer, key, createdAt, expiresAt, meta, stripePaymentIntentId, paddleTransactionId, maxMachines, maxOfflineDurationSeconds, activeMachineCount, lastActivatedAt, maxVersion, price, status, cancellableUntil, canceledAt, cancellationReason, subscription, cancellationComment, stripeRefundId, paddleAdjustmentId, paddleRefundStatus, updatedAt, additionalProperties);
   }
 
   @Override
@@ -747,6 +878,7 @@ public class License {
     sb.append("    expiresAt: ").append(toIndentedString(expiresAt)).append("\n");
     sb.append("    meta: ").append(toIndentedString(meta)).append("\n");
     sb.append("    stripePaymentIntentId: ").append(toIndentedString(stripePaymentIntentId)).append("\n");
+    sb.append("    paddleTransactionId: ").append(toIndentedString(paddleTransactionId)).append("\n");
     sb.append("    maxMachines: ").append(toIndentedString(maxMachines)).append("\n");
     sb.append("    maxOfflineDurationSeconds: ").append(toIndentedString(maxOfflineDurationSeconds)).append("\n");
     sb.append("    activeMachineCount: ").append(toIndentedString(activeMachineCount)).append("\n");
@@ -760,6 +892,8 @@ public class License {
     sb.append("    subscription: ").append(toIndentedString(subscription)).append("\n");
     sb.append("    cancellationComment: ").append(toIndentedString(cancellationComment)).append("\n");
     sb.append("    stripeRefundId: ").append(toIndentedString(stripeRefundId)).append("\n");
+    sb.append("    paddleAdjustmentId: ").append(toIndentedString(paddleAdjustmentId)).append("\n");
+    sb.append("    paddleRefundStatus: ").append(toIndentedString(paddleRefundStatus)).append("\n");
     sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
@@ -780,10 +914,10 @@ public class License {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("id", "productId", "policyId", "customerId", "customer", "key", "createdAt", "expiresAt", "meta", "stripePaymentIntentId", "maxMachines", "maxOfflineDurationSeconds", "activeMachineCount", "lastActivatedAt", "maxVersion", "price", "status", "cancellableUntil", "canceledAt", "cancellationReason", "subscription", "cancellationComment", "stripeRefundId", "updatedAt"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "productId", "policyId", "customerId", "customer", "key", "createdAt", "expiresAt", "meta", "stripePaymentIntentId", "paddleTransactionId", "maxMachines", "maxOfflineDurationSeconds", "activeMachineCount", "lastActivatedAt", "maxVersion", "price", "status", "cancellableUntil", "canceledAt", "cancellationReason", "subscription", "cancellationComment", "stripeRefundId", "paddleAdjustmentId", "paddleRefundStatus", "updatedAt"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "productId", "policyId", "customerId", "customer", "key", "createdAt", "expiresAt", "meta", "stripePaymentIntentId", "maxMachines", "maxOfflineDurationSeconds", "activeMachineCount", "lastActivatedAt", "maxVersion", "price", "status", "cancellableUntil", "canceledAt", "cancellationReason", "subscription", "cancellationComment", "stripeRefundId", "updatedAt"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "productId", "policyId", "customerId", "customer", "key", "createdAt", "expiresAt", "meta", "stripePaymentIntentId", "paddleTransactionId", "maxMachines", "maxOfflineDurationSeconds", "activeMachineCount", "lastActivatedAt", "maxVersion", "price", "status", "cancellableUntil", "canceledAt", "cancellationReason", "subscription", "cancellationComment", "stripeRefundId", "paddleAdjustmentId", "paddleRefundStatus", "updatedAt"));
   }
 
   /**
@@ -826,6 +960,9 @@ public class License {
       if ((jsonObj.get("stripePaymentIntentId") != null && !jsonObj.get("stripePaymentIntentId").isJsonNull()) && !jsonObj.get("stripePaymentIntentId").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `stripePaymentIntentId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("stripePaymentIntentId").toString()));
       }
+      if ((jsonObj.get("paddleTransactionId") != null && !jsonObj.get("paddleTransactionId").isJsonNull()) && !jsonObj.get("paddleTransactionId").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `paddleTransactionId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("paddleTransactionId").toString()));
+      }
       // validate the required field `maxVersion`
       LicenseMaxVersion.validateJsonElement(jsonObj.get("maxVersion"));
       if (jsonObj.get("price") != null && !jsonObj.get("price").isJsonNull()) {
@@ -847,6 +984,16 @@ public class License {
       }
       if ((jsonObj.get("stripeRefundId") != null && !jsonObj.get("stripeRefundId").isJsonNull()) && !jsonObj.get("stripeRefundId").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `stripeRefundId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("stripeRefundId").toString()));
+      }
+      if ((jsonObj.get("paddleAdjustmentId") != null && !jsonObj.get("paddleAdjustmentId").isJsonNull()) && !jsonObj.get("paddleAdjustmentId").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `paddleAdjustmentId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("paddleAdjustmentId").toString()));
+      }
+      if ((jsonObj.get("paddleRefundStatus") != null && !jsonObj.get("paddleRefundStatus").isJsonNull()) && !jsonObj.get("paddleRefundStatus").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `paddleRefundStatus` to be a primitive type in the JSON string but got `%s`", jsonObj.get("paddleRefundStatus").toString()));
+      }
+      if (jsonObj.get("paddleRefundStatus") != null && !jsonObj.get("paddleRefundStatus").isJsonNull()) {
+      // validate the required field `paddleRefundStatus`
+      PaddleRefundStatusEnum.validateJsonElement(jsonObj.get("paddleRefundStatus"));
       }
   }
 

@@ -27,12 +27,16 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 
 
+import dev.licensemanager.model.ConnectPaddle;
 import dev.licensemanager.model.ConnectStripe;
 import dev.licensemanager.model.CreateIntegrationMapping;
+import dev.licensemanager.model.CreatePaddleMapping;
 import dev.licensemanager.model.Error;
 import dev.licensemanager.model.Integration;
 import dev.licensemanager.model.IntegrationMapping;
+import dev.licensemanager.model.ListPaddlePrices200Response;
 import dev.licensemanager.model.ListStripePrices200Response;
+import dev.licensemanager.model.PaddleIntegration;
 import dev.licensemanager.model.SlackAuthorize;
 import dev.licensemanager.model.SlackConnection;
 import dev.licensemanager.model.SlackIntegration;
@@ -373,7 +377,7 @@ public class IntegrationsApi {
             <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Stripe can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
@@ -396,7 +400,7 @@ public class IntegrationsApi {
             <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Stripe can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public Integration execute() throws ApiException {
@@ -420,7 +424,7 @@ public class IntegrationsApi {
             <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Stripe can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public ApiResponse<Integration> executeWithHttpInfo() throws ApiException {
@@ -444,7 +448,7 @@ public class IntegrationsApi {
             <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Stripe can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public okhttp3.Call executeAsync(final ApiCallback<Integration> _callback) throws ApiException {
@@ -469,11 +473,219 @@ public class IntegrationsApi {
         <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Stripe can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
         <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-        <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+        <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
      </table>
      */
     public APIcheckIntegrationRequest checkIntegration(@javax.annotation.Nonnull String id) {
         return new APIcheckIntegrationRequest(id);
+    }
+    private okhttp3.Call connectPaddleCall(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull ConnectPaddle connectPaddle, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = connectPaddle;
+
+        // create path and map variables
+        String localVarPath = "/v1/products/{productId}/integrations/paddle"
+            .replace("{" + "productId" + "}", localVarApiClient.escapeString(productId.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "apiKey" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "PUT", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call connectPaddleValidateBeforeCall(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull ConnectPaddle connectPaddle, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'productId' is set
+        if (productId == null) {
+            throw new ApiException("Missing the required parameter 'productId' when calling connectPaddle(Async)");
+        }
+
+        // verify the required parameter 'connectPaddle' is set
+        if (connectPaddle == null) {
+            throw new ApiException("Missing the required parameter 'connectPaddle' when calling connectPaddle(Async)");
+        }
+
+        return connectPaddleCall(productId, connectPaddle, _callback);
+
+    }
+
+
+    private ApiResponse<PaddleIntegration> connectPaddleWithHttpInfo(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull ConnectPaddle connectPaddle) throws ApiException {
+        okhttp3.Call localVarCall = connectPaddleValidateBeforeCall(productId, connectPaddle, null);
+        Type localVarReturnType = new TypeToken<PaddleIntegration>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    private okhttp3.Call connectPaddleAsync(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull ConnectPaddle connectPaddle, final ApiCallback<PaddleIntegration> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = connectPaddleValidateBeforeCall(productId, connectPaddle, _callback);
+        Type localVarReturnType = new TypeToken<PaddleIntegration>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+
+    public class APIconnectPaddleRequest {
+        @javax.annotation.Nonnull
+        private final String productId;
+        @javax.annotation.Nonnull
+        private final ConnectPaddle connectPaddle;
+
+        private APIconnectPaddleRequest(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull ConnectPaddle connectPaddle) {
+            this.productId = productId;
+            this.connectPaddle = connectPaddle;
+        }
+
+        /**
+         * Build call for connectPaddle
+         * @param _callback ApiCallback API callback
+         * @return Call to execute
+         * @throws ApiException If fail to serialize the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Paddle integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Paddle can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Paddle Billing API key, or Paddle rejected it. &#x60;key_mode_mismatch&#x60;: a sandbox key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message. &#x60;too_many_destinations&#x60;: the account already has the 10 active notification destinations Paddle allows </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
+            return connectPaddleCall(productId, connectPaddle, _callback);
+        }
+
+        /**
+         * Execute connectPaddle request
+         * @return PaddleIntegration
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Paddle integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Paddle can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Paddle Billing API key, or Paddle rejected it. &#x60;key_mode_mismatch&#x60;: a sandbox key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message. &#x60;too_many_destinations&#x60;: the account already has the 10 active notification destinations Paddle allows </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
+         </table>
+         */
+        public PaddleIntegration execute() throws ApiException {
+            ApiResponse<PaddleIntegration> localVarResp = connectPaddleWithHttpInfo(productId, connectPaddle);
+            return localVarResp.getData();
+        }
+
+        /**
+         * Execute connectPaddle request with HTTP info returned
+         * @return ApiResponse&lt;PaddleIntegration&gt;
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Paddle integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Paddle can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Paddle Billing API key, or Paddle rejected it. &#x60;key_mode_mismatch&#x60;: a sandbox key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message. &#x60;too_many_destinations&#x60;: the account already has the 10 active notification destinations Paddle allows </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
+         </table>
+         */
+        public ApiResponse<PaddleIntegration> executeWithHttpInfo() throws ApiException {
+            return connectPaddleWithHttpInfo(productId, connectPaddle);
+        }
+
+        /**
+         * Execute connectPaddle request (asynchronously)
+         * @param _callback The callback to be executed when the API call finishes
+         * @return The request call
+         * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Paddle integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Paddle can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Paddle Billing API key, or Paddle rejected it. &#x60;key_mode_mismatch&#x60;: a sandbox key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message. &#x60;too_many_destinations&#x60;: the account already has the 10 active notification destinations Paddle allows </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call executeAsync(final ApiCallback<PaddleIntegration> _callback) throws ApiException {
+            return connectPaddleAsync(productId, connectPaddle, _callback);
+        }
+    }
+
+    /**
+     * Connect Paddle
+     * Connects the Paddle Billing account of the API key for the organization&#39;s products of the product&#39;s mode, or replaces the key of the existing connection. Checks the key works and has the required permissions, then creates a notification destination on the account, telling the app about payments. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:create&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     * @param productId  (required)
+     * @param connectPaddle  (required)
+     * @return APIconnectPaddleRequest
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Paddle integration </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+        <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+        <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Paddle can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Paddle Billing API key, or Paddle rejected it. &#x60;key_mode_mismatch&#x60;: a sandbox key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message. &#x60;too_many_destinations&#x60;: the account already has the 10 active notification destinations Paddle allows </td><td>  -  </td></tr>
+        <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+        <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
+     </table>
+     */
+    public APIconnectPaddleRequest connectPaddle(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull ConnectPaddle connectPaddle) {
+        return new APIconnectPaddleRequest(productId, connectPaddle);
     }
     private okhttp3.Call connectStripeCall(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull ConnectStripe connectStripe, final ApiCallback _callback) throws ApiException {
         String basePath = null;
@@ -580,7 +792,7 @@ public class IntegrationsApi {
             <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Stripe can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Stripe secret or restricted key, or Stripe rejected it. &#x60;key_mode_mismatch&#x60;: a test mode key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message. Optional ones aren&#39;t required: without Refunds: Write, it connects with &#x60;canRefund&#x60; false </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
@@ -603,7 +815,7 @@ public class IntegrationsApi {
             <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Stripe can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Stripe secret or restricted key, or Stripe rejected it. &#x60;key_mode_mismatch&#x60;: a test mode key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message. Optional ones aren&#39;t required: without Refunds: Write, it connects with &#x60;canRefund&#x60; false </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public StripeIntegration execute() throws ApiException {
@@ -627,7 +839,7 @@ public class IntegrationsApi {
             <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Stripe can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Stripe secret or restricted key, or Stripe rejected it. &#x60;key_mode_mismatch&#x60;: a test mode key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message. Optional ones aren&#39;t required: without Refunds: Write, it connects with &#x60;canRefund&#x60; false </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public ApiResponse<StripeIntegration> executeWithHttpInfo() throws ApiException {
@@ -651,7 +863,7 @@ public class IntegrationsApi {
             <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Stripe can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Stripe secret or restricted key, or Stripe rejected it. &#x60;key_mode_mismatch&#x60;: a test mode key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message. Optional ones aren&#39;t required: without Refunds: Write, it connects with &#x60;canRefund&#x60; false </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public okhttp3.Call executeAsync(final ApiCallback<StripeIntegration> _callback) throws ApiException {
@@ -677,11 +889,219 @@ public class IntegrationsApi {
         <tr><td> 409 </td><td> &#x60;webhook_url_unreachable&#x60;: Stripe can&#39;t reach the server&#39;s webhook URL </td><td>  -  </td></tr>
         <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;invalid_api_key&#x60;: not a Stripe secret or restricted key, or Stripe rejected it. &#x60;key_mode_mismatch&#x60;: a test mode key for a live product, or the opposite. &#x60;missing_permission&#x60;: the key lacks required permissions, listed in the message. Optional ones aren&#39;t required: without Refunds: Write, it connects with &#x60;canRefund&#x60; false </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-        <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+        <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
      </table>
      */
     public APIconnectStripeRequest connectStripe(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull ConnectStripe connectStripe) {
         return new APIconnectStripeRequest(productId, connectStripe);
+    }
+    private okhttp3.Call createPaddleMappingCall(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull CreatePaddleMapping createPaddleMapping, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = createPaddleMapping;
+
+        // create path and map variables
+        String localVarPath = "/v1/products/{productId}/integrations/paddle/mappings"
+            .replace("{" + "productId" + "}", localVarApiClient.escapeString(productId.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "apiKey" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call createPaddleMappingValidateBeforeCall(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull CreatePaddleMapping createPaddleMapping, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'productId' is set
+        if (productId == null) {
+            throw new ApiException("Missing the required parameter 'productId' when calling createPaddleMapping(Async)");
+        }
+
+        // verify the required parameter 'createPaddleMapping' is set
+        if (createPaddleMapping == null) {
+            throw new ApiException("Missing the required parameter 'createPaddleMapping' when calling createPaddleMapping(Async)");
+        }
+
+        return createPaddleMappingCall(productId, createPaddleMapping, _callback);
+
+    }
+
+
+    private ApiResponse<IntegrationMapping> createPaddleMappingWithHttpInfo(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull CreatePaddleMapping createPaddleMapping) throws ApiException {
+        okhttp3.Call localVarCall = createPaddleMappingValidateBeforeCall(productId, createPaddleMapping, null);
+        Type localVarReturnType = new TypeToken<IntegrationMapping>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    private okhttp3.Call createPaddleMappingAsync(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull CreatePaddleMapping createPaddleMapping, final ApiCallback<IntegrationMapping> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = createPaddleMappingValidateBeforeCall(productId, createPaddleMapping, _callback);
+        Type localVarReturnType = new TypeToken<IntegrationMapping>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+
+    public class APIcreatePaddleMappingRequest {
+        @javax.annotation.Nonnull
+        private final String productId;
+        @javax.annotation.Nonnull
+        private final CreatePaddleMapping createPaddleMapping;
+
+        private APIcreatePaddleMappingRequest(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull CreatePaddleMapping createPaddleMapping) {
+            this.productId = productId;
+            this.createPaddleMapping = createPaddleMapping;
+        }
+
+        /**
+         * Build call for createPaddleMapping
+         * @param _callback ApiCallback API callback
+         * @return Call to execute
+         * @throws ApiException If fail to serialize the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 201 </td><td> Created mapping </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> &#x60;not_found&#x60;: product not found. &#x60;policy_not_found&#x60;: the product has no policy with this &#x60;policyId&#x60;. &#x60;price_not_found&#x60;: the Paddle account has no price with this &#x60;paddlePriceId&#x60; </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;not_connected&#x60;: Paddle isn&#39;t connected in the product&#39;s mode. &#x60;price_mapped&#x60;: the price already creates licenses of a product </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;price_unusable&#x60;: the price or its product is archived, or it&#39;s a custom (non-catalog) price. &#x60;missing_permission&#x60;: a recurring price, while the API key lacks the Subscriptions: Read permission </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
+            return createPaddleMappingCall(productId, createPaddleMapping, _callback);
+        }
+
+        /**
+         * Execute createPaddleMapping request
+         * @return IntegrationMapping
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 201 </td><td> Created mapping </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> &#x60;not_found&#x60;: product not found. &#x60;policy_not_found&#x60;: the product has no policy with this &#x60;policyId&#x60;. &#x60;price_not_found&#x60;: the Paddle account has no price with this &#x60;paddlePriceId&#x60; </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;not_connected&#x60;: Paddle isn&#39;t connected in the product&#39;s mode. &#x60;price_mapped&#x60;: the price already creates licenses of a product </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;price_unusable&#x60;: the price or its product is archived, or it&#39;s a custom (non-catalog) price. &#x60;missing_permission&#x60;: a recurring price, while the API key lacks the Subscriptions: Read permission </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
+         </table>
+         */
+        public IntegrationMapping execute() throws ApiException {
+            ApiResponse<IntegrationMapping> localVarResp = createPaddleMappingWithHttpInfo(productId, createPaddleMapping);
+            return localVarResp.getData();
+        }
+
+        /**
+         * Execute createPaddleMapping request with HTTP info returned
+         * @return ApiResponse&lt;IntegrationMapping&gt;
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 201 </td><td> Created mapping </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> &#x60;not_found&#x60;: product not found. &#x60;policy_not_found&#x60;: the product has no policy with this &#x60;policyId&#x60;. &#x60;price_not_found&#x60;: the Paddle account has no price with this &#x60;paddlePriceId&#x60; </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;not_connected&#x60;: Paddle isn&#39;t connected in the product&#39;s mode. &#x60;price_mapped&#x60;: the price already creates licenses of a product </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;price_unusable&#x60;: the price or its product is archived, or it&#39;s a custom (non-catalog) price. &#x60;missing_permission&#x60;: a recurring price, while the API key lacks the Subscriptions: Read permission </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
+         </table>
+         */
+        public ApiResponse<IntegrationMapping> executeWithHttpInfo() throws ApiException {
+            return createPaddleMappingWithHttpInfo(productId, createPaddleMapping);
+        }
+
+        /**
+         * Execute createPaddleMapping request (asynchronously)
+         * @param _callback The callback to be executed when the API call finishes
+         * @return The request call
+         * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 201 </td><td> Created mapping </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> &#x60;not_found&#x60;: product not found. &#x60;policy_not_found&#x60;: the product has no policy with this &#x60;policyId&#x60;. &#x60;price_not_found&#x60;: the Paddle account has no price with this &#x60;paddlePriceId&#x60; </td><td>  -  </td></tr>
+            <tr><td> 409 </td><td> &#x60;not_connected&#x60;: Paddle isn&#39;t connected in the product&#39;s mode. &#x60;price_mapped&#x60;: the price already creates licenses of a product </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;price_unusable&#x60;: the price or its product is archived, or it&#39;s a custom (non-catalog) price. &#x60;missing_permission&#x60;: a recurring price, while the API key lacks the Subscriptions: Read permission </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call executeAsync(final ApiCallback<IntegrationMapping> _callback) throws ApiException {
+            return createPaddleMappingAsync(productId, createPaddleMapping, _callback);
+        }
+    }
+
+    /**
+     * Map a Paddle price to a policy
+     * Paying the price then creates licenses of the product with the policy: one per unit bought, or one per subscription for a recurring price. Doesn&#39;t accept tokens: only API keys and sessions.  **Required role permission**: &#x60;integration:update&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     * @param productId  (required)
+     * @param createPaddleMapping  (required)
+     * @return APIcreatePaddleMappingRequest
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 201 </td><td> Created mapping </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+        <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> &#x60;not_found&#x60;: product not found. &#x60;policy_not_found&#x60;: the product has no policy with this &#x60;policyId&#x60;. &#x60;price_not_found&#x60;: the Paddle account has no price with this &#x60;paddlePriceId&#x60; </td><td>  -  </td></tr>
+        <tr><td> 409 </td><td> &#x60;not_connected&#x60;: Paddle isn&#39;t connected in the product&#39;s mode. &#x60;price_mapped&#x60;: the price already creates licenses of a product </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;price_unusable&#x60;: the price or its product is archived, or it&#39;s a custom (non-catalog) price. &#x60;missing_permission&#x60;: a recurring price, while the API key lacks the Subscriptions: Read permission </td><td>  -  </td></tr>
+        <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+        <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
+     </table>
+     */
+    public APIcreatePaddleMappingRequest createPaddleMapping(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull CreatePaddleMapping createPaddleMapping) {
+        return new APIcreatePaddleMappingRequest(productId, createPaddleMapping);
     }
     private okhttp3.Call createStripeMappingCall(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull CreateIntegrationMapping createIntegrationMapping, final ApiCallback _callback) throws ApiException {
         String basePath = null;
@@ -788,7 +1208,7 @@ public class IntegrationsApi {
             <tr><td> 409 </td><td> &#x60;not_connected&#x60;: Stripe isn&#39;t connected in the product&#39;s mode. &#x60;price_mapped&#x60;: the price already creates licenses of a product </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;price_unusable&#x60;: the price is archived, or isn&#39;t a one-time price </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
@@ -811,7 +1231,7 @@ public class IntegrationsApi {
             <tr><td> 409 </td><td> &#x60;not_connected&#x60;: Stripe isn&#39;t connected in the product&#39;s mode. &#x60;price_mapped&#x60;: the price already creates licenses of a product </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;price_unusable&#x60;: the price is archived, or isn&#39;t a one-time price </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public IntegrationMapping execute() throws ApiException {
@@ -835,7 +1255,7 @@ public class IntegrationsApi {
             <tr><td> 409 </td><td> &#x60;not_connected&#x60;: Stripe isn&#39;t connected in the product&#39;s mode. &#x60;price_mapped&#x60;: the price already creates licenses of a product </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;price_unusable&#x60;: the price is archived, or isn&#39;t a one-time price </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public ApiResponse<IntegrationMapping> executeWithHttpInfo() throws ApiException {
@@ -859,7 +1279,7 @@ public class IntegrationsApi {
             <tr><td> 409 </td><td> &#x60;not_connected&#x60;: Stripe isn&#39;t connected in the product&#39;s mode. &#x60;price_mapped&#x60;: the price already creates licenses of a product </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;price_unusable&#x60;: the price is archived, or isn&#39;t a one-time price </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public okhttp3.Call executeAsync(final ApiCallback<IntegrationMapping> _callback) throws ApiException {
@@ -885,7 +1305,7 @@ public class IntegrationsApi {
         <tr><td> 409 </td><td> &#x60;not_connected&#x60;: Stripe isn&#39;t connected in the product&#39;s mode. &#x60;price_mapped&#x60;: the price already creates licenses of a product </td><td>  -  </td></tr>
         <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid body. &#x60;price_unusable&#x60;: the price is archived, or isn&#39;t a one-time price </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-        <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+        <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
      </table>
      */
     public APIcreateStripeMappingRequest createStripeMapping(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull CreateIntegrationMapping createIntegrationMapping) {
@@ -1352,7 +1772,7 @@ public class IntegrationsApi {
             <tr><td> 404 </td><td> Integration not found </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;missing_permission&#x60;: the key can&#39;t delete the webhook endpoint </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
@@ -1373,7 +1793,7 @@ public class IntegrationsApi {
             <tr><td> 404 </td><td> Integration not found </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;missing_permission&#x60;: the key can&#39;t delete the webhook endpoint </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public void execute() throws ApiException {
@@ -1395,7 +1815,7 @@ public class IntegrationsApi {
             <tr><td> 404 </td><td> Integration not found </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;missing_permission&#x60;: the key can&#39;t delete the webhook endpoint </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public ApiResponse<Void> executeWithHttpInfo() throws ApiException {
@@ -1418,7 +1838,7 @@ public class IntegrationsApi {
             <tr><td> 404 </td><td> Integration not found </td><td>  -  </td></tr>
             <tr><td> 422 </td><td> &#x60;missing_permission&#x60;: the key can&#39;t delete the webhook endpoint </td><td>  -  </td></tr>
             <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
          </table>
          */
         public okhttp3.Call executeAsync(final ApiCallback<Void> _callback) throws ApiException {
@@ -1442,11 +1862,199 @@ public class IntegrationsApi {
         <tr><td> 404 </td><td> Integration not found </td><td>  -  </td></tr>
         <tr><td> 422 </td><td> &#x60;missing_permission&#x60;: the key can&#39;t delete the webhook endpoint </td><td>  -  </td></tr>
         <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
-        <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Stripe couldn&#39;t be reached </td><td>  -  </td></tr>
+        <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: the provider (Stripe or Paddle) couldn&#39;t be reached </td><td>  -  </td></tr>
      </table>
      */
     public APIdisconnectIntegrationRequest disconnectIntegration(@javax.annotation.Nonnull String id) {
         return new APIdisconnectIntegrationRequest(id);
+    }
+    private okhttp3.Call getPaddleIntegrationCall(@javax.annotation.Nonnull String productId, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/v1/products/{productId}/integrations/paddle"
+            .replace("{" + "productId" + "}", localVarApiClient.escapeString(productId.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "apiKey" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call getPaddleIntegrationValidateBeforeCall(@javax.annotation.Nonnull String productId, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'productId' is set
+        if (productId == null) {
+            throw new ApiException("Missing the required parameter 'productId' when calling getPaddleIntegration(Async)");
+        }
+
+        return getPaddleIntegrationCall(productId, _callback);
+
+    }
+
+
+    private ApiResponse<PaddleIntegration> getPaddleIntegrationWithHttpInfo(@javax.annotation.Nonnull String productId) throws ApiException {
+        okhttp3.Call localVarCall = getPaddleIntegrationValidateBeforeCall(productId, null);
+        Type localVarReturnType = new TypeToken<PaddleIntegration>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    private okhttp3.Call getPaddleIntegrationAsync(@javax.annotation.Nonnull String productId, final ApiCallback<PaddleIntegration> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = getPaddleIntegrationValidateBeforeCall(productId, _callback);
+        Type localVarReturnType = new TypeToken<PaddleIntegration>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+
+    public class APIgetPaddleIntegrationRequest {
+        @javax.annotation.Nonnull
+        private final String productId;
+
+        private APIgetPaddleIntegrationRequest(@javax.annotation.Nonnull String productId) {
+            this.productId = productId;
+        }
+
+        /**
+         * Build call for getPaddleIntegration
+         * @param _callback ApiCallback API callback
+         * @return Call to execute
+         * @throws ApiException If fail to serialize the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Paddle integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
+            return getPaddleIntegrationCall(productId, _callback);
+        }
+
+        /**
+         * Execute getPaddleIntegration request
+         * @return PaddleIntegration
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Paddle integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public PaddleIntegration execute() throws ApiException {
+            ApiResponse<PaddleIntegration> localVarResp = getPaddleIntegrationWithHttpInfo(productId);
+            return localVarResp.getData();
+        }
+
+        /**
+         * Execute getPaddleIntegration request with HTTP info returned
+         * @return ApiResponse&lt;PaddleIntegration&gt;
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Paddle integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public ApiResponse<PaddleIntegration> executeWithHttpInfo() throws ApiException {
+            return getPaddleIntegrationWithHttpInfo(productId);
+        }
+
+        /**
+         * Execute getPaddleIntegration request (asynchronously)
+         * @param _callback The callback to be executed when the API call finishes
+         * @return The request call
+         * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Paddle integration </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call executeAsync(final ApiCallback<PaddleIntegration> _callback) throws ApiException {
+            return getPaddleIntegrationAsync(productId, _callback);
+        }
+    }
+
+    /**
+     * Get the Paddle integration of a product
+     * The organization connects one Paddle Billing account for its live products, and one sandbox account for its test products. Its mappings tell which Paddle prices create licenses of the product. Doesn&#39;t accept tokens: only API keys and sessions.
+     * @param productId  (required)
+     * @return APIgetPaddleIntegrationRequest
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Paddle integration </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+        <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+        <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+     </table>
+     */
+    public APIgetPaddleIntegrationRequest getPaddleIntegration(@javax.annotation.Nonnull String productId) {
+        return new APIgetPaddleIntegrationRequest(productId);
     }
     private okhttp3.Call getSlackIntegrationCall(@javax.annotation.Nonnull String productId, final ApiCallback _callback) throws ApiException {
         String basePath = null;
@@ -1823,6 +2431,199 @@ public class IntegrationsApi {
      */
     public APIgetStripeIntegrationRequest getStripeIntegration(@javax.annotation.Nonnull String productId) {
         return new APIgetStripeIntegrationRequest(productId);
+    }
+    private okhttp3.Call listPaddlePricesCall(@javax.annotation.Nonnull String id, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/v1/integrations/{id}/paddle/prices"
+            .replace("{" + "id" + "}", localVarApiClient.escapeString(id.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "apiKey" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call listPaddlePricesValidateBeforeCall(@javax.annotation.Nonnull String id, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'id' is set
+        if (id == null) {
+            throw new ApiException("Missing the required parameter 'id' when calling listPaddlePrices(Async)");
+        }
+
+        return listPaddlePricesCall(id, _callback);
+
+    }
+
+
+    private ApiResponse<ListPaddlePrices200Response> listPaddlePricesWithHttpInfo(@javax.annotation.Nonnull String id) throws ApiException {
+        okhttp3.Call localVarCall = listPaddlePricesValidateBeforeCall(id, null);
+        Type localVarReturnType = new TypeToken<ListPaddlePrices200Response>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    private okhttp3.Call listPaddlePricesAsync(@javax.annotation.Nonnull String id, final ApiCallback<ListPaddlePrices200Response> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = listPaddlePricesValidateBeforeCall(id, _callback);
+        Type localVarReturnType = new TypeToken<ListPaddlePrices200Response>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+
+    public class APIlistPaddlePricesRequest {
+        @javax.annotation.Nonnull
+        private final String id;
+
+        private APIlistPaddlePricesRequest(@javax.annotation.Nonnull String id) {
+            this.id = id;
+        }
+
+        /**
+         * Build call for listPaddlePrices
+         * @param _callback ApiCallback API callback
+         * @return Call to execute
+         * @throws ApiException If fail to serialize the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Prices </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Integration not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Paddle couldn&#39;t be reached, or refused the request </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
+            return listPaddlePricesCall(id, _callback);
+        }
+
+        /**
+         * Execute listPaddlePrices request
+         * @return ListPaddlePrices200Response
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Prices </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Integration not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Paddle couldn&#39;t be reached, or refused the request </td><td>  -  </td></tr>
+         </table>
+         */
+        public ListPaddlePrices200Response execute() throws ApiException {
+            ApiResponse<ListPaddlePrices200Response> localVarResp = listPaddlePricesWithHttpInfo(id);
+            return localVarResp.getData();
+        }
+
+        /**
+         * Execute listPaddlePrices request with HTTP info returned
+         * @return ApiResponse&lt;ListPaddlePrices200Response&gt;
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Prices </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Integration not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Paddle couldn&#39;t be reached, or refused the request </td><td>  -  </td></tr>
+         </table>
+         */
+        public ApiResponse<ListPaddlePrices200Response> executeWithHttpInfo() throws ApiException {
+            return listPaddlePricesWithHttpInfo(id);
+        }
+
+        /**
+         * Execute listPaddlePrices request (asynchronously)
+         * @param _callback The callback to be executed when the API call finishes
+         * @return The request call
+         * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Prices </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Integration not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+            <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Paddle couldn&#39;t be reached, or refused the request </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call executeAsync(final ApiCallback<ListPaddlePrices200Response> _callback) throws ApiException {
+            return listPaddlePricesAsync(id, _callback);
+        }
+    }
+
+    /**
+     * List the Paddle prices of an integration
+     * Active catalog prices of active products of the Paddle account, the ones that can be mapped, up to 500. Doesn&#39;t accept tokens: only API keys and sessions.
+     * @param id  (required)
+     * @return APIlistPaddlePricesRequest
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Prices </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+        <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Integration not found </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+        <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+        <tr><td> 502 </td><td> &#x60;provider_unavailable&#x60;: Paddle couldn&#39;t be reached, or refused the request </td><td>  -  </td></tr>
+     </table>
+     */
+    public APIlistPaddlePricesRequest listPaddlePrices(@javax.annotation.Nonnull String id) {
+        return new APIlistPaddlePricesRequest(id);
     }
     private okhttp3.Call listStripePricesCall(@javax.annotation.Nonnull String id, final ApiCallback _callback) throws ApiException {
         String basePath = null;

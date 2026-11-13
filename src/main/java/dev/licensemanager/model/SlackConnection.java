@@ -352,7 +352,7 @@ public class SlackConnection {
   }
 
   /**
-   * Notifications the channel gets: &#x60;purchased&#x60; (a license bought through Stripe), &#x60;renewed&#x60; (a subscription renewal paid), &#x60;payment_failed&#x60; (a subscription payment failed) and &#x60;canceled&#x60; (a license canceled, or its subscription ended).
+   * Notifications the channel gets: &#x60;purchased&#x60; (a license bought through Stripe or Paddle), &#x60;renewed&#x60; (a subscription renewal paid), &#x60;payment_failed&#x60; (a subscription payment failed) and &#x60;canceled&#x60; (a license canceled, or its subscription ended).
    * @return events
    */
   @javax.annotation.Nonnull

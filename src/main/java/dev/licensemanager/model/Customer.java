@@ -82,6 +82,11 @@ public class Customer {
   @javax.annotation.Nullable
   private String stripeCustomerId;
 
+  public static final String SERIALIZED_NAME_PADDLE_CUSTOMER_ID = "paddleCustomerId";
+  @SerializedName(SERIALIZED_NAME_PADDLE_CUSTOMER_ID)
+  @javax.annotation.Nullable
+  private String paddleCustomerId;
+
   public static final String SERIALIZED_NAME_CREATED_AT = "createdAt";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
   @javax.annotation.Nonnull
@@ -204,6 +209,25 @@ public class Customer {
   }
 
 
+  public Customer paddleCustomerId(@javax.annotation.Nullable String paddleCustomerId) {
+    this.paddleCustomerId = paddleCustomerId;
+    return this;
+  }
+
+  /**
+   * Id of the Paddle customer, when the customer bought licenses through the Paddle integration. &#x60;null&#x60; otherwise.
+   * @return paddleCustomerId
+   */
+  @javax.annotation.Nullable
+  public String getPaddleCustomerId() {
+    return paddleCustomerId;
+  }
+
+  public void setPaddleCustomerId(@javax.annotation.Nullable String paddleCustomerId) {
+    this.paddleCustomerId = paddleCustomerId;
+  }
+
+
   public Customer createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
@@ -283,13 +307,14 @@ public class Customer {
         Objects.equals(this.name, customer.name) &&
         Objects.equals(this.licenseCount, customer.licenseCount) &&
         Objects.equals(this.stripeCustomerId, customer.stripeCustomerId) &&
+        Objects.equals(this.paddleCustomerId, customer.paddleCustomerId) &&
         Objects.equals(this.createdAt, customer.createdAt)&&
         Objects.equals(this.additionalProperties, customer.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, productId, email, name, licenseCount, stripeCustomerId, createdAt, additionalProperties);
+    return Objects.hash(id, productId, email, name, licenseCount, stripeCustomerId, paddleCustomerId, createdAt, additionalProperties);
   }
 
   @Override
@@ -302,6 +327,7 @@ public class Customer {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    licenseCount: ").append(toIndentedString(licenseCount)).append("\n");
     sb.append("    stripeCustomerId: ").append(toIndentedString(stripeCustomerId)).append("\n");
+    sb.append("    paddleCustomerId: ").append(toIndentedString(paddleCustomerId)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
@@ -322,10 +348,10 @@ public class Customer {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("id", "productId", "email", "name", "licenseCount", "stripeCustomerId", "createdAt"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "productId", "email", "name", "licenseCount", "stripeCustomerId", "paddleCustomerId", "createdAt"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "productId", "email", "name", "licenseCount", "stripeCustomerId", "createdAt"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "productId", "email", "name", "licenseCount", "stripeCustomerId", "paddleCustomerId", "createdAt"));
   }
 
   /**
@@ -362,6 +388,9 @@ public class Customer {
       }
       if ((jsonObj.get("stripeCustomerId") != null && !jsonObj.get("stripeCustomerId").isJsonNull()) && !jsonObj.get("stripeCustomerId").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `stripeCustomerId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("stripeCustomerId").toString()));
+      }
+      if ((jsonObj.get("paddleCustomerId") != null && !jsonObj.get("paddleCustomerId").isJsonNull()) && !jsonObj.get("paddleCustomerId").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `paddleCustomerId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("paddleCustomerId").toString()));
       }
   }
 
