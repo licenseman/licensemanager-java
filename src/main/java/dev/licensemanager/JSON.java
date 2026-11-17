@@ -133,6 +133,12 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.EventList.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.EventMachine.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.FixedMaxVersion.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ImportLicense.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ImportLicenseResult.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ImportLicenseResultError.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ImportLicenseSubscription.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ImportLicenses.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ImportLicensesResult.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.Integration.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.IntegrationMapping.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.IntegrationMappingRecurring.CustomTypeAdapterFactory());
@@ -182,6 +188,7 @@ public class JSON {
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ProductList.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ProductStats.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ProductStatsActivationsByVersionInner.CustomTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ProductStatsActiveMachinesByCountryInner.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ProductStatsActiveMachinesByPlatformInner.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ProductStatsActiveMachinesByVersionInner.CustomTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new dev.licensemanager.model.ProductStatsNewLicensesByPolicyInner.CustomTypeAdapterFactory());

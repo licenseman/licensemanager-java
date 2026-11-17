@@ -18,6 +18,8 @@ import java.math.BigDecimal;
 import dev.licensemanager.model.CancelLicense;
 import dev.licensemanager.model.CreateLicense;
 import dev.licensemanager.model.Error;
+import dev.licensemanager.model.ImportLicenses;
+import dev.licensemanager.model.ImportLicensesResult;
 import dev.licensemanager.model.License;
 import dev.licensemanager.model.LicenseList;
 import dev.licensemanager.model.LicenseStats;
@@ -132,6 +134,22 @@ public class LicensesApiTest {
     @Test
     public void getSigningKeyTest() throws ApiException {
         SigningKey response = api.getSigningKey()
+                .execute();
+        // TODO: test validations
+    }
+
+    /**
+     * Import licenses
+     *
+     * Creates up to 500 licenses with their current keys, like when moving from another license manager or Lemon Squeezy, in one request. Each license is created like with &#x60;createLicense&#x60;, which describes the defaults, and never emails its key. The licenses are imported one by one: one that fails doesn&#39;t stop the others, and the response tells the result of each.  A key already used by a license of the product is skipped, so an interrupted import can be sent again.  With a &#x60;subscription&#x60;, the license is kept valid by the Stripe or Paddle subscription, rather than one created by its next payment.  **Required role permission**: &#x60;license:create&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     *
+     * @throws ApiException if the Api call fails
+     */
+    @Test
+    public void importLicensesTest() throws ApiException {
+        String productId = null;
+        ImportLicenses importLicenses = null;
+        ImportLicensesResult response = api.importLicenses(productId, importLicenses)
                 .execute();
         // TODO: test validations
     }

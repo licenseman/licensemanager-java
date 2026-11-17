@@ -2922,6 +2922,94 @@ paths:
       - Licenses
       x-accepts:
       - application/json
+  /v1/products/{productId}/licenses/import:
+    post:
+      description: |-
+        Creates up to 500 licenses with their current keys, like when moving from another license manager or Lemon Squeezy, in one request. Each license is created like with `createLicense`, which describes the defaults, and never emails its key. The licenses are imported one by one: one that fails doesn't stop the others, and the response tells the result of each.
+
+        A key already used by a license of the product is skipped, so an interrupted import can be sent again.
+
+        With a `subscription`, the license is kept valid by the Stripe or Paddle subscription, rather than one created by its next payment.
+
+        **Required role permission**: `license:create` when called with a session, granted by the member's role. API keys aren't limited by roles.
+      operationId: importLicenses
+      parameters:
+      - explode: false
+        in: path
+        name: productId
+        required: true
+        schema:
+          example: x7Kp2QaZ
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImportLicenses"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportLicensesResult"
+          description: Result of each license
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`unauthorized`: no credentials. `invalid_api_key`: the API\
+            \ key doesn't exist, was revoked or has expired. `invalid_token`: the\
+            \ token's signature is invalid, it has expired, or the resource it's scoped\
+            \ to was deleted"
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`plan_limit_exceeded`: the organization stayed over its plan's\
+            \ limits after the grace period, its API is blocked until it upgrades.\
+            \ `plan_limit_reached`: creating the resource would go over the plan's\
+            \ limit"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`token_not_allowed`: the endpoint doesn't accept tokens, or\
+            \ not of this type. `insufficient_scope`: the token lacks the permission.\
+            \ `no_active_organization` or `forbidden`: the session has no organization,\
+            \ or isn't a member of the one requested"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Product not found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`validation_error`: invalid path, query or body, with the\
+            \ `issues`"
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "`rate_limited`: the API key made more than 10 requests in\
+            \ the last second. Wait for the `Retry-After` seconds"
+      summary: Import licenses
+      tags:
+      - Licenses
+      x-required-permissions:
+      - license:create
+      x-content-type: application/json
+      x-accepts:
+      - application/json
   /v1/licenses/{id}:
     delete:
       description: |-
@@ -7412,6 +7500,11 @@ components:
           count: 42
         - platform: macOS
           count: 42
+        activeMachinesByCountry:
+        - country: FR
+          count: 42
+        - country: FR
+          count: 42
       properties:
         licenseCount:
           description: Number of licenses of the product.
@@ -7546,10 +7639,18 @@ components:
             $ref: "#/components/schemas/ProductStats_activeMachinesByPlatform_inner"
           type: array
           default: null
+        activeMachinesByCountry:
+          description: "Number of active machines in each country, from the one with\
+            \ the most machines."
+          items:
+            $ref: "#/components/schemas/ProductStats_activeMachinesByCountry_inner"
+          type: array
+          default: null
       required:
       - activationsByVersion
       - activeLicenseCount
       - activeMachineCount
+      - activeMachinesByCountry
       - activeMachinesByPlatform
       - activeMachinesByVersion
       - cancellation
@@ -8999,6 +9100,321 @@ components:
           format: date-time
           nullable: true
           type: string
+    ImportLicensesResult:
+      example:
+        created: 0
+        skipped: 6
+        failed: 1
+        results:
+        - index: 5
+          key: key
+          status: created
+          licenseId: licenseId
+          error:
+            code: code
+            message: message
+        - index: 5
+          key: key
+          status: created
+          licenseId: licenseId
+          error:
+            code: code
+            message: message
+      properties:
+        created:
+          type: integer
+        skipped:
+          type: integer
+        failed:
+          type: integer
+        results:
+          description: "Result of each license, in the order sent."
+          items:
+            $ref: "#/components/schemas/ImportLicenseResult"
+          type: array
+          default: null
+      required:
+      - created
+      - failed
+      - results
+      - skipped
+    ImportLicenseResult:
+      example:
+        index: 5
+        key: key
+        status: created
+        licenseId: licenseId
+        error:
+          code: code
+          message: message
+      properties:
+        index:
+          description: "Position of the license in `licenses`, from 0."
+          type: integer
+        key:
+          type: string
+        status:
+          description: "`created`: imported. `skipped`: a license of the product already\
+            \ uses the key, like one imported before: it's left as is. `failed`: not\
+            \ imported, see `error`."
+          enum:
+          - created
+          - skipped
+          - failed
+          type: string
+        licenseId:
+          description: "Id of the license created, or of the one using the key."
+          nullable: true
+          type: string
+        error:
+          $ref: "#/components/schemas/ImportLicenseResult_error"
+      required:
+      - error
+      - index
+      - key
+      - licenseId
+      - status
+    ImportLicenses:
+      example:
+        licenses:
+        - email: jane@example.com
+          key: 7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF
+          policyId: p4Rt8LmQ
+          expiresAt: 2027-01-15T09:30:00.000Z
+          meta:
+            seats: 5
+          maxMachines: 3
+          maxOfflineDurationSeconds: 604800
+          price:
+            amount: 49.99
+            currency: USD
+          maxVersion:
+            version: "2.3"
+            lockMajorAt: 2026-02-15T09:30:00.000Z
+            lockMinorAt: 2027-01-15T09:30:00.000Z
+          cancellableUntil: 2026-02-14T09:30:00.000Z
+          name: Jane Doe
+          subscription:
+            provider: stripe
+            externalId: sub_1MowQVLkdIwHu7ix
+        - email: jane@example.com
+          key: 7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF
+          policyId: p4Rt8LmQ
+          expiresAt: 2027-01-15T09:30:00.000Z
+          meta:
+            seats: 5
+          maxMachines: 3
+          maxOfflineDurationSeconds: 604800
+          price:
+            amount: 49.99
+            currency: USD
+          maxVersion:
+            version: "2.3"
+            lockMajorAt: 2026-02-15T09:30:00.000Z
+            lockMinorAt: 2027-01-15T09:30:00.000Z
+          cancellableUntil: 2026-02-14T09:30:00.000Z
+          name: Jane Doe
+          subscription:
+            provider: stripe
+            externalId: sub_1MowQVLkdIwHu7ix
+        - email: jane@example.com
+          key: 7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF
+          policyId: p4Rt8LmQ
+          expiresAt: 2027-01-15T09:30:00.000Z
+          meta:
+            seats: 5
+          maxMachines: 3
+          maxOfflineDurationSeconds: 604800
+          price:
+            amount: 49.99
+            currency: USD
+          maxVersion:
+            version: "2.3"
+            lockMajorAt: 2026-02-15T09:30:00.000Z
+            lockMinorAt: 2027-01-15T09:30:00.000Z
+          cancellableUntil: 2026-02-14T09:30:00.000Z
+          name: Jane Doe
+          subscription:
+            provider: stripe
+            externalId: sub_1MowQVLkdIwHu7ix
+        - email: jane@example.com
+          key: 7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF
+          policyId: p4Rt8LmQ
+          expiresAt: 2027-01-15T09:30:00.000Z
+          meta:
+            seats: 5
+          maxMachines: 3
+          maxOfflineDurationSeconds: 604800
+          price:
+            amount: 49.99
+            currency: USD
+          maxVersion:
+            version: "2.3"
+            lockMajorAt: 2026-02-15T09:30:00.000Z
+            lockMinorAt: 2027-01-15T09:30:00.000Z
+          cancellableUntil: 2026-02-14T09:30:00.000Z
+          name: Jane Doe
+          subscription:
+            provider: stripe
+            externalId: sub_1MowQVLkdIwHu7ix
+        - email: jane@example.com
+          key: 7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF
+          policyId: p4Rt8LmQ
+          expiresAt: 2027-01-15T09:30:00.000Z
+          meta:
+            seats: 5
+          maxMachines: 3
+          maxOfflineDurationSeconds: 604800
+          price:
+            amount: 49.99
+            currency: USD
+          maxVersion:
+            version: "2.3"
+            lockMajorAt: 2026-02-15T09:30:00.000Z
+            lockMinorAt: 2027-01-15T09:30:00.000Z
+          cancellableUntil: 2026-02-14T09:30:00.000Z
+          name: Jane Doe
+          subscription:
+            provider: stripe
+            externalId: sub_1MowQVLkdIwHu7ix
+      properties:
+        licenses:
+          description: "Licenses to import, up to 500."
+          items:
+            $ref: "#/components/schemas/ImportLicense"
+          maxItems: 500
+          minItems: 1
+          type: array
+          default: null
+      required:
+      - licenses
+    ImportLicense:
+      example:
+        email: jane@example.com
+        key: 7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF
+        policyId: p4Rt8LmQ
+        expiresAt: 2027-01-15T09:30:00.000Z
+        meta:
+          seats: 5
+        maxMachines: 3
+        maxOfflineDurationSeconds: 604800
+        price:
+          amount: 49.99
+          currency: USD
+        maxVersion:
+          version: "2.3"
+          lockMajorAt: 2026-02-15T09:30:00.000Z
+          lockMinorAt: 2027-01-15T09:30:00.000Z
+        cancellableUntil: 2026-02-14T09:30:00.000Z
+        name: Jane Doe
+        subscription:
+          provider: stripe
+          externalId: sub_1MowQVLkdIwHu7ix
+      properties:
+        email:
+          description: "Email of the customer the license belongs to. The product's\
+            \ customer with this email, compared regardless of case, or a new one\
+            \ when there's none."
+          example: jane@example.com
+          format: email
+          maxLength: 320
+          type: string
+        key:
+          description: "The license's current key, kept as is. Case sensitive. Starts\
+            \ with `TEST-` in test products, which is added when missing, and removed\
+            \ in live products."
+          example: 7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF
+          maxLength: 255
+          minLength: 1
+          type: string
+        policyId:
+          description: Policy of the product the license follows. Defaults to the
+            product's default policy.
+          example: p4Rt8LmQ
+          type: string
+        expiresAt:
+          description: "`null` makes the license never expire. Defaults to the creation\
+            \ date plus the duration of the policy, or `null` when the policy has\
+            \ none."
+          example: 2027-01-15T09:30:00.000Z
+          format: date-time
+          nullable: true
+          type: string
+        meta:
+          additionalProperties:
+            nullable: true
+          description: Free-form JSON object.
+          example:
+            seats: 5
+          nullable: true
+          type: object
+        maxMachines:
+          description: Maximum number of active machines the license can be used on.
+            `null` for no limit. Defaults to the one of the policy.
+          example: 3
+          exclusiveMinimum: true
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          type: integer
+        maxOfflineDurationSeconds:
+          description: "Longest the applications can run offline with the license,\
+            \ in seconds. At least one hour (`3600`). Defaults to the one of the policy."
+          example: 604800
+          maximum: 2147483647
+          minimum: 3600
+          type: integer
+        price:
+          $ref: "#/components/schemas/PriceInput"
+        maxVersion:
+          $ref: "#/components/schemas/LicenseMaxVersionInput"
+        cancellableUntil:
+          description: "End of the money back guarantee: until then, the customer\
+            \ can cancel the license from the customer portal, or with a token. `null`\
+            \ to not let them. Defaults to the creation date plus the policy's `moneyBackGuaranteeDays`,\
+            \ or `null` when it has none."
+          example: 2026-02-14T09:30:00.000Z
+          format: date-time
+          nullable: true
+          type: string
+        name:
+          description: "Name of the customer, given to it when it has none yet."
+          example: Jane Doe
+          maxLength: 200
+          type: string
+        subscription:
+          $ref: "#/components/schemas/ImportLicenseSubscription"
+      required:
+      - email
+      - key
+    ImportLicenseSubscription:
+      description: "Subscription of the provider keeping the license valid, like one\
+        \ moved to Stripe by Lemon Squeezy's migration: its renewals then extend this\
+        \ license rather than creating one with a new key. Its price must be mapped\
+        \ to a policy of the product, which the license follows instead of `policyId`,\
+        \ and the license's expiration, version and money back guarantee follow the\
+        \ subscription like the ones it creates. Read from the provider of the product's\
+        \ mode, through the integration."
+      example:
+        provider: stripe
+        externalId: sub_1MowQVLkdIwHu7ix
+      properties:
+        provider:
+          description: Provider of the subscription.
+          enum:
+          - stripe
+          - paddle
+          type: string
+        externalId:
+          description: "Id of the subscription in the provider: `sub_…` in Stripe\
+            \ and in Paddle."
+          example: sub_1MowQVLkdIwHu7ix
+          maxLength: 255
+          minLength: 1
+          type: string
+      required:
+      - externalId
+      - provider
     LicenseStats:
       example:
         from: 2026-10-12
@@ -9181,6 +9597,9 @@ components:
           version: 1.4.2
           overriddenByMachineId: overriddenByMachineId
           lastValidatedAt: 2026-01-15T09:30:00.000Z
+          country: FR
+          latitude: 48.8566
+          longitude: 2.3522
           createdAt: 2026-01-15T09:30:00.000Z
           updatedAt: 2026-01-15T09:30:00.000Z
         - id: m9Tq3VhD
@@ -9192,6 +9611,9 @@ components:
           version: 1.4.2
           overriddenByMachineId: overriddenByMachineId
           lastValidatedAt: 2026-01-15T09:30:00.000Z
+          country: FR
+          latitude: 48.8566
+          longitude: 2.3522
           createdAt: 2026-01-15T09:30:00.000Z
           updatedAt: 2026-01-15T09:30:00.000Z
         pagination:
@@ -9223,6 +9645,9 @@ components:
         version: 1.4.2
         overriddenByMachineId: overriddenByMachineId
         lastValidatedAt: 2026-01-15T09:30:00.000Z
+        country: FR
+        latitude: 48.8566
+        longitude: 2.3522
         createdAt: 2026-01-15T09:30:00.000Z
         updatedAt: 2026-01-15T09:30:00.000Z
       properties:
@@ -9272,6 +9697,27 @@ components:
           format: date-time
           nullable: true
           type: string
+        country:
+          description: "ISO 3166-1 alpha-2 code of the country of the IP address the\
+            \ license was last successfully validated from on the machine. `null`\
+            \ until it's looked up, shortly after, or when it can't be."
+          example: FR
+          nullable: true
+          type: string
+        latitude:
+          description: "Approximate latitude of the IP address the license was last\
+            \ successfully validated from on the machine. `null` until it's looked\
+            \ up, shortly after, or when it can't be."
+          example: 48.8566
+          nullable: true
+          type: number
+        longitude:
+          description: "Approximate longitude of the IP address the license was last\
+            \ successfully validated from on the machine. `null` until it's looked\
+            \ up, shortly after, or when it can't be."
+          example: 2.3522
+          nullable: true
+          type: number
         createdAt:
           example: 2026-01-15T09:30:00.000Z
           format: date-time
@@ -9281,11 +9727,14 @@ components:
           format: date-time
           type: string
       required:
+      - country
       - createdAt
       - fingerprint
       - id
       - lastValidatedAt
+      - latitude
       - licenseId
+      - longitude
       - name
       - overriddenByMachineId
       - platform
@@ -9624,6 +10073,9 @@ components:
             name: Jane Doe
             email: jane@licensemanager.dev
             image: https://example.com/jane.png
+          country: FR
+          latitude: 48.8566
+          longitude: 2.3522
         - id: e6Pw2JcXa
           type: license.validated
           createdAt: 2026-01-15T09:30:00.000Z
@@ -9643,6 +10095,9 @@ components:
             name: Jane Doe
             email: jane@licensemanager.dev
             image: https://example.com/jane.png
+          country: FR
+          latitude: 48.8566
+          longitude: 2.3522
         pagination:
           page: 1
           pageSize: 20
@@ -9682,6 +10137,9 @@ components:
           name: Jane Doe
           email: jane@licensemanager.dev
           image: https://example.com/jane.png
+        country: FR
+        latitude: 48.8566
+        longitude: 2.3522
       properties:
         id:
           example: e6Pw2JcXa
@@ -9716,11 +10174,36 @@ components:
           $ref: "#/components/schemas/EventMachine"
         actor:
           $ref: "#/components/schemas/EventActor"
+        country:
+          description: "ISO 3166-1 alpha-2 code of the country of the IP address the\
+            \ request came from, for `license.validated` and `license.validation_failed`\
+            \ events. `null` until it's looked up, shortly after, or when it can't\
+            \ be."
+          example: FR
+          nullable: true
+          type: string
+        latitude:
+          description: "Approximate latitude of the IP address the request came from,\
+            \ for `license.validated` and `license.validation_failed` events. `null`\
+            \ until it's looked up, shortly after, or when it can't be."
+          example: 48.8566
+          nullable: true
+          type: number
+        longitude:
+          description: "Approximate longitude of the IP address the request came from,\
+            \ for `license.validated` and `license.validation_failed` events. `null`\
+            \ until it's looked up, shortly after, or when it can't be."
+          example: 2.3522
+          nullable: true
+          type: number
       required:
       - actor
+      - country
       - createdAt
       - id
+      - latitude
       - licenseId
+      - longitude
       - machine
       - machineId
       - payload
@@ -11028,6 +11511,24 @@ components:
       required:
       - count
       - platform
+    ProductStats_activeMachinesByCountry_inner:
+      example:
+        country: FR
+        count: 42
+      properties:
+        country:
+          description: ISO 3166-1 alpha-2 code of the country the machine was last
+            successfully validated from. `null` for the machines it couldn't be located
+            for.
+          example: FR
+          nullable: true
+          type: string
+        count:
+          example: 42
+          type: integer
+      required:
+      - count
+      - country
     CancellationStats_byReason_inner:
       properties:
         reason:
@@ -11095,6 +11596,23 @@ components:
 
         Bug fixes are never locked: a hard-coded version has no patch number, like `"2.3.1"`, and a lock only locks major and minor versions.
       nullable: true
+    ImportLicenseResult_error:
+      description: "Why it wasn't imported. `key_taken` when skipped. `policy_not_found`,\
+        \ `validation_error`, `integration_not_connected`, `integration_error`, `subscription_not_found`,\
+        \ `subscription_not_mapped` or `subscription_taken` when failed."
+      example:
+        code: code
+        message: message
+      nullable: true
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      type: object
     LicenseStats_activationsByMachine_inner:
       example:
         machineId: m5Tq9HsJ

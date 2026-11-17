@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.4.1 (2026-11-17)
+
+### Changes
+
+- `GET /v1/licenses/{id}/events`: added the required property `data/items/country` to the response with the `200` status
+- `GET /v1/licenses/{id}/events`: added the required property `data/items/latitude` to the response with the `200` status
+- `GET /v1/licenses/{id}/events`: added the required property `data/items/longitude` to the response with the `200` status
+- `GET /v1/licenses/{licenseId}/machines`: added the required property `data/items/country` to the response with the `200` status
+- `GET /v1/licenses/{licenseId}/machines`: added the required property `data/items/latitude` to the response with the `200` status
+- `GET /v1/licenses/{licenseId}/machines`: added the required property `data/items/longitude` to the response with the `200` status
+- `GET /v1/machines/{id}`: added the required property `country` to the response with the `200` status
+- `GET /v1/machines/{id}`: added the required property `latitude` to the response with the `200` status
+- `GET /v1/machines/{id}`: added the required property `longitude` to the response with the `200` status
+- `POST /v1/machines/{id}/deactivate`: added the required property `country` to the response with the `200` status
+- `POST /v1/machines/{id}/deactivate`: added the required property `latitude` to the response with the `200` status
+- `POST /v1/machines/{id}/deactivate`: added the required property `longitude` to the response with the `200` status
+- `GET /v1/policies/{id}/events`: added the required property `data/items/country` to the response with the `200` status
+- `GET /v1/policies/{id}/events`: added the required property `data/items/latitude` to the response with the `200` status
+- `GET /v1/policies/{id}/events`: added the required property `data/items/longitude` to the response with the `200` status
+- `GET /v1/products/{id}/stats`: added the required property `activeMachinesByCountry` to the response with the `200` status
+- `POST /v1/products/{productId}/licenses/import`: endpoint added
+
 ## 0.4.0 (2026-11-13)
 
 ### Breaking changes

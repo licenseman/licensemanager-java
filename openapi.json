@@ -1104,6 +1104,31 @@
               ]
             },
             "description": "Number of active machines on each platform, from the one with the most machines."
+          },
+          "activeMachinesByCountry": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "country": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "ISO 3166-1 alpha-2 code of the country the machine was last successfully validated from. `null` for the machines it couldn't be located for.",
+                  "example": "FR"
+                },
+                "count": {
+                  "type": "integer",
+                  "example": 42
+                }
+              },
+              "required": [
+                "country",
+                "count"
+              ]
+            },
+            "description": "Number of active machines in each country, from the one with the most machines."
           }
         },
         "required": [
@@ -1127,7 +1152,8 @@
           "revenue",
           "activationsByVersion",
           "activeMachinesByVersion",
-          "activeMachinesByPlatform"
+          "activeMachinesByPlatform",
+          "activeMachinesByCountry"
         ]
       },
       "CancellationStats": {
@@ -2637,6 +2663,218 @@
         },
         "description": "Latest version of the product the license can use. Each value left out defaults to the policy's max version: `version` to its hard-coded version, else `null`, and `lockMajorAt` and `lockMinorAt` to the creation date plus its `majorAfter` and `minorAfter` when it locks, else `null`."
       },
+      "ImportLicensesResult": {
+        "type": "object",
+        "properties": {
+          "created": {
+            "type": "integer"
+          },
+          "skipped": {
+            "type": "integer"
+          },
+          "failed": {
+            "type": "integer"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImportLicenseResult"
+            },
+            "description": "Result of each license, in the order sent."
+          }
+        },
+        "required": [
+          "created",
+          "skipped",
+          "failed",
+          "results"
+        ]
+      },
+      "ImportLicenseResult": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "description": "Position of the license in `licenses`, from 0."
+          },
+          "key": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "created",
+              "skipped",
+              "failed"
+            ],
+            "description": "`created`: imported. `skipped`: a license of the product already uses the key, like one imported before: it's left as is. `failed`: not imported, see `error`."
+          },
+          "licenseId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Id of the license created, or of the one using the key."
+          },
+          "error": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "description": "Why it wasn't imported. `key_taken` when skipped. `policy_not_found`, `validation_error`, `integration_not_connected`, `integration_error`, `subscription_not_found`, `subscription_not_mapped` or `subscription_taken` when failed."
+          }
+        },
+        "required": [
+          "index",
+          "key",
+          "status",
+          "licenseId",
+          "error"
+        ]
+      },
+      "ImportLicenses": {
+        "type": "object",
+        "properties": {
+          "licenses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImportLicense"
+            },
+            "minItems": 1,
+            "maxItems": 500,
+            "description": "Licenses to import, up to 500."
+          }
+        },
+        "required": [
+          "licenses"
+        ]
+      },
+      "ImportLicense": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 320,
+            "format": "email",
+            "description": "Email of the customer the license belongs to. The product's customer with this email, compared regardless of case, or a new one when there's none.",
+            "example": "jane@example.com"
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "description": "The license's current key, kept as is. Case sensitive. Starts with `TEST-` in test products, which is added when missing, and removed in live products.",
+            "example": "7KQ2M-X9ZPA-H4TRC-WN6EY-B3JDF"
+          },
+          "policyId": {
+            "type": "string",
+            "description": "Policy of the product the license follows. Defaults to the product's default policy.",
+            "example": "p4Rt8LmQ"
+          },
+          "expiresAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "`null` makes the license never expire. Defaults to the creation date plus the duration of the policy, or `null` when the policy has none.",
+            "example": "2027-01-15T09:30:00.000Z"
+          },
+          "meta": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {},
+            "description": "Free-form JSON object.",
+            "example": {
+              "seats": 5
+            }
+          },
+          "maxMachines": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "exclusiveMinimum": 0,
+            "maximum": 2147483647,
+            "description": "Maximum number of active machines the license can be used on. `null` for no limit. Defaults to the one of the policy.",
+            "example": 3
+          },
+          "maxOfflineDurationSeconds": {
+            "type": "integer",
+            "minimum": 3600,
+            "maximum": 2147483647,
+            "description": "Longest the applications can run offline with the license, in seconds. At least one hour (`3600`). Defaults to the one of the policy.",
+            "example": 604800
+          },
+          "price": {
+            "$ref": "#/components/schemas/PriceInput"
+          },
+          "maxVersion": {
+            "$ref": "#/components/schemas/LicenseMaxVersionInput"
+          },
+          "cancellableUntil": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "End of the money back guarantee: until then, the customer can cancel the license from the customer portal, or with a token. `null` to not let them. Defaults to the creation date plus the policy's `moneyBackGuaranteeDays`, or `null` when it has none.",
+            "example": "2026-02-14T09:30:00.000Z"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Name of the customer, given to it when it has none yet.",
+            "example": "Jane Doe"
+          },
+          "subscription": {
+            "$ref": "#/components/schemas/ImportLicenseSubscription"
+          }
+        },
+        "required": [
+          "email",
+          "key"
+        ]
+      },
+      "ImportLicenseSubscription": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "stripe",
+              "paddle"
+            ],
+            "description": "Provider of the subscription."
+          },
+          "externalId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "description": "Id of the subscription in the provider: `sub_…` in Stripe and in Paddle.",
+            "example": "sub_1MowQVLkdIwHu7ix"
+          }
+        },
+        "required": [
+          "provider",
+          "externalId"
+        ],
+        "description": "Subscription of the provider keeping the license valid, like one moved to Stripe by Lemon Squeezy's migration: its renewals then extend this license rather than creating one with a new key. Its price must be mapped to a policy of the product, which the license follows instead of `policyId`, and the license's expiration, version and money back guarantee follow the subscription like the ones it creates. Read from the provider of the product's mode, through the integration."
+      },
       "LicenseStats": {
         "type": "object",
         "properties": {
@@ -2930,6 +3168,30 @@
             "description": "When the license was last validated on the machine.",
             "example": "2026-01-15T09:30:00.000Z"
           },
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 3166-1 alpha-2 code of the country of the IP address the license was last successfully validated from on the machine. `null` until it's looked up, shortly after, or when it can't be.",
+            "example": "FR"
+          },
+          "latitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Approximate latitude of the IP address the license was last successfully validated from on the machine. `null` until it's looked up, shortly after, or when it can't be.",
+            "example": 48.8566
+          },
+          "longitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Approximate longitude of the IP address the license was last successfully validated from on the machine. `null` until it's looked up, shortly after, or when it can't be.",
+            "example": 2.3522
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time",
@@ -2951,6 +3213,9 @@
           "version",
           "overriddenByMachineId",
           "lastValidatedAt",
+          "country",
+          "latitude",
+          "longitude",
           "createdAt",
           "updatedAt"
         ]
@@ -3325,6 +3590,30 @@
           },
           "actor": {
             "$ref": "#/components/schemas/EventActor"
+          },
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 3166-1 alpha-2 code of the country of the IP address the request came from, for `license.validated` and `license.validation_failed` events. `null` until it's looked up, shortly after, or when it can't be.",
+            "example": "FR"
+          },
+          "latitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Approximate latitude of the IP address the request came from, for `license.validated` and `license.validation_failed` events. `null` until it's looked up, shortly after, or when it can't be.",
+            "example": 48.8566
+          },
+          "longitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Approximate longitude of the IP address the request came from, for `license.validated` and `license.validation_failed` events. `null` until it's looked up, shortly after, or when it can't be.",
+            "example": 2.3522
           }
         },
         "required": [
@@ -3336,7 +3625,10 @@
           "licenseId",
           "machineId",
           "machine",
-          "actor"
+          "actor",
+          "country",
+          "latitude",
+          "longitude"
         ]
       },
       "EventType": {
@@ -7649,6 +7941,112 @@
           },
           "404": {
             "description": "Customer not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation_error`: invalid path, query or body, with the `issues`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "`rate_limited`: the API key made more than 10 requests in the last second. Wait for the `Retry-After` seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/{productId}/licenses/import": {
+      "post": {
+        "tags": [
+          "Licenses"
+        ],
+        "operationId": "importLicenses",
+        "summary": "Import licenses",
+        "description": "Creates up to 500 licenses with their current keys, like when moving from another license manager or Lemon Squeezy, in one request. Each license is created like with `createLicense`, which describes the defaults, and never emails its key. The licenses are imported one by one: one that fails doesn't stop the others, and the response tells the result of each.\n\nA key already used by a license of the product is skipped, so an interrupted import can be sent again.\n\nWith a `subscription`, the license is kept valid by the Stripe or Paddle subscription, rather than one created by its next payment.\n\n**Required role permission**: `license:create` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "x-required-permissions": [
+          "license:create"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "x7Kp2QaZ"
+            },
+            "required": true,
+            "name": "productId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportLicenses"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result of each license",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportLicensesResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`unauthorized`: no credentials. `invalid_api_key`: the API key doesn't exist, was revoked or has expired. `invalid_token`: the token's signature is invalid, it has expired, or the resource it's scoped to was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "`plan_limit_exceeded`: the organization stayed over its plan's limits after the grace period, its API is blocked until it upgrades. `plan_limit_reached`: creating the resource would go over the plan's limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`token_not_allowed`: the endpoint doesn't accept tokens, or not of this type. `insufficient_scope`: the token lacks the permission. `no_active_organization` or `forbidden`: the session has no organization, or isn't a member of the one requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found",
             "content": {
               "application/json": {
                 "schema": {

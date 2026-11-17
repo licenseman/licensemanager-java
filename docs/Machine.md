@@ -16,6 +16,9 @@
 |**version** | **String** | Version of the application last validated on the machine. |  |
 |**overriddenByMachineId** | **String** | For a machine deactivated or locked by automatic machine changes, the machine that took its place. Validating the key on a deactivated machine that has one takes its place back. &#x60;null&#x60; otherwise. |  |
 |**lastValidatedAt** | **OffsetDateTime** | When the license was last validated on the machine. |  |
+|**country** | **String** | ISO 3166-1 alpha-2 code of the country of the IP address the license was last successfully validated from on the machine. &#x60;null&#x60; until it&#39;s looked up, shortly after, or when it can&#39;t be. |  |
+|**latitude** | **BigDecimal** | Approximate latitude of the IP address the license was last successfully validated from on the machine. &#x60;null&#x60; until it&#39;s looked up, shortly after, or when it can&#39;t be. |  |
+|**longitude** | **BigDecimal** | Approximate longitude of the IP address the license was last successfully validated from on the machine. &#x60;null&#x60; until it&#39;s looked up, shortly after, or when it can&#39;t be. |  |
 |**createdAt** | **OffsetDateTime** |  |  |
 |**updatedAt** | **OffsetDateTime** |  |  |
 

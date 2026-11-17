@@ -19,6 +19,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import org.junit.jupiter.api.Disabled;
@@ -108,6 +109,30 @@ public class MachineTest {
     @Test
     public void lastValidatedAtTest() {
         // TODO: test lastValidatedAt
+    }
+
+    /**
+     * Test the property 'country'
+     */
+    @Test
+    public void countryTest() {
+        // TODO: test country
+    }
+
+    /**
+     * Test the property 'latitude'
+     */
+    @Test
+    public void latitudeTest() {
+        // TODO: test latitude
+    }
+
+    /**
+     * Test the property 'longitude'
+     */
+    @Test
+    public void longitudeTest() {
+        // TODO: test longitude
     }
 
     /**

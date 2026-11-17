@@ -23,6 +23,7 @@ import dev.licensemanager.model.EventActor;
 import dev.licensemanager.model.EventMachine;
 import dev.licensemanager.model.EventType;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -101,6 +102,21 @@ public class Event {
   @SerializedName(SERIALIZED_NAME_ACTOR)
   @javax.annotation.Nullable
   private EventActor actor;
+
+  public static final String SERIALIZED_NAME_COUNTRY = "country";
+  @SerializedName(SERIALIZED_NAME_COUNTRY)
+  @javax.annotation.Nullable
+  private String country;
+
+  public static final String SERIALIZED_NAME_LATITUDE = "latitude";
+  @SerializedName(SERIALIZED_NAME_LATITUDE)
+  @javax.annotation.Nullable
+  private BigDecimal latitude;
+
+  public static final String SERIALIZED_NAME_LONGITUDE = "longitude";
+  @SerializedName(SERIALIZED_NAME_LONGITUDE)
+  @javax.annotation.Nullable
+  private BigDecimal longitude;
 
   public Event() {
   }
@@ -283,6 +299,63 @@ public class Event {
     this.actor = actor;
   }
 
+
+  public Event country(@javax.annotation.Nullable String country) {
+    this.country = country;
+    return this;
+  }
+
+  /**
+   * ISO 3166-1 alpha-2 code of the country of the IP address the request came from, for &#x60;license.validated&#x60; and &#x60;license.validation_failed&#x60; events. &#x60;null&#x60; until it&#39;s looked up, shortly after, or when it can&#39;t be.
+   * @return country
+   */
+  @javax.annotation.Nullable
+  public String getCountry() {
+    return country;
+  }
+
+  public void setCountry(@javax.annotation.Nullable String country) {
+    this.country = country;
+  }
+
+
+  public Event latitude(@javax.annotation.Nullable BigDecimal latitude) {
+    this.latitude = latitude;
+    return this;
+  }
+
+  /**
+   * Approximate latitude of the IP address the request came from, for &#x60;license.validated&#x60; and &#x60;license.validation_failed&#x60; events. &#x60;null&#x60; until it&#39;s looked up, shortly after, or when it can&#39;t be.
+   * @return latitude
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getLatitude() {
+    return latitude;
+  }
+
+  public void setLatitude(@javax.annotation.Nullable BigDecimal latitude) {
+    this.latitude = latitude;
+  }
+
+
+  public Event longitude(@javax.annotation.Nullable BigDecimal longitude) {
+    this.longitude = longitude;
+    return this;
+  }
+
+  /**
+   * Approximate longitude of the IP address the request came from, for &#x60;license.validated&#x60; and &#x60;license.validation_failed&#x60; events. &#x60;null&#x60; until it&#39;s looked up, shortly after, or when it can&#39;t be.
+   * @return longitude
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getLongitude() {
+    return longitude;
+  }
+
+  public void setLongitude(@javax.annotation.Nullable BigDecimal longitude) {
+    this.longitude = longitude;
+  }
+
   /**
    * A container for additional, undeclared properties.
    * This is a holder for any undeclared properties as specified with
@@ -346,13 +419,16 @@ public class Event {
         Objects.equals(this.licenseId, event.licenseId) &&
         Objects.equals(this.machineId, event.machineId) &&
         Objects.equals(this.machine, event.machine) &&
-        Objects.equals(this.actor, event.actor)&&
+        Objects.equals(this.actor, event.actor) &&
+        Objects.equals(this.country, event.country) &&
+        Objects.equals(this.latitude, event.latitude) &&
+        Objects.equals(this.longitude, event.longitude)&&
         Objects.equals(this.additionalProperties, event.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, type, createdAt, payload, policyId, licenseId, machineId, machine, actor, additionalProperties);
+    return Objects.hash(id, type, createdAt, payload, policyId, licenseId, machineId, machine, actor, country, latitude, longitude, additionalProperties);
   }
 
   @Override
@@ -368,6 +444,9 @@ public class Event {
     sb.append("    machineId: ").append(toIndentedString(machineId)).append("\n");
     sb.append("    machine: ").append(toIndentedString(machine)).append("\n");
     sb.append("    actor: ").append(toIndentedString(actor)).append("\n");
+    sb.append("    country: ").append(toIndentedString(country)).append("\n");
+    sb.append("    latitude: ").append(toIndentedString(latitude)).append("\n");
+    sb.append("    longitude: ").append(toIndentedString(longitude)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -387,10 +466,10 @@ public class Event {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("id", "type", "createdAt", "payload", "policyId", "licenseId", "machineId", "machine", "actor"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "type", "createdAt", "payload", "policyId", "licenseId", "machineId", "machine", "actor", "country", "latitude", "longitude"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "type", "createdAt", "payload", "policyId", "licenseId", "machineId", "machine", "actor"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "type", "createdAt", "payload", "policyId", "licenseId", "machineId", "machine", "actor", "country", "latitude", "longitude"));
   }
 
   /**
@@ -434,6 +513,9 @@ public class Event {
       if (jsonObj.get("actor") != null && !jsonObj.get("actor").isJsonNull()) {
       // validate the required field `actor`
       EventActor.validateJsonElement(jsonObj.get("actor"));
+      }
+      if ((jsonObj.get("country") != null && !jsonObj.get("country").isJsonNull()) && !jsonObj.get("country").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `country` to be a primitive type in the JSON string but got `%s`", jsonObj.get("country").toString()));
       }
   }
 

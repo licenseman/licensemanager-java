@@ -20,6 +20,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import dev.licensemanager.model.CancellationStats;
 import dev.licensemanager.model.ProductStatsActivationsByVersionInner;
+import dev.licensemanager.model.ProductStatsActiveMachinesByCountryInner;
 import dev.licensemanager.model.ProductStatsActiveMachinesByPlatformInner;
 import dev.licensemanager.model.ProductStatsActiveMachinesByVersionInner;
 import dev.licensemanager.model.ProductStatsNewLicensesByPolicyInner;
@@ -213,6 +214,14 @@ public class ProductStatsTest {
     @Test
     public void activeMachinesByPlatformTest() {
         // TODO: test activeMachinesByPlatform
+    }
+
+    /**
+     * Test the property 'activeMachinesByCountry'
+     */
+    @Test
+    public void activeMachinesByCountryTest() {
+        // TODO: test activeMachinesByCountry
     }
 
 }

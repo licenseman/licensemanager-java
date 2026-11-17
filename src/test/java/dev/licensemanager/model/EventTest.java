@@ -22,6 +22,7 @@ import dev.licensemanager.model.EventActor;
 import dev.licensemanager.model.EventMachine;
 import dev.licensemanager.model.EventType;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -113,6 +114,30 @@ public class EventTest {
     @Test
     public void actorTest() {
         // TODO: test actor
+    }
+
+    /**
+     * Test the property 'country'
+     */
+    @Test
+    public void countryTest() {
+        // TODO: test country
+    }
+
+    /**
+     * Test the property 'latitude'
+     */
+    @Test
+    public void latitudeTest() {
+        // TODO: test latitude
+    }
+
+    /**
+     * Test the property 'longitude'
+     */
+    @Test
+    public void longitudeTest() {
+        // TODO: test longitude
     }
 
 }

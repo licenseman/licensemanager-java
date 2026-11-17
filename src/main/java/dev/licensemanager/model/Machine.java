@@ -20,6 +20,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 
@@ -152,6 +153,21 @@ public class Machine {
   @SerializedName(SERIALIZED_NAME_LAST_VALIDATED_AT)
   @javax.annotation.Nullable
   private OffsetDateTime lastValidatedAt;
+
+  public static final String SERIALIZED_NAME_COUNTRY = "country";
+  @SerializedName(SERIALIZED_NAME_COUNTRY)
+  @javax.annotation.Nullable
+  private String country;
+
+  public static final String SERIALIZED_NAME_LATITUDE = "latitude";
+  @SerializedName(SERIALIZED_NAME_LATITUDE)
+  @javax.annotation.Nullable
+  private BigDecimal latitude;
+
+  public static final String SERIALIZED_NAME_LONGITUDE = "longitude";
+  @SerializedName(SERIALIZED_NAME_LONGITUDE)
+  @javax.annotation.Nullable
+  private BigDecimal longitude;
 
   public static final String SERIALIZED_NAME_CREATED_AT = "createdAt";
   @SerializedName(SERIALIZED_NAME_CREATED_AT)
@@ -337,6 +353,63 @@ public class Machine {
   }
 
 
+  public Machine country(@javax.annotation.Nullable String country) {
+    this.country = country;
+    return this;
+  }
+
+  /**
+   * ISO 3166-1 alpha-2 code of the country of the IP address the license was last successfully validated from on the machine. &#x60;null&#x60; until it&#39;s looked up, shortly after, or when it can&#39;t be.
+   * @return country
+   */
+  @javax.annotation.Nullable
+  public String getCountry() {
+    return country;
+  }
+
+  public void setCountry(@javax.annotation.Nullable String country) {
+    this.country = country;
+  }
+
+
+  public Machine latitude(@javax.annotation.Nullable BigDecimal latitude) {
+    this.latitude = latitude;
+    return this;
+  }
+
+  /**
+   * Approximate latitude of the IP address the license was last successfully validated from on the machine. &#x60;null&#x60; until it&#39;s looked up, shortly after, or when it can&#39;t be.
+   * @return latitude
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getLatitude() {
+    return latitude;
+  }
+
+  public void setLatitude(@javax.annotation.Nullable BigDecimal latitude) {
+    this.latitude = latitude;
+  }
+
+
+  public Machine longitude(@javax.annotation.Nullable BigDecimal longitude) {
+    this.longitude = longitude;
+    return this;
+  }
+
+  /**
+   * Approximate longitude of the IP address the license was last successfully validated from on the machine. &#x60;null&#x60; until it&#39;s looked up, shortly after, or when it can&#39;t be.
+   * @return longitude
+   */
+  @javax.annotation.Nullable
+  public BigDecimal getLongitude() {
+    return longitude;
+  }
+
+  public void setLongitude(@javax.annotation.Nullable BigDecimal longitude) {
+    this.longitude = longitude;
+  }
+
+
   public Machine createdAt(@javax.annotation.Nonnull OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
@@ -438,6 +511,9 @@ public class Machine {
         Objects.equals(this.version, machine.version) &&
         Objects.equals(this.overriddenByMachineId, machine.overriddenByMachineId) &&
         Objects.equals(this.lastValidatedAt, machine.lastValidatedAt) &&
+        Objects.equals(this.country, machine.country) &&
+        Objects.equals(this.latitude, machine.latitude) &&
+        Objects.equals(this.longitude, machine.longitude) &&
         Objects.equals(this.createdAt, machine.createdAt) &&
         Objects.equals(this.updatedAt, machine.updatedAt)&&
         Objects.equals(this.additionalProperties, machine.additionalProperties);
@@ -445,7 +521,7 @@ public class Machine {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, licenseId, fingerprint, platform, name, status, version, overriddenByMachineId, lastValidatedAt, createdAt, updatedAt, additionalProperties);
+    return Objects.hash(id, licenseId, fingerprint, platform, name, status, version, overriddenByMachineId, lastValidatedAt, country, latitude, longitude, createdAt, updatedAt, additionalProperties);
   }
 
   @Override
@@ -461,6 +537,9 @@ public class Machine {
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("    overriddenByMachineId: ").append(toIndentedString(overriddenByMachineId)).append("\n");
     sb.append("    lastValidatedAt: ").append(toIndentedString(lastValidatedAt)).append("\n");
+    sb.append("    country: ").append(toIndentedString(country)).append("\n");
+    sb.append("    latitude: ").append(toIndentedString(latitude)).append("\n");
+    sb.append("    longitude: ").append(toIndentedString(longitude)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
@@ -482,10 +561,10 @@ public class Machine {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("id", "licenseId", "fingerprint", "platform", "name", "status", "version", "overriddenByMachineId", "lastValidatedAt", "createdAt", "updatedAt"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "licenseId", "fingerprint", "platform", "name", "status", "version", "overriddenByMachineId", "lastValidatedAt", "country", "latitude", "longitude", "createdAt", "updatedAt"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "licenseId", "fingerprint", "platform", "name", "status", "version", "overriddenByMachineId", "lastValidatedAt", "createdAt", "updatedAt"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "licenseId", "fingerprint", "platform", "name", "status", "version", "overriddenByMachineId", "lastValidatedAt", "country", "latitude", "longitude", "createdAt", "updatedAt"));
   }
 
   /**
@@ -533,6 +612,9 @@ public class Machine {
       }
       if ((jsonObj.get("overriddenByMachineId") != null && !jsonObj.get("overriddenByMachineId").isJsonNull()) && !jsonObj.get("overriddenByMachineId").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `overriddenByMachineId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("overriddenByMachineId").toString()));
+      }
+      if ((jsonObj.get("country") != null && !jsonObj.get("country").isJsonNull()) && !jsonObj.get("country").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `country` to be a primitive type in the JSON string but got `%s`", jsonObj.get("country").toString()));
       }
   }
 

@@ -21,6 +21,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import dev.licensemanager.model.CancellationStats;
 import dev.licensemanager.model.ProductStatsActivationsByVersionInner;
+import dev.licensemanager.model.ProductStatsActiveMachinesByCountryInner;
 import dev.licensemanager.model.ProductStatsActiveMachinesByPlatformInner;
 import dev.licensemanager.model.ProductStatsActiveMachinesByVersionInner;
 import dev.licensemanager.model.ProductStatsNewLicensesByPolicyInner;
@@ -165,6 +166,11 @@ public class ProductStats {
   @SerializedName(SERIALIZED_NAME_ACTIVE_MACHINES_BY_PLATFORM)
   @javax.annotation.Nonnull
   private List<ProductStatsActiveMachinesByPlatformInner> activeMachinesByPlatform = new ArrayList<>();
+
+  public static final String SERIALIZED_NAME_ACTIVE_MACHINES_BY_COUNTRY = "activeMachinesByCountry";
+  @SerializedName(SERIALIZED_NAME_ACTIVE_MACHINES_BY_COUNTRY)
+  @javax.annotation.Nonnull
+  private List<ProductStatsActiveMachinesByCountryInner> activeMachinesByCountry = new ArrayList<>();
 
   public ProductStats() {
   }
@@ -639,6 +645,33 @@ public class ProductStats {
     this.activeMachinesByPlatform = activeMachinesByPlatform;
   }
 
+
+  public ProductStats activeMachinesByCountry(@javax.annotation.Nonnull List<ProductStatsActiveMachinesByCountryInner> activeMachinesByCountry) {
+    this.activeMachinesByCountry = activeMachinesByCountry;
+    return this;
+  }
+
+  public ProductStats addActiveMachinesByCountryItem(ProductStatsActiveMachinesByCountryInner activeMachinesByCountryItem) {
+    if (this.activeMachinesByCountry == null) {
+      this.activeMachinesByCountry = new ArrayList<>();
+    }
+    this.activeMachinesByCountry.add(activeMachinesByCountryItem);
+    return this;
+  }
+
+  /**
+   * Number of active machines in each country, from the one with the most machines.
+   * @return activeMachinesByCountry
+   */
+  @javax.annotation.Nonnull
+  public List<ProductStatsActiveMachinesByCountryInner> getActiveMachinesByCountry() {
+    return activeMachinesByCountry;
+  }
+
+  public void setActiveMachinesByCountry(@javax.annotation.Nonnull List<ProductStatsActiveMachinesByCountryInner> activeMachinesByCountry) {
+    this.activeMachinesByCountry = activeMachinesByCountry;
+  }
+
   /**
    * A container for additional, undeclared properties.
    * This is a holder for any undeclared properties as specified with
@@ -714,13 +747,14 @@ public class ProductStats {
         Objects.equals(this.revenue, productStats.revenue) &&
         Objects.equals(this.activationsByVersion, productStats.activationsByVersion) &&
         Objects.equals(this.activeMachinesByVersion, productStats.activeMachinesByVersion) &&
-        Objects.equals(this.activeMachinesByPlatform, productStats.activeMachinesByPlatform)&&
+        Objects.equals(this.activeMachinesByPlatform, productStats.activeMachinesByPlatform) &&
+        Objects.equals(this.activeMachinesByCountry, productStats.activeMachinesByCountry)&&
         Objects.equals(this.additionalProperties, productStats.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(licenseCount, activeLicenseCount, newLicenseCount, expiringLicenseCount, expiredLicenseCount, activeMachineCount, inUseLicenseCount, seatCount, usedSeatCount, fullLicenseCount, days, months, newLicensesByDay, newLicensesByMonth, newLicensesByPolicy, cancellation, subscriptions, revenue, activationsByVersion, activeMachinesByVersion, activeMachinesByPlatform, additionalProperties);
+    return Objects.hash(licenseCount, activeLicenseCount, newLicenseCount, expiringLicenseCount, expiredLicenseCount, activeMachineCount, inUseLicenseCount, seatCount, usedSeatCount, fullLicenseCount, days, months, newLicensesByDay, newLicensesByMonth, newLicensesByPolicy, cancellation, subscriptions, revenue, activationsByVersion, activeMachinesByVersion, activeMachinesByPlatform, activeMachinesByCountry, additionalProperties);
   }
 
   @Override
@@ -748,6 +782,7 @@ public class ProductStats {
     sb.append("    activationsByVersion: ").append(toIndentedString(activationsByVersion)).append("\n");
     sb.append("    activeMachinesByVersion: ").append(toIndentedString(activeMachinesByVersion)).append("\n");
     sb.append("    activeMachinesByPlatform: ").append(toIndentedString(activeMachinesByPlatform)).append("\n");
+    sb.append("    activeMachinesByCountry: ").append(toIndentedString(activeMachinesByCountry)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -767,10 +802,10 @@ public class ProductStats {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("licenseCount", "activeLicenseCount", "newLicenseCount", "expiringLicenseCount", "expiredLicenseCount", "activeMachineCount", "inUseLicenseCount", "seatCount", "usedSeatCount", "fullLicenseCount", "days", "months", "newLicensesByDay", "newLicensesByMonth", "newLicensesByPolicy", "cancellation", "subscriptions", "revenue", "activationsByVersion", "activeMachinesByVersion", "activeMachinesByPlatform"));
+    openapiFields = new HashSet<String>(Arrays.asList("licenseCount", "activeLicenseCount", "newLicenseCount", "expiringLicenseCount", "expiredLicenseCount", "activeMachineCount", "inUseLicenseCount", "seatCount", "usedSeatCount", "fullLicenseCount", "days", "months", "newLicensesByDay", "newLicensesByMonth", "newLicensesByPolicy", "cancellation", "subscriptions", "revenue", "activationsByVersion", "activeMachinesByVersion", "activeMachinesByPlatform", "activeMachinesByCountry"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("licenseCount", "activeLicenseCount", "newLicenseCount", "expiringLicenseCount", "expiredLicenseCount", "activeMachineCount", "inUseLicenseCount", "seatCount", "usedSeatCount", "fullLicenseCount", "days", "months", "newLicensesByDay", "newLicensesByMonth", "newLicensesByPolicy", "cancellation", "subscriptions", "revenue", "activationsByVersion", "activeMachinesByVersion", "activeMachinesByPlatform"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("licenseCount", "activeLicenseCount", "newLicenseCount", "expiringLicenseCount", "expiredLicenseCount", "activeMachineCount", "inUseLicenseCount", "seatCount", "usedSeatCount", "fullLicenseCount", "days", "months", "newLicensesByDay", "newLicensesByMonth", "newLicensesByPolicy", "cancellation", "subscriptions", "revenue", "activationsByVersion", "activeMachinesByVersion", "activeMachinesByPlatform", "activeMachinesByCountry"));
   }
 
   /**
@@ -873,6 +908,16 @@ public class ProductStats {
         // validate the required field `activeMachinesByPlatform` (array)
         for (int i = 0; i < jsonArrayactiveMachinesByPlatform.size(); i++) {
           ProductStatsActiveMachinesByPlatformInner.validateJsonElement(jsonArrayactiveMachinesByPlatform.get(i));
+        }
+      }
+      if (jsonObj.get("activeMachinesByCountry") != null) {
+        if (!jsonObj.get("activeMachinesByCountry").isJsonArray()) {
+          throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `activeMachinesByCountry` to be an array in the JSON string but got `%s`", jsonObj.get("activeMachinesByCountry").toString()));
+        }
+        JsonArray jsonArrayactiveMachinesByCountry = jsonObj.getAsJsonArray("activeMachinesByCountry");
+        // validate the required field `activeMachinesByCountry` (array)
+        for (int i = 0; i < jsonArrayactiveMachinesByCountry.size(); i++) {
+          ProductStatsActiveMachinesByCountryInner.validateJsonElement(jsonArrayactiveMachinesByCountry.get(i));
         }
       }
   }

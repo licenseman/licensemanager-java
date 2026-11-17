@@ -10,6 +10,7 @@ All URIs are relative to *https://api.licensemanager.dev*
 | [**getLicense**](LicensesApi.md#getLicense) | **GET** /v1/licenses/{id} | Get a license |
 | [**getLicenseStats**](LicensesApi.md#getLicenseStats) | **GET** /v1/licenses/{id}/stats | Get the stats of a license |
 | [**getSigningKey**](LicensesApi.md#getSigningKey) | **GET** /v1/signing-key | Get the organization&#39;s signing key |
+| [**importLicenses**](LicensesApi.md#importLicenses) | **POST** /v1/products/{productId}/licenses/import | Import licenses |
 | [**listCustomerLicenses**](LicensesApi.md#listCustomerLicenses) | **GET** /v1/customers/{customerId}/licenses | List the licenses of a customer |
 | [**listLicenses**](LicensesApi.md#listLicenses) | **GET** /v1/products/{productId}/licenses | List the licenses of a product |
 | [**sendLicenseKeys**](LicensesApi.md#sendLicenseKeys) | **POST** /v1/licenses/send-keys | Email license keys to their customers |
@@ -479,6 +480,84 @@ This endpoint does not need any parameter.
 | **401** | &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted |  -  |
 | **402** | &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit |  -  |
 | **403** | &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested |  -  |
+| **422** | &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; |  -  |
+| **429** | &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds |  -  |
+
+<a id="importLicenses"></a>
+# **importLicenses**
+> ImportLicensesResult importLicenses(productId, importLicenses).execute();
+
+Import licenses
+
+Creates up to 500 licenses with their current keys, like when moving from another license manager or Lemon Squeezy, in one request. Each license is created like with &#x60;createLicense&#x60;, which describes the defaults, and never emails its key. The licenses are imported one by one: one that fails doesn&#39;t stop the others, and the response tells the result of each.  A key already used by a license of the product is skipped, so an interrupted import can be sent again.  With a &#x60;subscription&#x60;, the license is kept valid by the Stripe or Paddle subscription, rather than one created by its next payment.  **Required role permission**: &#x60;license:create&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+
+### Example
+```java
+// Import classes:
+import dev.licensemanager.ApiClient;
+import dev.licensemanager.ApiException;
+import dev.licensemanager.Configuration;
+import dev.licensemanager.auth.*;
+import dev.licensemanager.models.*;
+import dev.licensemanager.api.LicensesApi;
+
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("https://api.licensemanager.dev");
+    
+    // Configure API key authorization: apiKey
+    ApiKeyAuth apiKey = (ApiKeyAuth) defaultClient.getAuthentication("apiKey");
+    apiKey.setApiKey("YOUR API KEY");
+    // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+    //apiKey.setApiKeyPrefix("Token");
+
+    LicensesApi apiInstance = new LicensesApi(defaultClient);
+    String productId = "x7Kp2QaZ"; // String | 
+    ImportLicenses importLicenses = new ImportLicenses(); // ImportLicenses | 
+    try {
+      ImportLicensesResult result = apiInstance.importLicenses(productId, importLicenses)
+            .execute();
+      System.out.println(result);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling LicensesApi#importLicenses");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
+}
+```
+
+### Parameters
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **productId** | **String**|  | |
+| **importLicenses** | [**ImportLicenses**](ImportLicenses.md)|  | |
+
+### Return type
+
+[**ImportLicensesResult**](ImportLicensesResult.md)
+
+### Authorization
+
+[apiKey](../README.md#apiKey)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | Result of each license |  -  |
+| **401** | &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted |  -  |
+| **402** | &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit |  -  |
+| **403** | &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested |  -  |
+| **404** | Product not found |  -  |
 | **422** | &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; |  -  |
 | **429** | &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds |  -  |
 

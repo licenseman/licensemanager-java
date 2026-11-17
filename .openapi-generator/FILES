@@ -43,6 +43,12 @@ docs/EventMachine.md
 docs/EventType.md
 docs/EventsApi.md
 docs/FixedMaxVersion.md
+docs/ImportLicense.md
+docs/ImportLicenseResult.md
+docs/ImportLicenseResultError.md
+docs/ImportLicenseSubscription.md
+docs/ImportLicenses.md
+docs/ImportLicensesResult.md
 docs/Integration.md
 docs/IntegrationMapping.md
 docs/IntegrationMappingRecurring.md
@@ -99,6 +105,7 @@ docs/Product.md
 docs/ProductList.md
 docs/ProductStats.md
 docs/ProductStatsActivationsByVersionInner.md
+docs/ProductStatsActiveMachinesByCountryInner.md
 docs/ProductStatsActiveMachinesByPlatformInner.md
 docs/ProductStatsActiveMachinesByVersionInner.md
 docs/ProductStatsNewLicensesByPolicyInner.md
@@ -205,6 +212,12 @@ src/main/java/dev/licensemanager/model/EventList.java
 src/main/java/dev/licensemanager/model/EventMachine.java
 src/main/java/dev/licensemanager/model/EventType.java
 src/main/java/dev/licensemanager/model/FixedMaxVersion.java
+src/main/java/dev/licensemanager/model/ImportLicense.java
+src/main/java/dev/licensemanager/model/ImportLicenseResult.java
+src/main/java/dev/licensemanager/model/ImportLicenseResultError.java
+src/main/java/dev/licensemanager/model/ImportLicenseSubscription.java
+src/main/java/dev/licensemanager/model/ImportLicenses.java
+src/main/java/dev/licensemanager/model/ImportLicensesResult.java
 src/main/java/dev/licensemanager/model/Integration.java
 src/main/java/dev/licensemanager/model/IntegrationMapping.java
 src/main/java/dev/licensemanager/model/IntegrationMappingRecurring.java
@@ -256,6 +269,7 @@ src/main/java/dev/licensemanager/model/Product.java
 src/main/java/dev/licensemanager/model/ProductList.java
 src/main/java/dev/licensemanager/model/ProductStats.java
 src/main/java/dev/licensemanager/model/ProductStatsActivationsByVersionInner.java
+src/main/java/dev/licensemanager/model/ProductStatsActiveMachinesByCountryInner.java
 src/main/java/dev/licensemanager/model/ProductStatsActiveMachinesByPlatformInner.java
 src/main/java/dev/licensemanager/model/ProductStatsActiveMachinesByVersionInner.java
 src/main/java/dev/licensemanager/model/ProductStatsNewLicensesByPolicyInner.java
@@ -332,6 +346,12 @@ src/test/java/dev/licensemanager/model/EventMachineTest.java
 src/test/java/dev/licensemanager/model/EventTest.java
 src/test/java/dev/licensemanager/model/EventTypeTest.java
 src/test/java/dev/licensemanager/model/FixedMaxVersionTest.java
+src/test/java/dev/licensemanager/model/ImportLicenseResultErrorTest.java
+src/test/java/dev/licensemanager/model/ImportLicenseResultTest.java
+src/test/java/dev/licensemanager/model/ImportLicenseSubscriptionTest.java
+src/test/java/dev/licensemanager/model/ImportLicenseTest.java
+src/test/java/dev/licensemanager/model/ImportLicensesResultTest.java
+src/test/java/dev/licensemanager/model/ImportLicensesTest.java
 src/test/java/dev/licensemanager/model/IntegrationMappingRecurringTest.java
 src/test/java/dev/licensemanager/model/IntegrationMappingTest.java
 src/test/java/dev/licensemanager/model/IntegrationStatusTest.java
@@ -381,6 +401,7 @@ src/test/java/dev/licensemanager/model/PriceInputTest.java
 src/test/java/dev/licensemanager/model/PriceTest.java
 src/test/java/dev/licensemanager/model/ProductListTest.java
 src/test/java/dev/licensemanager/model/ProductStatsActivationsByVersionInnerTest.java
+src/test/java/dev/licensemanager/model/ProductStatsActiveMachinesByCountryInnerTest.java
 src/test/java/dev/licensemanager/model/ProductStatsActiveMachinesByPlatformInnerTest.java
 src/test/java/dev/licensemanager/model/ProductStatsActiveMachinesByVersionInnerTest.java
 src/test/java/dev/licensemanager/model/ProductStatsNewLicensesByPolicyInnerTest.java

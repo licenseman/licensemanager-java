@@ -31,6 +31,8 @@ import java.math.BigDecimal;
 import dev.licensemanager.model.CancelLicense;
 import dev.licensemanager.model.CreateLicense;
 import dev.licensemanager.model.Error;
+import dev.licensemanager.model.ImportLicenses;
+import dev.licensemanager.model.ImportLicensesResult;
 import dev.licensemanager.model.License;
 import dev.licensemanager.model.LicenseList;
 import dev.licensemanager.model.LicenseStats;
@@ -1229,6 +1231,204 @@ public class LicensesApi {
      */
     public APIgetSigningKeyRequest getSigningKey() {
         return new APIgetSigningKeyRequest();
+    }
+    private okhttp3.Call importLicensesCall(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull ImportLicenses importLicenses, final ApiCallback _callback) throws ApiException {
+        String basePath = null;
+        // Operation Servers
+        String[] localBasePaths = new String[] {  };
+
+        // Determine Base Path to Use
+        if (localCustomBaseUrl != null){
+            basePath = localCustomBaseUrl;
+        } else if ( localBasePaths.length > 0 ) {
+            basePath = localBasePaths[localHostIndex];
+        } else {
+            basePath = null;
+        }
+
+        Object localVarPostBody = importLicenses;
+
+        // create path and map variables
+        String localVarPath = "/v1/products/{productId}/licenses/import"
+            .replace("{" + "productId" + "}", localVarApiClient.escapeString(productId.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        if (localVarContentType != null) {
+            localVarHeaderParams.put("Content-Type", localVarContentType);
+        }
+
+        String[] localVarAuthNames = new String[] { "apiKey" };
+        return localVarApiClient.buildCall(basePath, localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call importLicensesValidateBeforeCall(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull ImportLicenses importLicenses, final ApiCallback _callback) throws ApiException {
+        // verify the required parameter 'productId' is set
+        if (productId == null) {
+            throw new ApiException("Missing the required parameter 'productId' when calling importLicenses(Async)");
+        }
+
+        // verify the required parameter 'importLicenses' is set
+        if (importLicenses == null) {
+            throw new ApiException("Missing the required parameter 'importLicenses' when calling importLicenses(Async)");
+        }
+
+        return importLicensesCall(productId, importLicenses, _callback);
+
+    }
+
+
+    private ApiResponse<ImportLicensesResult> importLicensesWithHttpInfo(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull ImportLicenses importLicenses) throws ApiException {
+        okhttp3.Call localVarCall = importLicensesValidateBeforeCall(productId, importLicenses, null);
+        Type localVarReturnType = new TypeToken<ImportLicensesResult>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    private okhttp3.Call importLicensesAsync(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull ImportLicenses importLicenses, final ApiCallback<ImportLicensesResult> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = importLicensesValidateBeforeCall(productId, importLicenses, _callback);
+        Type localVarReturnType = new TypeToken<ImportLicensesResult>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+
+    public class APIimportLicensesRequest {
+        @javax.annotation.Nonnull
+        private final String productId;
+        @javax.annotation.Nonnull
+        private final ImportLicenses importLicenses;
+
+        private APIimportLicensesRequest(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull ImportLicenses importLicenses) {
+            this.productId = productId;
+            this.importLicenses = importLicenses;
+        }
+
+        /**
+         * Build call for importLicenses
+         * @param _callback ApiCallback API callback
+         * @return Call to execute
+         * @throws ApiException If fail to serialize the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Result of each license </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call buildCall(final ApiCallback _callback) throws ApiException {
+            return importLicensesCall(productId, importLicenses, _callback);
+        }
+
+        /**
+         * Execute importLicenses request
+         * @return ImportLicensesResult
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Result of each license </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public ImportLicensesResult execute() throws ApiException {
+            ApiResponse<ImportLicensesResult> localVarResp = importLicensesWithHttpInfo(productId, importLicenses);
+            return localVarResp.getData();
+        }
+
+        /**
+         * Execute importLicenses request with HTTP info returned
+         * @return ApiResponse&lt;ImportLicensesResult&gt;
+         * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Result of each license </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public ApiResponse<ImportLicensesResult> executeWithHttpInfo() throws ApiException {
+            return importLicensesWithHttpInfo(productId, importLicenses);
+        }
+
+        /**
+         * Execute importLicenses request (asynchronously)
+         * @param _callback The callback to be executed when the API call finishes
+         * @return The request call
+         * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+         * @http.response.details
+         <table border="1">
+       <caption>Response Details</caption>
+            <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+            <tr><td> 200 </td><td> Result of each license </td><td>  -  </td></tr>
+            <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+            <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+            <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+            <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+            <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+            <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+         </table>
+         */
+        public okhttp3.Call executeAsync(final ApiCallback<ImportLicensesResult> _callback) throws ApiException {
+            return importLicensesAsync(productId, importLicenses, _callback);
+        }
+    }
+
+    /**
+     * Import licenses
+     * Creates up to 500 licenses with their current keys, like when moving from another license manager or Lemon Squeezy, in one request. Each license is created like with &#x60;createLicense&#x60;, which describes the defaults, and never emails its key. The licenses are imported one by one: one that fails doesn&#39;t stop the others, and the response tells the result of each.  A key already used by a license of the product is skipped, so an interrupted import can be sent again.  With a &#x60;subscription&#x60;, the license is kept valid by the Stripe or Paddle subscription, rather than one created by its next payment.  **Required role permission**: &#x60;license:create&#x60; when called with a session, granted by the member&#39;s role. API keys aren&#39;t limited by roles.
+     * @param productId  (required)
+     * @param importLicenses  (required)
+     * @return APIimportLicensesRequest
+     * @http.response.details
+     <table border="1">
+       <caption>Response Details</caption>
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> Result of each license </td><td>  -  </td></tr>
+        <tr><td> 401 </td><td> &#x60;unauthorized&#x60;: no credentials. &#x60;invalid_api_key&#x60;: the API key doesn&#39;t exist, was revoked or has expired. &#x60;invalid_token&#x60;: the token&#39;s signature is invalid, it has expired, or the resource it&#39;s scoped to was deleted </td><td>  -  </td></tr>
+        <tr><td> 402 </td><td> &#x60;plan_limit_exceeded&#x60;: the organization stayed over its plan&#39;s limits after the grace period, its API is blocked until it upgrades. &#x60;plan_limit_reached&#x60;: creating the resource would go over the plan&#39;s limit </td><td>  -  </td></tr>
+        <tr><td> 403 </td><td> &#x60;token_not_allowed&#x60;: the endpoint doesn&#39;t accept tokens, or not of this type. &#x60;insufficient_scope&#x60;: the token lacks the permission. &#x60;no_active_organization&#x60; or &#x60;forbidden&#x60;: the session has no organization, or isn&#39;t a member of the one requested </td><td>  -  </td></tr>
+        <tr><td> 404 </td><td> Product not found </td><td>  -  </td></tr>
+        <tr><td> 422 </td><td> &#x60;validation_error&#x60;: invalid path, query or body, with the &#x60;issues&#x60; </td><td>  -  </td></tr>
+        <tr><td> 429 </td><td> &#x60;rate_limited&#x60;: the API key made more than 10 requests in the last second. Wait for the &#x60;Retry-After&#x60; seconds </td><td>  -  </td></tr>
+     </table>
+     */
+    public APIimportLicensesRequest importLicenses(@javax.annotation.Nonnull String productId, @javax.annotation.Nonnull ImportLicenses importLicenses) {
+        return new APIimportLicensesRequest(productId, importLicenses);
     }
     private okhttp3.Call listCustomerLicensesCall(@javax.annotation.Nonnull String customerId, @javax.annotation.Nullable Integer page, @javax.annotation.Nullable Integer pageSize, @javax.annotation.Nullable String sort, @javax.annotation.Nullable String search, @javax.annotation.Nullable String key, @javax.annotation.Nullable String policyId, @javax.annotation.Nullable String machineVersion, @javax.annotation.Nullable String machinePlatform, @javax.annotation.Nullable LicenseStatus status, @javax.annotation.Nullable OffsetDateTime createdFrom, @javax.annotation.Nullable OffsetDateTime createdTo, @javax.annotation.Nullable OffsetDateTime lastActivatedFrom, @javax.annotation.Nullable OffsetDateTime lastActivatedTo, @javax.annotation.Nullable String neverActivated, @javax.annotation.Nullable OffsetDateTime expiresFrom, @javax.annotation.Nullable OffsetDateTime expiresTo, @javax.annotation.Nullable String neverExpires, @javax.annotation.Nullable String currency, @javax.annotation.Nullable BigDecimal price, @javax.annotation.Nullable BigDecimal priceMin, @javax.annotation.Nullable BigDecimal priceMax, @javax.annotation.Nullable String hasPrice, final ApiCallback _callback) throws ApiException {
         String basePath = null;
