@@ -20,7 +20,9 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import dev.licensemanager.model.UpdateProductPortal;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -52,6 +54,22 @@ public class UpdateProductTest {
     @Test
     public void slugTest() {
         // TODO: test slug
+    }
+
+    /**
+     * Test the property 'websiteUrl'
+     */
+    @Test
+    public void websiteUrlTest() {
+        // TODO: test websiteUrl
+    }
+
+    /**
+     * Test the property 'downloadUrl'
+     */
+    @Test
+    public void downloadUrlTest() {
+        // TODO: test downloadUrl
     }
 
     /**

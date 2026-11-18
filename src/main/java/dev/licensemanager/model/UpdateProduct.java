@@ -21,7 +21,9 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import dev.licensemanager.model.UpdateProductPortal;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
+import org.openapitools.jackson.nullable.JsonNullable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -61,6 +63,16 @@ public class UpdateProduct {
   @SerializedName(SERIALIZED_NAME_SLUG)
   @javax.annotation.Nullable
   private String slug;
+
+  public static final String SERIALIZED_NAME_WEBSITE_URL = "websiteUrl";
+  @SerializedName(SERIALIZED_NAME_WEBSITE_URL)
+  @javax.annotation.Nullable
+  private URI websiteUrl;
+
+  public static final String SERIALIZED_NAME_DOWNLOAD_URL = "downloadUrl";
+  @SerializedName(SERIALIZED_NAME_DOWNLOAD_URL)
+  @javax.annotation.Nullable
+  private URI downloadUrl;
 
   public static final String SERIALIZED_NAME_PORTAL = "portal";
   @SerializedName(SERIALIZED_NAME_PORTAL)
@@ -110,6 +122,44 @@ public class UpdateProduct {
 
   public void setSlug(@javax.annotation.Nullable String slug) {
     this.slug = slug;
+  }
+
+
+  public UpdateProduct websiteUrl(@javax.annotation.Nullable URI websiteUrl) {
+    this.websiteUrl = websiteUrl;
+    return this;
+  }
+
+  /**
+   * The product&#39;s website, linked from the customer portal, when its URL has no allowed &#x60;return_url&#x60;, and from the emails sent to customers. &#x60;null&#x60; for no link.
+   * @return websiteUrl
+   */
+  @javax.annotation.Nullable
+  public URI getWebsiteUrl() {
+    return websiteUrl;
+  }
+
+  public void setWebsiteUrl(@javax.annotation.Nullable URI websiteUrl) {
+    this.websiteUrl = websiteUrl;
+  }
+
+
+  public UpdateProduct downloadUrl(@javax.annotation.Nullable URI downloadUrl) {
+    this.downloadUrl = downloadUrl;
+    return this;
+  }
+
+  /**
+   * Where customers download the product, linked from the email sending their license keys. &#x60;null&#x60; for no link.
+   * @return downloadUrl
+   */
+  @javax.annotation.Nullable
+  public URI getDownloadUrl() {
+    return downloadUrl;
+  }
+
+  public void setDownloadUrl(@javax.annotation.Nullable URI downloadUrl) {
+    this.downloadUrl = downloadUrl;
   }
 
 
@@ -207,14 +257,27 @@ public class UpdateProduct {
     UpdateProduct updateProduct = (UpdateProduct) o;
     return Objects.equals(this.name, updateProduct.name) &&
         Objects.equals(this.slug, updateProduct.slug) &&
+        Objects.equals(this.websiteUrl, updateProduct.websiteUrl) &&
+        Objects.equals(this.downloadUrl, updateProduct.downloadUrl) &&
         Objects.equals(this.portal, updateProduct.portal) &&
         Objects.equals(this.autoMachineChange, updateProduct.autoMachineChange)&&
         Objects.equals(this.additionalProperties, updateProduct.additionalProperties);
   }
 
+  private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
+    return a == b || (a != null && b != null && a.isPresent() && b.isPresent() && Objects.deepEquals(a.get(), b.get()));
+  }
+
   @Override
   public int hashCode() {
-    return Objects.hash(name, slug, portal, autoMachineChange, additionalProperties);
+    return Objects.hash(name, slug, websiteUrl, downloadUrl, portal, autoMachineChange, additionalProperties);
+  }
+
+  private static <T> int hashCodeNullable(JsonNullable<T> a) {
+    if (a == null) {
+      return 1;
+    }
+    return a.isPresent() ? Arrays.deepHashCode(new Object[]{a.get()}) : 31;
   }
 
   @Override
@@ -223,6 +286,8 @@ public class UpdateProduct {
     sb.append("class UpdateProduct {\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    slug: ").append(toIndentedString(slug)).append("\n");
+    sb.append("    websiteUrl: ").append(toIndentedString(websiteUrl)).append("\n");
+    sb.append("    downloadUrl: ").append(toIndentedString(downloadUrl)).append("\n");
     sb.append("    portal: ").append(toIndentedString(portal)).append("\n");
     sb.append("    autoMachineChange: ").append(toIndentedString(autoMachineChange)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
@@ -244,7 +309,7 @@ public class UpdateProduct {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("name", "slug", "portal", "autoMachineChange"));
+    openapiFields = new HashSet<String>(Arrays.asList("name", "slug", "websiteUrl", "downloadUrl", "portal", "autoMachineChange"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -268,6 +333,12 @@ public class UpdateProduct {
       }
       if ((jsonObj.get("slug") != null && !jsonObj.get("slug").isJsonNull()) && !jsonObj.get("slug").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `slug` to be a primitive type in the JSON string but got `%s`", jsonObj.get("slug").toString()));
+      }
+      if ((jsonObj.get("websiteUrl") != null && !jsonObj.get("websiteUrl").isJsonNull()) && !jsonObj.get("websiteUrl").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `websiteUrl` to be a primitive type in the JSON string but got `%s`", jsonObj.get("websiteUrl").toString()));
+      }
+      if ((jsonObj.get("downloadUrl") != null && !jsonObj.get("downloadUrl").isJsonNull()) && !jsonObj.get("downloadUrl").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `downloadUrl` to be a primitive type in the JSON string but got `%s`", jsonObj.get("downloadUrl").toString()));
       }
       // validate the optional field `portal`
       if (jsonObj.get("portal") != null && !jsonObj.get("portal").isJsonNull()) {

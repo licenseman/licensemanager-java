@@ -19,7 +19,6 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -63,14 +62,6 @@ public class UpdateProductPortalTest {
     @Test
     public void accentColorTest() {
         // TODO: test accentColor
-    }
-
-    /**
-     * Test the property 'returnUrl'
-     */
-    @Test
-    public void returnUrlTest() {
-        // TODO: test returnUrl
     }
 
     /**

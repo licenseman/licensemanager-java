@@ -262,7 +262,7 @@
               "string",
               "null"
             ],
-            "description": "Link back to the product's website: the requested `returnUrl` when its domain is allowed, the product's default return link otherwise. `null` for no link.",
+            "description": "Link back to the product's website: the requested `returnUrl` when its domain is allowed, the product's website otherwise. `null` for no link.",
             "example": "https://example.com/account"
           }
         },
@@ -370,6 +370,26 @@
             "description": "Public URL of the product's logo, shown in the web app and the customer portal. `null` without a logo.",
             "example": "https://cdn.example.com/logos/x7Kp2QaZ/k3f9a2LpQ7xw.webp"
           },
+          "websiteUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000,
+            "format": "uri",
+            "description": "The product's website, linked from the customer portal, when its URL has no allowed `return_url`, and from the emails sent to customers. `null` for no link.",
+            "example": "https://example.com"
+          },
+          "downloadUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000,
+            "format": "uri",
+            "description": "Where customers download the product, linked from the email sending their license keys. `null` for no link.",
+            "example": "https://example.com/download"
+          },
           "portal": {
             "$ref": "#/components/schemas/PortalSettings"
           },
@@ -395,6 +415,8 @@
           "name",
           "isTestFromProductId",
           "logoUrl",
+          "websiteUrl",
+          "downloadUrl",
           "portal",
           "autoMachineChange",
           "createdAt",
@@ -427,16 +449,6 @@
             "description": "Color of the portal's inputs and buttons, as `#rrggbb`, stored lower cased. `null` for the default color.",
             "example": "#2563eb"
           },
-          "returnUrl": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "maxLength": 2000,
-            "format": "uri",
-            "description": "Link back to your website shown in the portal, when the portal's URL has no allowed `return_url`. `null` for no link.",
-            "example": "https://example.com/account"
-          },
           "returnDomains": {
             "type": "array",
             "items": {
@@ -445,7 +457,7 @@
               "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$"
             },
             "maxItems": 20,
-            "description": "Domains the portal's `return_url` query parameter may point to, their subdomains included. Other return URLs are ignored, in favor of `returnUrl`.",
+            "description": "Domains the portal's `return_url` query parameter may point to, their subdomains included. Other return URLs are ignored, in favor of the product's `websiteUrl`.",
             "example": [
               "example.com"
             ]
@@ -455,7 +467,6 @@
           "enabled",
           "brandColor",
           "accentColor",
-          "returnUrl",
           "returnDomains"
         ]
       },
@@ -504,7 +515,7 @@
               },
               "isTestFromProductId": {
                 "type": "string",
-                "description": "Creates a test product: a sandbox of this live product of the organization, starting with copies of its policies, releases, portal settings and `autoMachineChange`.",
+                "description": "Creates a test product: a sandbox of this live product of the organization, starting with copies of its policies, releases, `websiteUrl`, `downloadUrl`, portal settings and `autoMachineChange`.",
                 "example": "x7Kp2QaZ"
               }
             }
@@ -785,6 +796,26 @@
             "description": "Unique within the organization. Defaults to the name, lower cased, without accents and special characters. Starts with `test_` in test products, which is added when missing, and removed in live products.",
             "example": "acme-pro"
           },
+          "websiteUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000,
+            "format": "uri",
+            "description": "The product's website, linked from the customer portal, when its URL has no allowed `return_url`, and from the emails sent to customers. `null` for no link.",
+            "example": "https://example.com"
+          },
+          "downloadUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000,
+            "format": "uri",
+            "description": "Where customers download the product, linked from the email sending their license keys. `null` for no link.",
+            "example": "https://example.com/download"
+          },
           "portal": {
             "type": "object",
             "properties": {
@@ -811,16 +842,6 @@
                 "description": "Color of the portal's inputs and buttons, as `#rrggbb`, stored lower cased. `null` for the default color.",
                 "example": "#2563eb"
               },
-              "returnUrl": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "maxLength": 2000,
-                "format": "uri",
-                "description": "Link back to your website shown in the portal, when the portal's URL has no allowed `return_url`. `null` for no link.",
-                "example": "https://example.com/account"
-              },
               "returnDomains": {
                 "type": "array",
                 "items": {
@@ -829,7 +850,7 @@
                   "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$"
                 },
                 "maxItems": 20,
-                "description": "Domains the portal's `return_url` query parameter may point to, their subdomains included. Other return URLs are ignored, in favor of `returnUrl`.",
+                "description": "Domains the portal's `return_url` query parameter may point to, their subdomains included. Other return URLs are ignored, in favor of the product's `websiteUrl`.",
                 "example": [
                   "example.com"
                 ]
@@ -5008,7 +5029,7 @@
         ],
         "operationId": "createProduct",
         "summary": "Create a product",
-        "description": "Without a `slug`, the product gets one derived from its name: lower cased, without accents and special characters (`Élan Pro 2!` becomes `elan-pro-2`).\nWhen another product of the organization already uses it, a dash and 3 random lowercase letters or digits are appended (`elan-pro-2-k3f`), until the slug is free.\n\nAn explicit `slug` is used as is: the request fails with a `409` when it's taken, it's never changed.\n\nSlug uniqueness is enforced by the database, so when concurrent requests end up with the same slug, only one succeeds and the others get a `409`, even without an explicit `slug`. Retrying such a request without a `slug` derives a new one.\n\nThe product is created with its default policy, named `Default policy` with the `default` slug, whose settings are given by `defaultPolicy`. Omitted settings default to licenses that never expire, on a single machine, offline for one week, for every version of the product. Unlike `createPolicy`, where `maxMachines` defaults to no limit.\n\nWith `isTestFromProductId`, the product is a test product: its id, its slug, and the ids, slugs and license keys of its resources start with `test_` (`TEST-` for license keys), and only test API keys reach it. It starts with copies of the policies, releases, portal settings and `autoMachineChange` of the live product, `defaultPolicy` is ignored. Later changes to the live product aren't copied: reset the test product to copy them again. Test API keys can only create test products, live API keys only live ones.\n\n**Required role permission**: `product:create` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "description": "Without a `slug`, the product gets one derived from its name: lower cased, without accents and special characters (`Élan Pro 2!` becomes `elan-pro-2`).\nWhen another product of the organization already uses it, a dash and 3 random lowercase letters or digits are appended (`elan-pro-2-k3f`), until the slug is free.\n\nAn explicit `slug` is used as is: the request fails with a `409` when it's taken, it's never changed.\n\nSlug uniqueness is enforced by the database, so when concurrent requests end up with the same slug, only one succeeds and the others get a `409`, even without an explicit `slug`. Retrying such a request without a `slug` derives a new one.\n\nThe product is created with its default policy, named `Default policy` with the `default` slug, whose settings are given by `defaultPolicy`. Omitted settings default to licenses that never expire, on a single machine, offline for one week, for every version of the product. Unlike `createPolicy`, where `maxMachines` defaults to no limit.\n\nWith `isTestFromProductId`, the product is a test product: its id, its slug, and the ids, slugs and license keys of its resources start with `test_` (`TEST-` for license keys), and only test API keys reach it. It starts with copies of the policies, releases, `websiteUrl`, `downloadUrl`, portal settings and `autoMachineChange` of the live product, `defaultPolicy` is ignored. Later changes to the live product aren't copied: reset the test product to copy them again. Test API keys can only create test products, live API keys only live ones.\n\n**Required role permission**: `product:create` when called with a session, granted by the member's role. API keys aren't limited by roles.",
         "x-required-permissions": [
           "product:create"
         ],
@@ -5416,7 +5437,7 @@
         ],
         "operationId": "resetProduct",
         "summary": "Reset a test product",
-        "description": "Deletes the customers, licenses, machines, policies and releases of the test product, with their events, then copies the policies, releases, portal settings and `autoMachineChange` of its live product again. Its id, name and slug are kept, but the copied policies get new ids. The tokens of its customers, licenses and machines stop working.\n\n**Required role permission**: `product:update` when called with a session, granted by the member's role. API keys aren't limited by roles.",
+        "description": "Deletes the customers, licenses, machines, policies and releases of the test product, with their events, then copies the policies, releases, `websiteUrl`, `downloadUrl`, portal settings and `autoMachineChange` of its live product again. Its id, name and slug are kept, but the copied policies get new ids. The tokens of its customers, licenses and machines stop working.\n\n**Required role permission**: `product:update` when called with a session, granted by the member's role. API keys aren't limited by roles.",
         "x-required-permissions": [
           "product:update"
         ],

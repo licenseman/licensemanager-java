@@ -20,7 +20,6 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -69,11 +68,6 @@ public class UpdateProductPortal {
   @SerializedName(SERIALIZED_NAME_ACCENT_COLOR)
   @javax.annotation.Nullable
   private String accentColor;
-
-  public static final String SERIALIZED_NAME_RETURN_URL = "returnUrl";
-  @SerializedName(SERIALIZED_NAME_RETURN_URL)
-  @javax.annotation.Nullable
-  private URI returnUrl;
 
   public static final String SERIALIZED_NAME_RETURN_DOMAINS = "returnDomains";
   @SerializedName(SERIALIZED_NAME_RETURN_DOMAINS)
@@ -140,25 +134,6 @@ public class UpdateProductPortal {
   }
 
 
-  public UpdateProductPortal returnUrl(@javax.annotation.Nullable URI returnUrl) {
-    this.returnUrl = returnUrl;
-    return this;
-  }
-
-  /**
-   * Link back to your website shown in the portal, when the portal&#39;s URL has no allowed &#x60;return_url&#x60;. &#x60;null&#x60; for no link.
-   * @return returnUrl
-   */
-  @javax.annotation.Nullable
-  public URI getReturnUrl() {
-    return returnUrl;
-  }
-
-  public void setReturnUrl(@javax.annotation.Nullable URI returnUrl) {
-    this.returnUrl = returnUrl;
-  }
-
-
   public UpdateProductPortal returnDomains(@javax.annotation.Nullable List<String> returnDomains) {
     this.returnDomains = returnDomains;
     return this;
@@ -173,7 +148,7 @@ public class UpdateProductPortal {
   }
 
   /**
-   * Domains the portal&#39;s &#x60;return_url&#x60; query parameter may point to, their subdomains included. Other return URLs are ignored, in favor of &#x60;returnUrl&#x60;.
+   * Domains the portal&#39;s &#x60;return_url&#x60; query parameter may point to, their subdomains included. Other return URLs are ignored, in favor of the product&#39;s &#x60;websiteUrl&#x60;.
    * @return returnDomains
    */
   @javax.annotation.Nullable
@@ -243,7 +218,6 @@ public class UpdateProductPortal {
     return Objects.equals(this.enabled, updateProductPortal.enabled) &&
         Objects.equals(this.brandColor, updateProductPortal.brandColor) &&
         Objects.equals(this.accentColor, updateProductPortal.accentColor) &&
-        Objects.equals(this.returnUrl, updateProductPortal.returnUrl) &&
         Objects.equals(this.returnDomains, updateProductPortal.returnDomains)&&
         Objects.equals(this.additionalProperties, updateProductPortal.additionalProperties);
   }
@@ -254,7 +228,7 @@ public class UpdateProductPortal {
 
   @Override
   public int hashCode() {
-    return Objects.hash(enabled, brandColor, accentColor, returnUrl, returnDomains, additionalProperties);
+    return Objects.hash(enabled, brandColor, accentColor, returnDomains, additionalProperties);
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -271,7 +245,6 @@ public class UpdateProductPortal {
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    brandColor: ").append(toIndentedString(brandColor)).append("\n");
     sb.append("    accentColor: ").append(toIndentedString(accentColor)).append("\n");
-    sb.append("    returnUrl: ").append(toIndentedString(returnUrl)).append("\n");
     sb.append("    returnDomains: ").append(toIndentedString(returnDomains)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
@@ -292,7 +265,7 @@ public class UpdateProductPortal {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("enabled", "brandColor", "accentColor", "returnUrl", "returnDomains"));
+    openapiFields = new HashSet<String>(Arrays.asList("enabled", "brandColor", "accentColor", "returnDomains"));
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>(0);
@@ -316,9 +289,6 @@ public class UpdateProductPortal {
       }
       if ((jsonObj.get("accentColor") != null && !jsonObj.get("accentColor").isJsonNull()) && !jsonObj.get("accentColor").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `accentColor` to be a primitive type in the JSON string but got `%s`", jsonObj.get("accentColor").toString()));
-      }
-      if ((jsonObj.get("returnUrl") != null && !jsonObj.get("returnUrl").isJsonNull()) && !jsonObj.get("returnUrl").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `returnUrl` to be a primitive type in the JSON string but got `%s`", jsonObj.get("returnUrl").toString()));
       }
       // ensure the optional json data is an array if present
       if (jsonObj.get("returnDomains") != null && !jsonObj.get("returnDomains").isJsonNull() && !jsonObj.get("returnDomains").isJsonArray()) {

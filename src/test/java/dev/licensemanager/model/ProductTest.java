@@ -81,6 +81,22 @@ public class ProductTest {
     }
 
     /**
+     * Test the property 'websiteUrl'
+     */
+    @Test
+    public void websiteUrlTest() {
+        // TODO: test websiteUrl
+    }
+
+    /**
+     * Test the property 'downloadUrl'
+     */
+    @Test
+    public void downloadUrlTest() {
+        // TODO: test downloadUrl
+    }
+
+    /**
      * Test the property 'portal'
      */
     @Test

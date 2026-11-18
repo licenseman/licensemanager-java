@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.5.0 (2026-11-18)
+
+### Breaking changes
+
+- `GET /v1/products`: removed the required property `data/items/portal/returnUrl` from the response with the `200` status
+- `POST /v1/products`: removed the required property `portal/returnUrl` from the response with the `201` status
+- `GET /v1/products/{id}`: removed the required property `portal/returnUrl` from the response with the `200` status
+- `PATCH /v1/products/{id}`: removed the required property `portal/returnUrl` from the response with the `200` status
+- `DELETE /v1/products/{id}/logo`: removed the required property `portal/returnUrl` from the response with the `200` status
+- `PUT /v1/products/{id}/logo`: removed the required property `portal/returnUrl` from the response with the `200` status
+- `POST /v1/products/{id}/reset`: removed the required property `portal/returnUrl` from the response with the `200` status
+
+### Potentially breaking changes
+
+- `PATCH /v1/products/{id}`: removed the request property `portal/returnUrl`
+
+### Changes
+
+- `GET /v1/products`: added the required property `data/items/downloadUrl` to the response with the `200` status
+- `GET /v1/products`: added the required property `data/items/websiteUrl` to the response with the `200` status
+- `POST /v1/products`: added the required property `downloadUrl` to the response with the `201` status
+- `POST /v1/products`: added the required property `websiteUrl` to the response with the `201` status
+- `GET /v1/products/{id}`: added the required property `downloadUrl` to the response with the `200` status
+- `GET /v1/products/{id}`: added the required property `websiteUrl` to the response with the `200` status
+- `PATCH /v1/products/{id}`: added the new optional request property `downloadUrl`
+- `PATCH /v1/products/{id}`: added the new optional request property `websiteUrl`
+- `PATCH /v1/products/{id}`: added the required property `downloadUrl` to the response with the `200` status
+- `PATCH /v1/products/{id}`: added the required property `websiteUrl` to the response with the `200` status
+- `DELETE /v1/products/{id}/logo`: added the required property `downloadUrl` to the response with the `200` status
+- `DELETE /v1/products/{id}/logo`: added the required property `websiteUrl` to the response with the `200` status
+- `PUT /v1/products/{id}/logo`: added the required property `downloadUrl` to the response with the `200` status
+- `PUT /v1/products/{id}/logo`: added the required property `websiteUrl` to the response with the `200` status
+- `POST /v1/products/{id}/reset`: added the required property `downloadUrl` to the response with the `200` status
+- `POST /v1/products/{id}/reset`: added the required property `websiteUrl` to the response with the `200` status
+
 ## 0.4.1 (2026-11-17)
 
 ### Changes

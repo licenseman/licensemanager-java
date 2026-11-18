@@ -79,6 +79,16 @@ public class Product {
   @javax.annotation.Nullable
   private URI logoUrl;
 
+  public static final String SERIALIZED_NAME_WEBSITE_URL = "websiteUrl";
+  @SerializedName(SERIALIZED_NAME_WEBSITE_URL)
+  @javax.annotation.Nullable
+  private URI websiteUrl;
+
+  public static final String SERIALIZED_NAME_DOWNLOAD_URL = "downloadUrl";
+  @SerializedName(SERIALIZED_NAME_DOWNLOAD_URL)
+  @javax.annotation.Nullable
+  private URI downloadUrl;
+
   public static final String SERIALIZED_NAME_PORTAL = "portal";
   @SerializedName(SERIALIZED_NAME_PORTAL)
   @javax.annotation.Nonnull
@@ -194,6 +204,44 @@ public class Product {
 
   public void setLogoUrl(@javax.annotation.Nullable URI logoUrl) {
     this.logoUrl = logoUrl;
+  }
+
+
+  public Product websiteUrl(@javax.annotation.Nullable URI websiteUrl) {
+    this.websiteUrl = websiteUrl;
+    return this;
+  }
+
+  /**
+   * The product&#39;s website, linked from the customer portal, when its URL has no allowed &#x60;return_url&#x60;, and from the emails sent to customers. &#x60;null&#x60; for no link.
+   * @return websiteUrl
+   */
+  @javax.annotation.Nullable
+  public URI getWebsiteUrl() {
+    return websiteUrl;
+  }
+
+  public void setWebsiteUrl(@javax.annotation.Nullable URI websiteUrl) {
+    this.websiteUrl = websiteUrl;
+  }
+
+
+  public Product downloadUrl(@javax.annotation.Nullable URI downloadUrl) {
+    this.downloadUrl = downloadUrl;
+    return this;
+  }
+
+  /**
+   * Where customers download the product, linked from the email sending their license keys. &#x60;null&#x60; for no link.
+   * @return downloadUrl
+   */
+  @javax.annotation.Nullable
+  public URI getDownloadUrl() {
+    return downloadUrl;
+  }
+
+  public void setDownloadUrl(@javax.annotation.Nullable URI downloadUrl) {
+    this.downloadUrl = downloadUrl;
   }
 
 
@@ -332,6 +380,8 @@ public class Product {
         Objects.equals(this.name, product.name) &&
         Objects.equals(this.isTestFromProductId, product.isTestFromProductId) &&
         Objects.equals(this.logoUrl, product.logoUrl) &&
+        Objects.equals(this.websiteUrl, product.websiteUrl) &&
+        Objects.equals(this.downloadUrl, product.downloadUrl) &&
         Objects.equals(this.portal, product.portal) &&
         Objects.equals(this.autoMachineChange, product.autoMachineChange) &&
         Objects.equals(this.createdAt, product.createdAt) &&
@@ -341,7 +391,7 @@ public class Product {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, slug, name, isTestFromProductId, logoUrl, portal, autoMachineChange, createdAt, updatedAt, additionalProperties);
+    return Objects.hash(id, slug, name, isTestFromProductId, logoUrl, websiteUrl, downloadUrl, portal, autoMachineChange, createdAt, updatedAt, additionalProperties);
   }
 
   @Override
@@ -353,6 +403,8 @@ public class Product {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    isTestFromProductId: ").append(toIndentedString(isTestFromProductId)).append("\n");
     sb.append("    logoUrl: ").append(toIndentedString(logoUrl)).append("\n");
+    sb.append("    websiteUrl: ").append(toIndentedString(websiteUrl)).append("\n");
+    sb.append("    downloadUrl: ").append(toIndentedString(downloadUrl)).append("\n");
     sb.append("    portal: ").append(toIndentedString(portal)).append("\n");
     sb.append("    autoMachineChange: ").append(toIndentedString(autoMachineChange)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
@@ -376,10 +428,10 @@ public class Product {
 
   static {
     // a set of all properties/fields (JSON key names)
-    openapiFields = new HashSet<String>(Arrays.asList("id", "slug", "name", "isTestFromProductId", "logoUrl", "portal", "autoMachineChange", "createdAt", "updatedAt"));
+    openapiFields = new HashSet<String>(Arrays.asList("id", "slug", "name", "isTestFromProductId", "logoUrl", "websiteUrl", "downloadUrl", "portal", "autoMachineChange", "createdAt", "updatedAt"));
 
     // a set of required properties/fields (JSON key names)
-    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "slug", "name", "isTestFromProductId", "logoUrl", "portal", "autoMachineChange", "createdAt", "updatedAt"));
+    openapiRequiredFields = new HashSet<String>(Arrays.asList("id", "slug", "name", "isTestFromProductId", "logoUrl", "websiteUrl", "downloadUrl", "portal", "autoMachineChange", "createdAt", "updatedAt"));
   }
 
   /**
@@ -416,6 +468,12 @@ public class Product {
       }
       if ((jsonObj.get("logoUrl") != null && !jsonObj.get("logoUrl").isJsonNull()) && !jsonObj.get("logoUrl").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `logoUrl` to be a primitive type in the JSON string but got `%s`", jsonObj.get("logoUrl").toString()));
+      }
+      if ((jsonObj.get("websiteUrl") != null && !jsonObj.get("websiteUrl").isJsonNull()) && !jsonObj.get("websiteUrl").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `websiteUrl` to be a primitive type in the JSON string but got `%s`", jsonObj.get("websiteUrl").toString()));
+      }
+      if ((jsonObj.get("downloadUrl") != null && !jsonObj.get("downloadUrl").isJsonNull()) && !jsonObj.get("downloadUrl").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format(java.util.Locale.ROOT, "Expected the field `downloadUrl` to be a primitive type in the JSON string but got `%s`", jsonObj.get("downloadUrl").toString()));
       }
       // validate the required field `portal`
       PortalSettings.validateJsonElement(jsonObj.get("portal"));

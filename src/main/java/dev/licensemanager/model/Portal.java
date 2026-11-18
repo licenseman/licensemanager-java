@@ -210,7 +210,7 @@ public class Portal {
   }
 
   /**
-   * Link back to the product&#39;s website: the requested &#x60;returnUrl&#x60; when its domain is allowed, the product&#39;s default return link otherwise. &#x60;null&#x60; for no link.
+   * Link back to the product&#39;s website: the requested &#x60;returnUrl&#x60; when its domain is allowed, the product&#39;s website otherwise. &#x60;null&#x60; for no link.
    * @return returnUrl
    */
   @javax.annotation.Nullable

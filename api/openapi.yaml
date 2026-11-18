@@ -356,7 +356,7 @@ paths:
 
         The product is created with its default policy, named `Default policy` with the `default` slug, whose settings are given by `defaultPolicy`. Omitted settings default to licenses that never expire, on a single machine, offline for one week, for every version of the product. Unlike `createPolicy`, where `maxMachines` defaults to no limit.
 
-        With `isTestFromProductId`, the product is a test product: its id, its slug, and the ids, slugs and license keys of its resources start with `test_` (`TEST-` for license keys), and only test API keys reach it. It starts with copies of the policies, releases, portal settings and `autoMachineChange` of the live product, `defaultPolicy` is ignored. Later changes to the live product aren't copied: reset the test product to copy them again. Test API keys can only create test products, live API keys only live ones.
+        With `isTestFromProductId`, the product is a test product: its id, its slug, and the ids, slugs and license keys of its resources start with `test_` (`TEST-` for license keys), and only test API keys reach it. It starts with copies of the policies, releases, `websiteUrl`, `downloadUrl`, portal settings and `autoMachineChange` of the live product, `defaultPolicy` is ignored. Later changes to the live product aren't copied: reset the test product to copy them again. Test API keys can only create test products, live API keys only live ones.
 
         **Required role permission**: `product:create` when called with a session, granted by the member's role. API keys aren't limited by roles.
       operationId: createProduct
@@ -677,7 +677,7 @@ paths:
   /v1/products/{id}/reset:
     post:
       description: |-
-        Deletes the customers, licenses, machines, policies and releases of the test product, with their events, then copies the policies, releases, portal settings and `autoMachineChange` of its live product again. Its id, name and slug are kept, but the copied policies get new ids. The tokens of its customers, licenses and machines stop working.
+        Deletes the customers, licenses, machines, policies and releases of the test product, with their events, then copies the policies, releases, `websiteUrl`, `downloadUrl`, portal settings and `autoMachineChange` of its live product again. Its id, name and slug are kept, but the copied policies get new ids. The tokens of its customers, licenses and machines stop working.
 
         **Required role permission**: `product:update` when called with a session, granted by the member's role. API keys aren't limited by roles.
       operationId: resetProduct
@@ -6916,8 +6916,8 @@ components:
           type: string
         returnUrl:
           description: "Link back to the product's website: the requested `returnUrl`\
-            \ when its domain is allowed, the product's default return link otherwise.\
-            \ `null` for no link."
+            \ when its domain is allowed, the product's website otherwise. `null`\
+            \ for no link."
           example: https://example.com/account
           nullable: true
           type: string
@@ -6982,11 +6982,12 @@ components:
           name: Acme Pro
           isTestFromProductId: isTestFromProductId
           logoUrl: https://cdn.example.com/logos/x7Kp2QaZ/k3f9a2LpQ7xw.webp
+          websiteUrl: https://example.com
+          downloadUrl: https://example.com/download
           portal:
             enabled: true
             brandColor: "#1e3a8a"
             accentColor: "#2563eb"
-            returnUrl: https://example.com/account
             returnDomains:
             - example.com
           autoMachineChange: true
@@ -6997,11 +6998,12 @@ components:
           name: Acme Pro
           isTestFromProductId: isTestFromProductId
           logoUrl: https://cdn.example.com/logos/x7Kp2QaZ/k3f9a2LpQ7xw.webp
+          websiteUrl: https://example.com
+          downloadUrl: https://example.com/download
           portal:
             enabled: true
             brandColor: "#1e3a8a"
             accentColor: "#2563eb"
-            returnUrl: https://example.com/account
             returnDomains:
             - example.com
           autoMachineChange: true
@@ -7032,11 +7034,12 @@ components:
         name: Acme Pro
         isTestFromProductId: isTestFromProductId
         logoUrl: https://cdn.example.com/logos/x7Kp2QaZ/k3f9a2LpQ7xw.webp
+        websiteUrl: https://example.com
+        downloadUrl: https://example.com/download
         portal:
           enabled: true
           brandColor: "#1e3a8a"
           accentColor: "#2563eb"
-          returnUrl: https://example.com/account
           returnDomains:
           - example.com
         autoMachineChange: true
@@ -7065,6 +7068,23 @@ components:
           format: uri
           nullable: true
           type: string
+        websiteUrl:
+          description: "The product's website, linked from the customer portal, when\
+            \ its URL has no allowed `return_url`, and from the emails sent to customers.\
+            \ `null` for no link."
+          example: https://example.com
+          format: uri
+          maxLength: 2000
+          nullable: true
+          type: string
+        downloadUrl:
+          description: "Where customers download the product, linked from the email\
+            \ sending their license keys. `null` for no link."
+          example: https://example.com/download
+          format: uri
+          maxLength: 2000
+          nullable: true
+          type: string
         portal:
           $ref: "#/components/schemas/PortalSettings"
         autoMachineChange:
@@ -7086,6 +7106,7 @@ components:
       required:
       - autoMachineChange
       - createdAt
+      - downloadUrl
       - id
       - isTestFromProductId
       - logoUrl
@@ -7093,12 +7114,12 @@ components:
       - portal
       - slug
       - updatedAt
+      - websiteUrl
     PortalSettings:
       example:
         enabled: true
         brandColor: "#1e3a8a"
         accentColor: "#2563eb"
-        returnUrl: https://example.com/account
         returnDomains:
         - example.com
       properties:
@@ -7121,18 +7142,10 @@ components:
           nullable: true
           pattern: "^#[0-9a-f]{6}$/i"
           type: string
-        returnUrl:
-          description: "Link back to your website shown in the portal, when the portal's\
-            \ URL has no allowed `return_url`. `null` for no link."
-          example: https://example.com/account
-          format: uri
-          maxLength: 2000
-          nullable: true
-          type: string
         returnDomains:
           description: "Domains the portal's `return_url` query parameter may point\
             \ to, their subdomains included. Other return URLs are ignored, in favor\
-            \ of `returnUrl`."
+            \ of the product's `websiteUrl`."
           example:
           - example.com
           items:
@@ -7147,7 +7160,6 @@ components:
       - brandColor
       - enabled
       - returnDomains
-      - returnUrl
     Pagination:
       description: Where the returned page stands among all the items matching the
         filters. Pages are numbered from 1.
@@ -7192,7 +7204,7 @@ components:
           isTestFromProductId:
             description: "Creates a test product: a sandbox of this live product of\
               \ the organization, starting with copies of its policies, releases,\
-              \ portal settings and `autoMachineChange`."
+              \ `websiteUrl`, `downloadUrl`, portal settings and `autoMachineChange`."
             example: x7Kp2QaZ
             type: string
       example:
@@ -7316,11 +7328,12 @@ components:
       example:
         name: Acme Pro
         slug: acme-pro
+        websiteUrl: https://example.com
+        downloadUrl: https://example.com/download
         portal:
           enabled: true
           brandColor: "#1e3a8a"
           accentColor: "#2563eb"
-          returnUrl: https://example.com/account
           returnDomains:
           - example.com
         autoMachineChange: true
@@ -7338,6 +7351,23 @@ components:
           maxLength: 100
           minLength: 1
           pattern: "^(test_)?[a-z0-9]+(-[a-z0-9]+)*$"
+          type: string
+        websiteUrl:
+          description: "The product's website, linked from the customer portal, when\
+            \ its URL has no allowed `return_url`, and from the emails sent to customers.\
+            \ `null` for no link."
+          example: https://example.com
+          format: uri
+          maxLength: 2000
+          nullable: true
+          type: string
+        downloadUrl:
+          description: "Where customers download the product, linked from the email\
+            \ sending their license keys. `null` for no link."
+          example: https://example.com/download
+          format: uri
+          maxLength: 2000
+          nullable: true
           type: string
         portal:
           $ref: "#/components/schemas/UpdateProduct_portal"
@@ -11370,7 +11400,6 @@ components:
         enabled: true
         brandColor: "#1e3a8a"
         accentColor: "#2563eb"
-        returnUrl: https://example.com/account
         returnDomains:
         - example.com
       properties:
@@ -11393,18 +11422,10 @@ components:
           nullable: true
           pattern: "^#[0-9a-f]{6}$/i"
           type: string
-        returnUrl:
-          description: "Link back to your website shown in the portal, when the portal's\
-            \ URL has no allowed `return_url`. `null` for no link."
-          example: https://example.com/account
-          format: uri
-          maxLength: 2000
-          nullable: true
-          type: string
         returnDomains:
           description: "Domains the portal's `return_url` query parameter may point\
             \ to, their subdomains included. Other return URLs are ignored, in favor\
-            \ of `returnUrl`."
+            \ of the product's `websiteUrl`."
           example:
           - example.com
           items:
