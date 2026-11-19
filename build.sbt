@@ -2,7 +2,7 @@ lazy val root = (project in file(".")).
   settings(
     organization := "dev.licensemanager",
     name := "licensemanager-java",
-    version := "0.5.0",
+    version := "1.0.0",
     scalaVersion := "2.13.6",
     scalacOptions ++= Seq("-feature"),
     compile / javacOptions ++= Seq("-Xlint:deprecation"),

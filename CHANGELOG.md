@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0 (2026-11-19)
+
+No changes.
+
 ## 0.5.0 (2026-11-18)
 
 ### Breaking changes
